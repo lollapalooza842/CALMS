@@ -1,0 +1,26 @@
+# Render blueprint: puts the CALMS back end (and the screens it serves) online.
+# Render reads this file when you choose New > Blueprint and pick this repository.
+# The database stays on Supabase. Its password is typed into Render, never into this file.
+services:
+  - type: web
+    name: calms
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false            # Render asks for it: paste the same line as in backend/.env
+      - key: SESSION_SECRET
+        generateValue: true    # Render makes a long random one
+      - key: DEV_MFA_CODE
+        value: "246810"        # the practice code; remove it for real use
+      - key: COOKIE_SECURE
+        value: "1"             # the site is https, so the sign-in cookie is sent over https only
+      - key: TZ
+        value: Asia/Manila
+      - key: NODE_VERSION
+        value: "22"
