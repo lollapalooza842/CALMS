@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Encode and Verify</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/encode-verify.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/encode-verify.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cApps">Applications</a> / <a href="#" class="px" id="cRef">APP-2026-0409</a> / Encode and verify</p><h1>Encode and verify</h1><p class="sub" id="subline">Norma Estrella &middot; SME loan &middot; APP-2026-0409</p></div>
+      <label class="proto" id="protoRole" for="role">Prototype only: view as <select id="role"><option value="v">Second user (verifier): Aurelio Soriano</option><option value="e">Encoder: Liza Mendoza</option></select></label>
+    </div>
+    <div class="strip" id="strip"></div>
+    <ul class="tabs" id="tabs" aria-label="Documents"></ul>
+    <div class="work" id="work">
+      <svg id="thread" aria-hidden="true"></svg>
+      <div class="pinwrap">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div><p id="says" role="status"></p>
+        <div class="pinboard">
+          <div class="zoom"><button type="button" id="zo" aria-label="Smaller text on the document">A&minus;</button><button type="button" id="zi" aria-label="Larger text on the document">A+</button></div>
+          <div class="docp" id="doc"></div>
+        </div>
+      </div>
+      <section class="sheet" aria-label="Encoded entries">
+        <h2 id="sTitle"></h2><p class="hint" id="hint"></p>
+        <ul class="rows" id="rows"></ul>
+        <div class="done" id="done"></div>
+      </section>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>The system checks formats, not truth. It cannot catch an error copied faithfully from the paper, which is why a second person checks every line.</span><span>Example data for a design prototype. No real borrower.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/encode-verify.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

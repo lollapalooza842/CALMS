@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Documents</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/documents.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/documents.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cApps">Applications</a> / <a href="#" class="px" id="cRef">APP-2026-0409</a> / Documents</p><h1>Documents and checklist</h1><p class="sub" id="sub"></p></div>
+      <div class="protos" id="protos">
+        <label class="proto" for="prod">Prototype only: checklist for <select id="prod"><option value="sme">SME loan</option><option value="salary">Salary loan</option></select></label>
+        <label class="proto" for="role">Prototype only: view as <select id="role"><option value="processor">Loan Processor: Liza Mendoza</option><option value="underwriter">Lead Underwriter: Antonio Reyes</option></select></label>
+      </div>
+    </div>
+    <div class="tally">
+      <div class="flip" id="flip" role="img"></div>
+      <p class="state" id="state"></p>
+      <button class="act" type="button" id="go">Send to Encode and verify</button>
+    </div>
+    <div class="work">
+      <div class="cabwrap" id="cabwrap">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div><p id="says" role="status"></p>
+        <ul class="cab" id="cab" aria-label="Required documents"></ul>
+      </div>
+      <aside class="table" aria-label="Light table">
+        <h2 id="tTitle">Light table</h2>
+        <div class="lamp" id="lamp"></div>
+        <div class="tb" id="tb"></div>
+        <dl class="meta" id="meta"></dl>
+        <ul class="vers" id="vers" aria-label="Versions"></ul>
+        <p class="hush" id="hush">Pull a paper out of the cabinet to see it here.</p>
+        <ul class="acc" id="acc" aria-label="Who has looked, this session"></ul>
+      </aside>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Accepted: PDF, JPG, PNG, up to 10 MB each. Replacing a paper keeps the old version; nothing is ever deleted.</span><span>Design prototype. Files you add stay in this browser tab and are not uploaded anywhere.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/documents.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

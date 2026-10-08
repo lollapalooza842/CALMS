@@ -1,0 +1,47 @@
+/* Layout: deliberately quiet. Left: the page's one showpiece, a brass staff badge with Kuwa on it, then how to reach you, then sign-in settings with the password form and sessions folded away. Right: one plain grid of which notices you get and by which channel, with the mandatory ones locked on, and quiet hours. */
+:root { --low: #2c5a38; --high: #8f2a22; }
+[hidden] { display: none !important; }
+.card { color-scheme: light; }
+h1 { margin: 0; font: 400 clamp(30px, 4vw, 46px)/1.05 var(--display); letter-spacing: .03em; }
+.sub { margin: 4px 0 0; font-size: 15.5px; line-height: 1.4; color: var(--text-soft); max-width: 64ch; }
+.btn { font: 400 16px/1.1 var(--display); letter-spacing: .06em; padding: 10px 12px 8px; background: #fffdf6; color: #16110c; border: 2px solid #16110c; cursor: var(--cur-pointer, pointer); min-height: 42px; } .btn.grn { background: var(--low); color: #f7e8c6; box-shadow: 0 3px 0 #16110c; } .btn.quiet { background: none; border-style: dashed; } .btn.sm { font-size: 14.5px; padding: 8px 10px 6px; min-height: 38px; }
+.btn[aria-disabled="true"] { border-style: dashed; color: #654324; background: none; box-shadow: none; cursor: not-allowed; }
+.desk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 24px; align-items: start; } .col { display: grid; gap: 18px; min-width: 0; }
+.card { background: var(--paper); color: var(--ink); border: 1px solid rgba(36,19,10,.5); box-shadow: 3px 4px 0 var(--shade); padding: 18px clamp(14px, 2vw, 22px) 20px; min-width: 0; display: grid; gap: 14px; }
+.card h2 { margin: 0; font: 400 23px/1.1 var(--display); letter-spacing: .05em; } .lead { margin: -8px 0 0; font-size: 15.5px; line-height: 1.4; color: var(--ink-soft); }
+
+/* the one showpiece: the badge */
+.badge { position: relative; margin-top: 52px; background: linear-gradient(135deg, #e9c07a, #c98f4a 55%, #a06a2c); color: #16110c; border: 3px solid #120a05; border-radius: 14px; box-shadow: inset 0 0 0 3px rgba(255,240,200,.45), 5px 6px 0 var(--shade); padding: 18px 20px 16px; display: grid; gap: 10px; }
+.badge::before { content: ""; position: absolute; left: 50%; top: -14px; width: 54px; height: 16px; margin-left: -27px; background: #24130a; border-radius: 8px; box-shadow: inset 0 0 0 3px #c98f4a; }
+#kuwa { position: absolute; right: 14px; top: -72px; width: 96px; height: 96px; background: url(../img/kuwa.png) no-repeat; background-size: 768px 768px; image-rendering: pixelated; image-rendering: crisp-edges; }
+.badge .co { font: 400 14px/1.1 var(--display); letter-spacing: .16em; } .badge h2 { margin: 0; padding-right: 100px; font: 400 clamp(26px, 3vw, 34px)/1.05 var(--display); letter-spacing: .04em; overflow-wrap: anywhere; } .badge .role { font: 400 18px/1.1 var(--display); letter-spacing: .08em; background: #24130a; color: #f3ddb0; padding: 6px 10px 4px; justify-self: start; }
+.rcd { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 14px; font-size: 15px; line-height: 1.4; } .rcd dt { font: 400 12.5px/1.8 var(--display); letter-spacing: .1em; color: #3a2413; } .rcd dd { margin: 0; font-family: var(--figure); font-weight: 700; overflow-wrap: anywhere; }
+.badge small { font-size: 14px; line-height: 1.35; color: #24130a; }
+.f { display: grid; gap: 5px; min-width: 0; } .k { font: 400 13px/1.25 var(--display); letter-spacing: .1em; color: var(--ink-soft); display: block; }
+.f input[type=text], .f input[type=tel], .f input[type=password], .f select { font: 400 17px/1.3 var(--figure); color: #16110c; background: #fffdf6; border: 2px solid #16110c; border-radius: 0; padding: 8px 10px; min-height: 44px; width: 100%; box-sizing: border-box; min-width: 0; } .f [aria-invalid="true"] { border-color: var(--high); background: #fff3ef; }
+.e { font-size: 14px; line-height: 1.35; color: var(--high); } .h { font-size: 14px; line-height: 1.35; color: var(--ink-soft); }
+.acts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+details { border-top: 1px dashed var(--ink-soft); padding-top: 10px; } details summary { cursor: var(--cur-pointer, pointer); font: 400 18px/1.3 var(--display); letter-spacing: .06em; min-height: 36px; } details > div { display: grid; gap: 12px; margin-top: 10px; }
+.rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 14.5px; } .rules li::before { content: "\25CB  "; font-family: var(--figure); } .rules li.ok { color: var(--low); } .rules li.ok::before { content: "\2713  "; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; line-height: 1.4; } .check input { width: 22px; height: 22px; flex: none; margin: 1px 0 0; accent-color: #8f2a22; }
+.sess { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; } .sess li { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: space-between; align-items: center; font-size: 15px; line-height: 1.35; border: 1px solid var(--ink-soft); padding: 8px 12px; background: rgba(255,250,232,.6); } .sess small { display: block; font-size: 13.5px; color: var(--ink-soft); }
+
+/* preferences */
+.pref { width: 100%; border-collapse: collapse; } .pref th { font: 400 13.5px/1.2 var(--display); letter-spacing: .08em; padding: 6px 6px 8px; border-bottom: 3px double var(--ink); text-align: center; color: var(--ink); } .pref th:first-child { text-align: left; }
+.pref td { padding: 9px 6px 7px; border-bottom: 1px dotted var(--ink-soft); text-align: center; vertical-align: middle; } .pref td:first-child { text-align: left; font-size: 15.5px; line-height: 1.35; } .pref td small { display: block; font-size: 13.5px; color: var(--ink-soft); }
+.pref input { width: 22px; height: 22px; margin: 0; accent-color: #8f2a22; } .pref label { display: inline-grid; place-items: center; min-width: 44px; min-height: 36px; cursor: var(--cur-pointer, pointer); } .pref .cl { display: none; }
+.lock { font: 400 12.5px/1 var(--display); letter-spacing: .08em; padding: 3px 5px 1px; border: 1.5px solid var(--high); color: var(--high); white-space: nowrap; margin-left: 6px; }
+.quiet2 { display: grid; gap: 10px; } .qrow { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 15.5px; } .qrow select { font: 400 16px/1.2 var(--figure); min-height: 42px; padding: 6px 8px; background: #fffdf6; color: #16110c; border: 2px solid #16110c; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; font-size: 14px; color: var(--text-soft); }
+.note { min-height: 24px; font-size: 16px; margin: 0; }
+@media (max-width: 1000px) { .desk { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .pref thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .pref, .pref tbody, .pref tr, .pref td { display: block; text-align: left; } .pref tr { border-bottom: 1px dotted var(--ink-soft); padding: 8px 0; display: flex; flex-wrap: wrap; gap: 2px 14px; } .pref td { border: 0; padding: 2px 0; } .pref td:first-child { flex: 1 1 100%; } .pref .cl { display: inline; font-size: 14.5px; } .pref label { display: inline-flex; gap: 6px; min-width: 0; } }
+@media (max-width: 820px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 16px; border-right: 0; border-bottom: 4px solid var(--brass); padding: 10px 16px; }
+  .brand img { width: 44px; height: 44px; } .brand span { display: none; }
+  .nav { flex-direction: row; overflow-x: auto; flex: 1 1 100%; min-width: 0; order: 3; gap: 6px; padding-bottom: 4px; }
+  .nav a { white-space: nowrap; } .nav a[aria-current="page"], .nav a:hover, .nav a[aria-current="page"]:hover { transform: translateY(4px); box-shadow: inset 0 2px 0 rgba(255,220,160,.3), inset 0 -4px 0 rgba(0,0,0,.28); }
+  .who { margin: 0 0 0 auto; border: 0; padding: 0; text-align: right; }
+}
+@media (prefers-reduced-motion: reduce) { .nav a { transition: none !important; } }

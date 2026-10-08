@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Loan Account</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/loan-account.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/loan-account.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Rodel Macaraeg</b><span>Loan Account Officer</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cL">Loan accounts</a> / <span id="cNo">LN-2026-0163</span></p><h1><span id="hName">Norma Estrella</span> <span id="st"></span></h1><p class="sub" id="subline">LN-2026-0163 &middot; SME loan &middot; &#8369; 250,000.00 over 24 months</p></div>
+      <label class="proto" id="protoScn">Prototype: see this account at another point in its life <select id="scn"><option value="A">Today: just released</option><option value="B">Month 8: paying, one late payment</option><option value="C">Month 14: two payments behind</option><option value="D">Month 24: fully paid</option></select></label>
+    </div>
+    <ul class="cnts" id="cnts" aria-label="Where the account stands"></ul>
+    <section class="linecard" aria-labelledby="lh">
+      <h2 class="sec" id="lh" style="padding:10px 14px 0;color:#16110c">The line to payoff <small style="color:#3c4a44">24 stops, one for each payment. Choose a stop to read its ticket.</small></h2>
+      <div class="scroll" tabindex="0" role="group" aria-label="Payment stops, scrolls sideways"><div class="trk" id="trk"></div></div>
+      <ul class="lg" aria-label="How to read the stops"><li><span class="stn ok"><span class="d"></span></span>paid on time</li><li><span class="stn late"><span class="d"></span></span>paid late</li><li><span class="stn miss"><span class="d"></span></span>missed</li><li><span class="stn next"><span class="d"></span></span>next due</li><li><span class="stn fut"><span class="d"></span></span>still ahead</li><li id="hint" hidden><b>Scroll sideways to see all 24 stops.</b></li></ul>
+      <div class="ticket" id="ticket" role="status"></div>
+    </section>
+    <div class="desk">
+      <div>
+        <ul class="tabs" id="tabs" aria-label="The account's records"></ul>
+        <div class="pb" id="pb"></div>
+      </div>
+      <div class="side">
+        <div class="kw"><p class="says" id="says" role="status"></p><div id="kuwa" role="img" aria-label="Kuwa the owl"></div></div>
+        <section class="card"><h2>Balance, planned and actual</h2><ul class="cleg"><li><i></i>Actual principal left</li><li><i class="a"></i>As the schedule planned</li></ul><div class="chart" id="chart"></div><p style="margin:8px 0 0;font-size:13.5px;color:var(--ink-soft)">Move over the chart to read a month. Every figure is also in the Schedule tab.</p></section>
+        <section class="card"><h2>Who to call</h2><dl class="rcd" id="ppl"></dl></section>
+        <section class="card"><h2>What CALMS has flagged</h2><ul class="flags" id="flags"></ul></section>
+      </div>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Posted payments cannot be edited or deleted. A mistake is corrected with a reversal entry that stays in the book.</span><span>Design prototype. The 3% late penalty, the payoff estimate and every payment here are examples.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/loan-account.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

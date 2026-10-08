@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Post Payment</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/post-payment.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/post-payment.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Rodel Macaraeg</b><span>Loan Account Officer</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb">The teller's cage</p><h1>Post a payment</h1><p class="sub">Ring it up once. Fix a mistake with a reversal, never an edit.</p></div>
+      <button class="btn" type="button" id="reset">Prototype only: start over</button>
+    </div>
+    <h2 class="sec">Came in, not yet posted <small>From today's bank, e-wallet and counter reports. Choose one to load it into the register.</small></h2>
+    <ul class="unm" id="unm"></ul>
+    <div class="desk">
+      <div class="col">
+        <section class="card" aria-labelledby="sl"><h2 id="sl">Deposit slip</h2><div id="slip" style="display:grid;gap:12px"></div></section>
+        <section class="reg" aria-label="The register">
+          <div class="regtop">Amount received</div>
+          <div class="regbody">
+            <div class="win" aria-hidden="true"><div class="flags" id="flags"></div></div>
+            <div class="f"><label class="k" for="amt">Amount received, in pesos <i>*</i></label><input id="amt" type="text" inputmode="decimal" autocomplete="off" aria-describedby="amth amte" aria-required="true"><span class="h" id="amth">Type what actually arrived, even if it is short or over.</span><span class="e" id="amte" role="status"></span></div>
+            <div class="quick" id="quick"></div>
+            <div id="errs" class="e" role="alert"></div>
+            <button class="hold" type="button" id="hold"><span class="fill"></span><span class="lv"><i></i></span><span><b>Pull and hold to post</b><small>Hold for a second and a half. Once posted it cannot be edited or deleted.</small></span></button>
+          </div>
+          <div class="drawer" id="drawer" aria-hidden="true"><div class="tray"><span></span><span></span><span></span><span></span><span></span></div></div>
+        </section>
+      </div>
+      <div class="col">
+        <div class="kw"><p class="says" id="says" role="status"></p><div id="kuwa" role="img" aria-label="Kuwa the owl"></div></div>
+        <section class="card" aria-labelledby="ah"><h2 id="ah">The account <small id="ahs"></small></h2><div id="acct"></div></section>
+        <section class="card" aria-labelledby="wh"><h2 id="wh">Where the money goes <small>Penalties first, then interest, then principal, oldest payment first.</small></h2><div id="pour"></div></section>
+        <div id="rct"></div>
+      </div>
+    </div>
+    <h2 class="sec" id="dbh">Today's day book <small id="dbs"></small></h2>
+    <div class="book"><div class="lh" aria-hidden="true"><span>Time</span><span>Receipt</span><span>Account</span><span class="r">Amount</span><span>Channel and reference</span><span>By</span><span>Correct it</span></div><ul class="rows" id="rows" aria-labelledby="dbh"></ul></div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Every posting and reversal is written to the audit log with your name and the time.</span><span>Design prototype. The order money is applied in, the 3% late penalty and every figure are examples to confirm with GR8.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/post-payment.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Counter-Offers</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/counter-offers.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/counter-offers.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cApps">Applications</a> / <a href="#" class="px" id="cRef">APP-2026-0409</a> / Counter-offers</p><h1>Counter-offers</h1><p class="sub" id="subline">Norma Estrella &middot; SME loan &middot; asked for &#8369; 300,000.00 over 24 months</p></div>
+      <div class="protos">
+        <div class="sim" id="sim"><span>Prototype only: the borrower</span><button type="button" id="simNo">declines</button><button type="button" id="simYes">accepts</button><button type="button" id="simReset">start over</button></div>
+        <label class="proto" id="protoRole" for="role">Prototype only: view as <select id="role"><option value="uw">Lead Underwriter: Antonio Reyes</option><option value="ag">Sales Agent: Jun Espiritu</option></select></label>
+      </div>
+    </div>
+    <section class="card strip" id="strip" aria-label="Where it stands"></section>
+    <div><span class="k" style="color:var(--text-soft);margin-bottom:6px">On the table, in the order they were made. Click a card to compare it.</span><div class="table" id="table" role="group" aria-label="Offers"></div></div>
+    <div class="duel"><section class="sh" id="shA" aria-label="What she asked for"></section><div class="ref"><div id="kuwa" role="img" aria-label="Kuwa the owl"></div><p class="says" id="says" role="status"></p></div><section class="sh b" id="shB"></section></div>
+    <section class="card" aria-label="How each loan is paid down"><h2>How each is paid down <small>outstanding balance, month by month</small></h2>
+      <div class="legend" id="legend"></div><div class="chart" id="chart"></div>
+      <div class="acts" style="margin-top:8px"><button class="btn" type="button" id="tgl" aria-expanded="false">Show the schedule as a table</button></div><div class="scroll" id="sched" hidden></div></section>
+    <div class="two">
+      <section class="card" id="move" aria-label="Next move"></section>
+      <section class="card" aria-label="Notices"><h2>Who was told <small>every offer, every answer</small></h2><ul class="log" id="log"></ul></section>
+    </div>
+    <section class="card" aria-label="Offer sheet"><h2>Offer sheet for the borrower <small>printed and carried by the sales agent</small></h2>
+      <div class="acts" style="margin-bottom:12px"><button class="btn" type="button" id="prt" aria-expanded="false">Show the sheet</button></div><div class="print" id="print" hidden></div></section>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>An offer with an answer recorded against it is sealed. It cannot be changed; a revision goes out as a new offer.</span><span>Example data, product terms and policy for a design prototype. No real borrower.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/counter-offers.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

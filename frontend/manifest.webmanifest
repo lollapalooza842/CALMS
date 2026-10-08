@@ -1,0 +1,24 @@
+{
+  "name": "CALMS — Credit Approval and Loan Management System",
+  "short_name": "CALMS",
+  "description": "GR8 Lending Company back office: applications, credit review, loan release and collections.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a0f08",
+  "theme_color": "#24130a",
+  "lang": "en",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    { "src": "assets/img/app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "My queue", "url": "./pages/my-queue.html", "icons": [{ "src": "assets/img/icons/my-queue.png", "sizes": "32x32" }] },
+    { "name": "New application", "url": "./pages/new-application.html", "icons": [{ "src": "assets/img/icons/new-application.png", "sizes": "32x32" }] },
+    { "name": "Post payment", "url": "./pages/post-payment.html", "icons": [{ "src": "assets/img/icons/post-payment.png", "sizes": "32x32" }] }
+  ]
+}

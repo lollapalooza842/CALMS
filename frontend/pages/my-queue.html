@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS My Queue</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/my-queue.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/my-queue.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+<script src="../assets/js/entrance.js"></script>
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div class="left">
+        <h1 id="hello"></h1>
+        <div class="things">
+          <div class="thing"><span class="cap">Today</span><div class="cal" id="cal"></div></div>
+          <div class="thing"><span class="cap">Waiting on you</span><div class="flip" id="fWait"></div></div>
+          <div class="thing"><span class="cap">Over 48 hours</span><div class="flip red" id="fLate"></div></div>
+          <div class="thing"><span class="cap">Oldest</span><div class="tag" id="tOld"></div></div>
+          <div class="thing"><span class="cap" id="xCap"></span><div class="slate" id="slate"></div></div>
+        </div>
+      </div>
+      <div class="right">
+        <label class="proto" for="role">Prototype only: view this page as <select id="role"></select></label>
+        <div class="win" role="img" id="win" aria-label="The town outside"><div id="w1"></div><div id="wsun"></div><div id="w2"></div><div id="w3"></div><div id="w4"></div><div id="wtint"></div><div id="wga"></div><div id="wgb"></div></div>
+        <span class="wincap" id="wincap"></span>
+      </div>
+    </div>
+    <div class="bar">
+      <h2 class="sign">Waiting on you</h2>
+      <div class="chips" id="chips" role="group" aria-label="Show"></div>
+      <div class="view" role="group" aria-label="View"><button type="button" id="vBoard">Board</button><button type="button" id="vLedger">Ledger</button></div>
+    </div>
+    <div class="work" id="work">
+      <div class="wrap" id="wrap">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+        <p id="says" role="status"></p>
+        <div class="lamp"></div>
+        <section class="board" id="board" aria-label="Notices"><ul class="grid" id="grid"></ul></section>
+        <div class="ledger" id="ledger" hidden></div>
+      </div>
+      <aside class="desk" id="deskBox" aria-label="On my desk now"><h2>On my desk now</h2><p>Drag a notice here by its top strip, or use "Take to my desk".</p><ul class="grid" id="desk"></ul></aside>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>A red pin means it has sat more than 48 hours and your supervisor has been notified. <button class="plain" type="button" id="resetOrder" hidden>Back to oldest first</button> <button class="plain" type="button" id="restore">Put everything back</button></span><span>Example data for a design prototype. No real borrowers.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/my-queue.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

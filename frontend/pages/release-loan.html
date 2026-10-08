@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Release Loan</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/release-loan.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/release-loan.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Corazon Ilagan</b><span>Disbursement Officer</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cQ">Disbursement queue</a> / <span id="cRef">APP-2026-0409</span> / Release</p><h1>Release loan</h1><p class="sub" id="subline">Norma Estrella &middot; SME loan &middot; &#8369; 250,000.00 over 24 months</p></div>
+      <button class="btn" type="button" id="reset">Prototype only: start over</button>
+    </div>
+    <section class="card strip" id="strip" aria-label="Where it stands"></section>
+    <div class="desk">
+      <div class="track">
+        <section class="step" id="s1"><span class="num">1</span><div class="card"><h2>Check who gets paid <small id="s1s"></small></h2><div class="body" id="s1b"></div></div></section>
+        <section class="step" id="s2"><span class="num">2</span><div class="card"><h2>Count it out <small id="s2s"></small></h2><div class="body" id="s2b"></div></div></section>
+        <section class="step" id="s3"><span class="num">3</span><div class="card"><h2>Turn the key <small id="s3s"></small></h2><div class="body" id="s3b"></div></div></section>
+      </div>
+      <div class="side">
+        <p class="says" id="says" role="status"></p>
+        <div class="vwrap">
+          <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+          <div class="vplate">APP-2026-0409 &middot; <span id="vamt"></span></div>
+          <div class="vault" id="vault" aria-hidden="true"><div class="frame"></div><div class="inside"><span id="vin">Paid</span></div><div class="door"><div class="wheel" id="wheel"><i></i><i></i><i></i><b></b></div></div><div class="bolt b1"></div><div class="bolt b2"></div><div class="bolt b3"></div></div>
+          <ul class="bl" id="bl" aria-label="The three bolts"></ul>
+        </div>
+        <div id="vch"></div>
+      </div>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot" id="foot"><span>Releasing money does not change the approved terms. Every release is written to the audit log with your name.</span><span>Design prototype. No real money moves, the bank is simulated, and the cut-off time and channel limits are examples.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/release-loan.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

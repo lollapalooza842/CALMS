@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Audit Log</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/audit-log.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/audit-log.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Atty. Regina Sy</b><span>Compliance Auditor</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>Audit log</h1><p class="sub">Everything anyone did in CALMS, in order. You can search, read and export it. Nobody can change or delete an entry, not even an administrator. Entries are kept for at least five years.</p></div>
+    </div>
+    <section class="seal" aria-labelledby="sh">
+      <div class="wax" id="wax" aria-hidden="true">GR8<br>Seal</div>
+      <div><h2 id="sh">The record is sealed</h2><p id="sealp" role="status"></p></div>
+      <button class="btn" type="button" id="chk">Check the seal</button>
+      <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+    </section>
+    <div class="bar" role="search" aria-label="Filter the log">
+      <label>Find <input id="q" type="search" placeholder="A name, or a record number like APP-2026-0409"></label>
+      <label>What happened <select id="kind"></select></label>
+      <label>Who <select id="who"></select></label>
+      <label>When <select id="when"><option value="0">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option></select></label>
+    </div>
+    <div class="res"><span id="cnt" role="status"></span><span class="ex"><button class="btn" type="button" id="xc">Export as spreadsheet</button><button class="btn" type="button" id="xp">Export as PDF</button></span></div>
+    <div class="book"><ul class="rows" id="rows" aria-label="Audit entries, newest first"></ul><p class="empty" id="empty" hidden></p></div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Reading and exporting this log is itself recorded.</span><span>Design prototype. People, addresses and entries are invented examples.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/audit-log.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+/* Layout: one full-viewport stage. A layered pixel town behind, the logo and a teller-window sign-in card stacked in the centre. Single committed look (sunset western), so no light/dark split. */
+@font-face { font-family: "Badhorse"; src: url(../fonts/badhorse.otf) format("opentype"); font-display: swap; }
+:root {
+  color-scheme: dark;
+  --night: #1a0f08;      /* stage ground, curtains */
+  --wood: #3f2414;       /* card frame, dark text on paper */
+  --wood-mid: #5e3a1f;   /* frame highlight, borders */
+  --brass: #c98f4a;      /* plate, rules */
+  --paper: #f3ddb0;      /* card surface, light text on dark */
+  --paper-dim: #dcbf88;  /* field wells */
+  --amber: #f0a81e;      /* focus ring */
+  --bandana: #8f2a22;    /* primary action, errors */
+  --ink: #24130a;        /* text on paper */
+  --display: "Badhorse", "Copperplate", "Rockwell", Georgia, serif;
+  --type: "Ovo", Georgia, "Times New Roman", serif;
+}
+html, body { height: 100%; }
+html, body { margin: 0; }
+body { background: var(--night); color: var(--paper); font-family: var(--type); overflow: hidden; }
+#stage { position: relative; height: 100%; overflow: hidden; background: var(--night); }
+#scene { position: absolute; overflow: hidden; }
+.ly { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 100% 100%; image-rendering: pixelated; image-rendering: crisp-edges; transform-origin: 50% 64%; will-change: transform; }
+.px { position: absolute; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+#l1 { background-image: url(../img/town/layer-1.png); }
+#l2 { background-image: url(../img/town/layer-2.png); }
+#l3 { background-image: url(../img/town/layer-3.png); }
+#l4 { background-image: url(../img/town/layer-4.png); }
+#l5 { background-image: url(../img/town/layer-5.png); }
+#glowA { background-image: url(../img/town/glow-a.png); animation: flickA 3.1s steps(1) infinite; }
+#glowB { background-image: url(../img/town/glow-b.png); animation: flickB 4.3s steps(1) infinite; }
+@keyframes flickA { 0%{opacity:1} 12%{opacity:.55} 15%{opacity:1} 48%{opacity:.7} 52%{opacity:1} 81%{opacity:.4} 84%{opacity:.95} 100%{opacity:1} }
+@keyframes flickB { 0%{opacity:.9} 22%{opacity:.5} 25%{opacity:1} 61%{opacity:.65} 66%{opacity:1} 90%{opacity:.75} 100%{opacity:.9} }
+#sun { left: 39.6%; top: 30%; width: 19.17%; height: 51.1%; background-image: url(../img/town/sun.png); background-size: 100% 100%; filter: url(#shimmer); }
+.bird { width: calc(var(--u) * 9); height: calc(var(--u) * 5); background-image: url(../img/town/birds.png); background-size: 200% 100%; animation: flap .5s steps(2) infinite, drift 38s linear infinite; }
+@keyframes flap { to { background-position: -200% 0; } }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(calc(var(--u) * 150)); } }
+#sil { left: 30%; top: 44%; width: calc(var(--u) * 26); height: calc(var(--u) * 26); background-image: url(../img/kuwa.png); background-size: 800% 800%; filter: brightness(0); opacity: 0; }
+#sign { left: 47.3%; top: 66.9%; width: calc(var(--u) * 34); height: calc(var(--u) * 20); background-image: url(../img/town/sign.png); background-size: 100% 100%; transform-origin: 50% 0; animation: swing 2.6s ease-in-out infinite alternate; }
+@keyframes swing { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+#tumble { left: -6%; top: 80%; width: calc(var(--u) * 16); height: calc(var(--u) * 16); opacity: 0; }
+#tumble i { position: absolute; inset: 0; background-image: url(../img/town/tumbleweed.png); background-size: 200% 100%; image-rendering: pixelated; animation: roll .32s steps(2) infinite, hop .9s cubic-bezier(.3,0,.7,1) infinite alternate; }
+@keyframes roll { to { background-position: -200% 0; } }
+@keyframes hop { from { transform: translateY(0); } to { transform: translateY(calc(var(--u) * -9)); } }
+.streak { height: calc(var(--u) * 1); width: calc(var(--u) * 26); background: rgba(243,221,176,.32); animation: blow linear infinite; }
+@keyframes blow { from { transform: translateX(calc(var(--u) * -60)); } to { transform: translateX(calc(var(--u) * 520)); } }
+#shade { left: 0; top: 40%; width: calc(var(--u) * 120); height: calc(var(--u) * 50); background-image: url(../img/kuwa-closeup.png); background-size: 800% 100%; background-position: calc(var(--u) * -240) 0; filter: brightness(0) blur(calc(var(--u) * 1.2)); opacity: 0; }
+.nocur, .nocur * { cursor: none !important; }
+#fake { position: absolute; left: 0; top: 0; width: 22px; height: 30px; z-index: 6; pointer-events: none; will-change: transform; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 15' shape-rendering='crispEdges'%3E%3Cpath d='M1 1v11l3-2 2 4 2-1-2-4h4z' fill='%23f3ddb0' stroke='%2324130a'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%; }
+#bits .w { position: absolute; left: 0; top: 0; width: 16px; height: 3px; background: rgba(243,221,176,.85); }
+#night { position: absolute; inset: 0; background: #150d22; opacity: 0; pointer-events: none; }
+.curt { position: absolute; top: 0; bottom: 0; width: 50.5%; background: var(--night); }
+#curtL { left: 0; } #curtR { right: 0; }
+#title { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; text-align: center; padding-inline: 16px; opacity: 0; pointer-events: none; }
+#title b { font: 400 clamp(30px, 6.4vw, 76px)/1 var(--display); letter-spacing: .04em; color: var(--paper); }
+#title i { font: 400 clamp(16px, 2.6vw, 30px)/1 var(--display); letter-spacing: .3em; color: var(--brass); font-style: normal; }
+#title hr { width: min(46vw, 420px); border: 0; border-top: 2px solid var(--brass); margin: 4px 0; }
+.spr { background-image: url(../img/kuwa.png); background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+#kuwa { position: absolute; left: 50%; top: 50%; opacity: 0; pointer-events: none; will-change: transform; }
+#kb { position: absolute; inset: 0; }
+#ke { position: absolute; inset: 0; opacity: 0; }
+#ke u { position: absolute; background: var(--amber); box-shadow: 0 0 calc(var(--k) * 4) rgba(240,168,30,.55); }
+#ke u::after { content: ""; position: absolute; left: 50%; top: 30%; width: 40%; height: 45%; background: var(--night); }
+.bar { position: absolute; left: 0; right: 0; height: 11%; background: #000; pointer-events: none; }
+#barT { top: 0; } #barB { bottom: 0; }
+#grain { position: absolute; inset: 0; background-image: url(../img/town/grain.png); background-size: 256px 256px; image-rendering: pixelated; pointer-events: none; animation: grain .5s steps(4) infinite; }
+@keyframes grain { 0%{background-position:0 0} 25%{background-position:-70px 40px} 50%{background-position:50px -90px} 75%{background-position:-120px -30px} 100%{background-position:0 0} }
+#kuwahd { position: absolute; left: 50%; top: 50%; width: 256px; height: 256px; margin: -128px 0 0 -128px; background-image: url(../img/kuwa-closeup.png); background-size: 2048px 256px; image-rendering: pixelated; opacity: 0; pointer-events: none; will-change: transform; }
+#flash { position: absolute; inset: 0; background: #fff6dc; opacity: 0; pointer-events: none; }
+#crack { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+#bits { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#bits .f { position: absolute; left: 50%; top: 55%; width: 48px; height: 24px; margin: -12px 0 0 -24px; background-image: url(../img/town/feather.png); background-size: 100% 100%; image-rendering: pixelated; }
+#bits .d { position: absolute; left: 50%; top: 55%; width: 16px; height: 16px; margin: -8px; border-radius: 50%; background: var(--paper-dim); }
+#logoWrap { position: relative; width: min(250px, 52vw, 30vh); flex: none; opacity: 0; will-change: transform; }
+#logo { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgba(26,15,8,.45)); }
+#glint { position: absolute; inset: 0; background: linear-gradient(112deg, transparent 42%, rgba(255,250,230,.9) 50%, transparent 58%) no-repeat; background-size: 260% 100%; background-position: 140% 0; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { #glowA, #glowB, .bird, #sign, #tumble i, .streak, #grain { animation: none; } #sun { filter: none; } }
+#front { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: 8px; padding-block: 16px; padding-inline: 16px; overflow-y: auto; }
+#card { box-sizing: border-box; position: relative; width: min(400px, 100%); flex: none; background: var(--paper); color: var(--ink); border: 6px solid var(--wood); outline: 2px solid var(--brass); outline-offset: -10px; padding: 22px 26px 18px; opacity: 0; box-shadow: 0 8px 0 rgba(26,15,8,.5); }
+#clerk { opacity: 0; position: absolute; right: 14px; top: -78px; width: 96px; height: 96px; background-size: 768px 768px; }
+.plate { font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1.15; letter-spacing: .04em; margin: 0 0 4px; color: var(--wood); text-wrap: balance; padding-right: 96px; }
+.sub { margin: 0 0 18px; font-size: 16px; line-height: 1.4; color: var(--wood-mid); }
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+label { font-family: var(--display); font-size: 15px; font-weight: 400; letter-spacing: .12em; color: var(--wood); }
+input { font: 400 17px/1.2 var(--type); color: var(--ink); background: var(--paper-dim); border: 0; border-bottom: 2px solid var(--wood); padding: 10px 10px 8px; width: 100%; box-sizing: border-box; border-radius: 0; }
+input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+#code { letter-spacing: .5em; font-size: 22px; text-align: center; }
+.go { font-family: var(--display); font-size: 22px; letter-spacing: .06em; width: 100%; padding: 12px; margin-top: 4px; background: var(--bandana); color: var(--paper); border: 2px solid var(--ink); cursor: var(--cur-pointer, pointer); box-shadow: 0 4px 0 var(--ink); }
+.go:hover { filter: brightness(1.1); } .go:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.go:focus-visible, .ghost:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.err { min-height: 22px; margin: 0 0 10px; font-size: 16px; color: var(--bandana); }
+.fine { margin: 14px 0 0; font-size: 14px; line-height: 1.45; color: var(--wood-mid); }
+.link { background: none; border: 0; padding: 0; font: inherit; color: var(--wood); text-decoration: underline; cursor: var(--cur-pointer, pointer); }
+.stamp { display: inline-block; font-family: var(--display); font-size: 26px; letter-spacing: .08em; color: var(--bandana); border: 3px solid var(--bandana); padding: 4px 12px; transform: rotate(-4deg); margin: 6px 0 12px; }
+.ghost { z-index: 5; position: absolute; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); font: 400 15px/1 var(--display); letter-spacing: .1em; color: var(--paper); background: rgba(26,15,8,.7); border: 1px solid var(--brass); padding: 10px 14px; cursor: var(--cur-pointer, pointer); }
+
+/* "Install CALMS": only appears in a browser that offers to install the app (assets/js/app.js) */
+#install { right: auto; left: 16px; }

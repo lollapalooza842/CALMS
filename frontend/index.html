@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Sign-In</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/img/icons/sign-in.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/theme-ui.css">
+<link rel="stylesheet" href="assets/css/index.css">
+<link rel="stylesheet" href="assets/css/entrance.css">
+<script src="assets/js/entrance.js"></script>
+<link rel="stylesheet" href="assets/css/icons.css">
+</head>
+<body>
+<div id="stage">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="shimmer" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.001 0.09" numOctaves="1" seed="3"><animate attributeName="baseFrequency" dur="5s" values="0.001 0.09;0.001 0.14;0.001 0.09" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+  <div id="scene">
+    <div class="ly" id="l1"><div class="px" id="sun"></div>
+      <div class="px bird" style="left:8%;top:20%"></div><div class="px bird" style="left:14%;top:26%;animation-delay:-.2s,-6s"></div><div class="px bird" style="left:-6%;top:16%;animation-delay:-.35s,-2s"></div>
+      <div class="px" id="sil"></div></div>
+    <div class="ly" id="l2"></div><div class="ly" id="l3"></div>
+    <div class="ly" id="l4"><div class="px" id="shade"></div><div class="px" id="sign"></div><div class="px" id="tumble"><i></i></div>
+      <div class="px streak" style="top:84%;animation-duration:5.5s"></div><div class="px streak" style="top:90%;animation-duration:7.5s;animation-delay:-3s"></div><div class="px streak" style="top:80%;animation-duration:9s;animation-delay:-6s;opacity:.6"></div></div>
+    <div id="night"></div>
+    <div class="ly" id="l4g"><div class="ly" id="glowA"></div><div class="ly" id="glowB"></div></div>
+    <div class="ly" id="l5"></div>
+  </div>
+  <div class="curt" id="curtL"></div><div class="curt" id="curtR"></div>
+  <div id="title" aria-hidden="true"><b>GR8 Lending Company</b><hr><i>presents</i></div>
+  <div id="kuwa" aria-hidden="true"><div class="spr" id="kb"></div><div id="ke"><u></u><u></u></div></div>
+  <div class="bar" id="barT"></div><div class="bar" id="barB"></div>
+  <div id="grain"></div>
+  <div id="kuwahd" aria-hidden="true"></div>
+  <svg id="crack" aria-hidden="true"></svg>
+  <div id="bits"></div>
+  <div id="flash"></div>
+  <div id="front">
+    <div id="logoWrap"><img id="logo" alt="CALMS, Credit Approval and Loan Management System" src="assets/img/logo-large.webp"><div id="glint"></div></div>
+    <div id="card">
+      <div class="spr" id="clerk" role="img" aria-label="Kuwa the owl, watching"></div>
+      <form id="step1" novalidate>
+        <h1 class="plate">Staff Sign-In</h1>
+        <p class="sub">GR8 Lending Company personnel only.</p>
+        <div class="field"><label for="user">Username</label><input id="user" name="user" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+        <div class="field"><label for="pass">Password</label><input id="pass" name="pass" type="password" autocomplete="current-password"></div>
+        <p class="err" id="err1" role="alert"></p>
+        <button class="go" type="submit">Sign in</button>
+        <p class="fine">Five wrong attempts lock the account. Sessions close after 15 minutes without activity.</p>
+      </form>
+      <form id="step2" novalidate hidden>
+        <h1 class="plate">Verify it's you</h1>
+        <p class="sub">Enter the 6-digit code from your authenticator.</p>
+        <div class="field"><label for="code">Verification code</label><input id="code" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+        <p class="err" id="err2" role="alert"></p>
+        <button class="go" type="submit">Verify</button>
+        <p class="fine"><button class="link" type="button" id="back">Use a different account</button></p>
+      </form>
+      <div id="step3" hidden>
+        <h1 class="plate">Signed in</h1>
+        <div class="stamp">Admitted</div>
+        <p class="sub" id="welcome"></p>
+        <p class="fine">This is a design prototype. Nothing was sent or saved, and any username, password and code are accepted. <button class="link" type="button" id="again">Sign out</button></p>
+      </div>
+    </div>
+    </div>
+  <div id="fake" hidden></div>
+  <button class="ghost" id="skip" type="button">Skip intro</button>
+  <button class="ghost" id="replay" type="button" hidden>Replay intro</button>
+</div>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/index.js"></script>
+<script src="assets/js/links.js"></script>
+</body>
+</html>

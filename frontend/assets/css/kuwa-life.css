@@ -1,0 +1,12 @@
+/* KUWA's idle life. kuwa-life.js adds a layer inside #kuwa that shows frames from kuwa-idle.png,
+   and adds the class "alive" while that layer is in charge. When a page plays one of its own
+   reactions the class comes off and the page's own picture shows again. */
+#kuwa.alive { background-image: none !important; }
+#kuwa > .klife { position: absolute; left: 0; top: 0; width: 96px; height: 96px; display: none; pointer-events: none; background: url(../img/kuwa-idle.png) 0 0 / 768px auto no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+#kuwa.alive > .klife { display: block; }
+.kfeather { position: fixed; z-index: 50; width: 12px; height: 6px; margin: -3px 0 0 -6px; background: url(../img/town/feather.png) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.kzed { position: fixed; z-index: 50; font: 700 16px/1 "Courier Prime", "Courier New", monospace; color: #5e3a1f; text-shadow: 1px 1px 0 #f7e8c6, -1px -1px 0 #f7e8c6, 1px -1px 0 #f7e8c6, -1px 1px 0 #f7e8c6; pointer-events: none; }
+#kuwa.kuwa-out { visibility: hidden; }
+/* the peek: a narrow window at the edge of the side rail that he slides into */
+.kpeek { position: fixed; z-index: 40; width: 64px; height: 96px; overflow: hidden; pointer-events: none; }
+.kpeek span { position: absolute; left: 0; top: 0; width: 96px; height: 96px; background: url(../img/kuwa-idle.png) 0 0 / 768px auto no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }

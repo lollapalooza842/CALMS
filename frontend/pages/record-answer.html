@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Record Her Answer</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/record-answer.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/record-answer.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole">Sales Agent</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cQ">My Queue</a> / <a href="#" class="px" id="cRef">APP-2026-0409</a> / <a href="#" class="px" id="cCO">Counter-offers</a> / Her answer</p><h1>Record her answer</h1><p class="sub" id="subline">Norma Estrella &middot; SME loan &middot; offer 1 of 1</p></div>
+      <label class="proto" id="protoRole" for="role">Prototype only: signed in as <select id="role"><option value="je">Jun Espiritu (her assigned agent)</option><option value="kb">Karen Bernardo (another agent)</option></select></label>
+    </div>
+    <div class="card block" id="blocked" hidden><h2 style="border:0;justify-content:center">Not your borrower</h2><p style="margin:0;font-size:16px;line-height:1.45;max-width:46ch">Norma Estrella is assigned to J. Espiritu. Only the assigned sales agent can see this offer or record her answer. This attempt has been logged.</p></div>
+    <div class="field" id="field">
+      <div>
+        <section class="offer" aria-label="The offer to explain">
+          <h2 id="oTitle">Offer 1</h2><div class="meta" id="ometa"></div>
+          <dl id="odl"></dl>
+          <button class="big" type="button" id="showBtn">Turn the screen to her</button>
+        </section>
+        <ul class="tips"><li>Say the amounts exactly as written. You cannot change the terms; only underwriting can.</li><li>Get her answer in a form you can attach: the signed offer sheet, a written note, or a recording she agrees to.</li><li>No signal where you are? Wait until you have it. The system does not work offline.</li></ul>
+      </div>
+      <div class="ans">
+        <div class="perch"><div id="kuwa" role="img" aria-label="Kuwa the owl"><span class="env"></span></div><p id="says" role="status"></p></div>
+        <form class="card" id="form" novalidate>
+          <h2>Her answer <small id="draftAt"></small></h2>
+          <div style="display:grid;gap:18px">
+            <div class="sum" id="sum" role="alert" tabindex="-1" hidden></div>
+            <fieldset style="border:0;padding:0;margin:0;min-width:0"><legend class="k" style="padding:0;margin-bottom:6px">What did she say? <b>*</b></legend>
+              <div class="slips"><label class="slip"><input type="radio" name="ans" id="aYes" value="yes"><span><b>Accepts</b><small>She takes the offer as written</small></span></label><label class="slip no"><input type="radio" name="ans" id="aNo" value="no"><span><b>Declines</b><small>She does not take it</small></span></label></div><div class="e" id="eAns"></div></fieldset>
+            <fieldset style="border:0;padding:0;margin:0;min-width:0"><legend class="k" style="padding:0;margin-bottom:6px">How was she told the terms? <b>*</b></legend><div class="chips" id="chan"></div><div class="e" id="eChan"></div></fieldset>
+            <div class="two">
+              <div class="f"><label class="k" for="when">When did she answer? <b>*</b></label><input type="datetime-local" id="when" aria-describedby="eWhen"><div class="e" id="eWhen"></div></div>
+              <div class="f"><label class="k" for="ptype">Kind of proof <b>*</b></label><select id="ptype"><option value="">Choose</option><option>Signed offer sheet</option><option>Written confirmation</option><option>Recorded acknowledgment</option></select><div class="e" id="ePtype"></div></div>
+            </div>
+            <div class="f"><span class="k">The proof itself <b>*</b></span><div class="drop" id="drop"><input type="file" id="proof" accept="image/*,.pdf,audio/*" capture="environment" aria-label="Proof of her answer" aria-describedby="eProof"><span class="h">A photo, a PDF or an audio recording, up to 10 MB. On a phone this opens the camera.</span><div id="pv"></div></div><div class="e" id="eProof"></div></div>
+            <div class="f"><label class="k" for="words" id="wordsLab">In her words (optional)</label><textarea id="words" aria-describedby="eWords hWords"></textarea><div class="h" id="hWords">Underwriting reads this before deciding what to do next.</div><div class="e" id="eWords"></div></div>
+            <label class="check"><input type="checkbox" id="swear"><span>I explained the terms to her exactly as written on offer 1, and this is her own answer.</span></label><div class="e" id="eSwear" style="margin-top:-12px"></div>
+            <button class="hold" type="button" id="hold"><span class="fill"></span><span class="wax" id="waxI">JE</span><span><b>Press and hold to seal her answer</b><small id="holdS">Once sealed it cannot be changed, by you or anyone.</small></span></button>
+          </div>
+        </form>
+        <section class="card" id="record" hidden aria-label="Sealed answer" style="position:relative"><h2>Sealed <small>cannot be changed</small></h2><span class="bigseal" id="bigI">JE</span><dl class="rcd" id="rcd"></dl><h2 style="margin-top:16px">What happens now</h2><ol class="then" id="then"></ol><div style="margin-top:14px"><button class="big" type="button" id="again" style="background:transparent;color:var(--ink);font-size:17px">Prototype: record it again</button></div></section>
+      </div>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Keyboard: focus the seal and hold Space or Enter. Letting go early cancels.</span><span>Design prototype with example data. The proof you add stays in this browser tab and is not uploaded. No real borrower.</span></div>
+  </main>
+</div>
+<div class="show" id="show" hidden role="dialog" aria-modal="true" aria-label="Offer, shown to the borrower">
+  <div class="showbar"><span id="showT">GR8 Lending Company &middot; Offer 1</span><div class="seg" role="group" aria-label="Language"><button type="button" id="lEn" aria-pressed="true">English</button><button type="button" id="lFil" aria-pressed="false">Filipino</button></div><button type="button" class="x" id="showX">Close</button></div>
+  <div class="showbody" id="showBody" aria-live="polite"></div>
+  <div class="shownav"><button type="button" id="prev">Back</button><i id="pg"></i><button type="button" id="next">Next</button></div>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/record-answer.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

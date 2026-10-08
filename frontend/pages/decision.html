@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Decision</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/decision.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/decision.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cQ">Review queue</a> / <a href="#" class="px" id="cRef">APP-2026-0409</a> / <a href="#" class="px" id="cCA">Credit assessment</a> / Decision</p><h1>Decision</h1><p class="sub" id="subline">Norma Estrella &middot; SME loan &middot; asked for &#8369; 300,000.00 over 24 months</p></div>
+      <label class="proto" id="protoRole" for="role">Prototype only: deciding as <select id="role"><option value="ar">Lead Underwriter: Antonio Reyes (limit 500,000.00)</option><option value="bc">Credit Analyst: Benjie Cruz (limit 150,000.00)</option></select></label>
+    </div>
+    <div class="desk">
+      <section class="sheet" id="sheet" aria-label="Decision sheet">
+        <div class="lh"><b>Credit Decision</b><span id="lhs">APP-2026-0409 &middot; Moderate risk &middot; rule set version 14</span></div>
+        <div class="rec"><b>The rules recommend: approve a lower amount</b>At what she asked for, debt-to-income is 43.2%. Up to &#8369; 260,000.00 over 24 months it stays at or under 40%. This is a recommendation; the decision is yours, within your limit.</div>
+        <div class="scrollx"><table class="terms"><thead><tr><th scope="col">Terms</th><th scope="col">She asked for</th><th scope="col" id="thNow">You are granting</th></tr></thead><tbody id="terms"></tbody></table></div>
+        <div class="edit" id="edit" hidden>
+          <label for="amt">Amount to grant (pesos)<input id="amt" inputmode="numeric" autocomplete="off"></label>
+          <label for="term">Term<select id="term"></select></label>
+          <div class="e" id="eAmt" role="alert"></div>
+        </div>
+        <div id="banner"></div>
+        <div class="sig" id="sig"><span class="k">Decision and electronic signature</span><p id="sigText">Not yet signed.</p></div>
+      </section>
+      <div class="col" id="col">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div><p id="says" role="status"></p>
+        <section class="card" aria-label="Your authority"><h2>Your authority <small id="lim"></small></h2><div class="bar" id="bar"></div><ul class="auth" id="auth"></ul></section>
+        <div id="steps" style="display:grid;gap:16px">
+          <section aria-label="Choose the decision"><span class="k" style="color:var(--text-soft);margin-bottom:6px">1. Pick up a stamp</span><div class="rack" id="rack" role="group" aria-label="Decision"></div></section>
+          <section class="card" aria-label="Remarks"><h2>2. Remarks <small id="rmNeed"></small></h2><div style="display:grid;gap:10px"><span class="ov" id="ov" hidden>Override of the system's recommendation</span>
+            <div class="f" id="whyBox" hidden><label for="why">Reason for declining</label><select id="why"><option value="">Choose a reason</option><option>Capacity: cash flow does not support the installment</option><option>Credit history: bureau record</option><option>Documents: figures not supported</option><option>Policy: outside product rules</option></select></div>
+            <div class="f"><label for="rm" id="rmLab">Remarks</label><textarea id="rm" aria-describedby="eRm"></textarea><div class="e" id="eRm"></div></div></div></section>
+          <section class="card" aria-label="Prove it is you"><h2>3. Prove it is you <small>authenticator code</small></h2><div class="tumb" id="tumb" role="group" aria-label="Six-digit verification code"></div><div class="e" id="eMfa" style="margin-top:6px"></div></section>
+          <button class="hold" type="button" id="hold" aria-disabled="true"><span class="fill"></span><span class="st"></span><span><b id="holdT">4. Press and hold to stamp</b><small id="holdS">Finish the steps above first.</small></span></button>
+        </div>
+        <section class="card" id="record" hidden aria-label="Decision record"><h2>On the record <small>locked</small></h2><dl class="rcd" id="rcd"></dl><h2 style="margin-top:14px">What happens now</h2><ol class="then" id="then"></ol><div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px"><button class="act" type="button" id="nextB"></button><button class="act" type="button" id="again" style="background:transparent;color:var(--ink)">Prototype: decide again</button></div></section>
+      </div>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot" id="foot"><span>Holding the stamp is the signature. Keyboard: focus the stamp and hold Space or Enter. Letting go early cancels.</span><span>Example data, product terms and policy for a design prototype. Any six digits pass the identity check. No real borrower.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/decision.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

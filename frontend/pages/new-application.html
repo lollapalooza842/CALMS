@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS New Application</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/new-application.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/new-application.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Liza Mendoza</b><span>Loan Processor</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>New application</h1><p class="lede">Encode it once from the borrower's papers. Fields marked <span style="color:var(--red-on-wall)">*</span> are required before it can be submitted.</p></div>
+      <div class="saved" id="saved" role="status">Not saved yet</div>
+    </div>
+    <div class="desk">
+      <div class="clip">
+        <form class="paper" id="form" novalidate>
+          <div class="formhead"><b>Application for Loan</b><span id="refline">Reference number is issued on submission</span></div>
+          <ul class="tabs" id="tabs" aria-label="Sections"></ul>
+          <div class="sum" id="sum" role="alert" tabindex="-1" hidden></div>
+          <fieldset id="fs"></fieldset>
+        </form>
+      </div>
+      <aside class="side" aria-label="Request summary">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+        <div class="slip">
+          <p class="says" id="says" role="status"></p>
+          <h2>Terms requested</h2>
+          <dl id="terms"></dl>
+          <p class="small" id="rule"></p>
+          <h2>Before it can be submitted</h2>
+          <ul class="gate" id="gate"></ul>
+        </div>
+      </aside>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>To see the checks work, try the name "Jerome Pascual" with a Personal loan (duplicate) or "Herminia Cabrera" (past-due account).</span><span>Design prototype with example products and rates. Nothing is sent; the draft is kept only in this browser.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/new-application.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

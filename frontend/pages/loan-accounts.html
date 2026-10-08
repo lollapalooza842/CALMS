@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Loan Accounts</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/loan-accounts.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/loan-accounts.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Rodel Macaraeg</b><span>Loan Account Officer</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb">The ledger room</p><h1>Loan accounts</h1><p class="sub" id="sub"></p></div>
+      <button class="btn" type="button" id="reset">Prototype only: start over</button>
+    </div>
+    <ul class="cnts" id="cnts" aria-label="The portfolio today"></ul>
+    <div class="cabwrap">
+      <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+      <p class="says" id="says" role="status"></p>
+      <ul class="cab" id="cab" aria-label="Accounts sorted by how late they are. Choose one to filter the ledger."></ul>
+      <div class="share"><p class="k2">Share of the outstanding principal in each pigeonhole</p><div class="sbar" id="sbar" role="img"></div></div>
+    </div>
+    <h2 class="sec">Falling due this week <small>Choose a day to see only those accounts.</small></h2>
+    <ul class="week" id="week"></ul>
+    <h2 class="sec" id="lgh">The ledger <small id="shn"></small></h2>
+    <div class="bar"><input id="q" type="search" placeholder="Name or account number" aria-label="Find an account by name or number"><label>Product <select id="prod"><option value="">All products</option><option>SME loan</option><option>Personal loan</option><option>Salary loan</option></select></label><label>Order <select id="sort"><option value="att">Needs attention first</option><option value="bal">Largest balance</option><option value="due">Next due date</option><option value="nm">Name</option></select></label></div>
+    <div class="fl" id="fl"></div>
+    <ul class="legend" aria-label="How to read the payment trail"><li><span class="p"></span>paid on time</li><li><span class="p L"></span>paid late</li><li><span class="p x"></span>missed</li><li><span class="p u"></span>next one due</li><li>Shows the last 12; +2 means two earlier ones are not drawn.</li></ul>
+    <div class="book"><div class="lh" aria-hidden="true"><span>Account</span><span>Borrower</span><span class="r">Principal left</span><span>Next due</span><span>Standing</span><span>Payment trail, oldest first</span></div><ul class="rows" id="rows" aria-labelledby="lgh"></ul><p class="empty" id="empty" hidden></p></div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>CALMS watches and flags late accounts. It does not collect or recover; that is outside this system.</span><span>Design prototype. Every borrower, balance and the 3% late penalty are examples.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/loan-accounts.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS System</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/system.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/system.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Paolo Ventura</b><span>System Administrator</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>System</h1><p class="sub" id="sub"></p></div>
+      <ul class="tabs" id="tabs" aria-label="Section"></ul>
+    </div>
+    <div class="pane" id="p-health">
+      <section class="board" aria-labelledby="bh">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+        <h2 id="bh">Signal board</h2>
+        <p id="bsay" role="status"></p>
+        <ul class="lamps" id="lamps"></ul>
+        <div class="acts"><button class="btn" type="button" id="chk">Check all again</button><span class="when" id="when"></span></div>
+      </section>
+      <section class="card det" id="det" aria-live="polite"></section>
+      <section class="card"><h2>Jobs that run by themselves</h2><ul class="jobs" id="jobs"></ul></section>
+    </div>
+    <div class="pane" id="p-msg" hidden>
+      <div class="desk">
+        <ul class="list" id="tlist" aria-label="Messages CALMS sends"></ul>
+        <section class="card" id="edit" aria-live="polite"></section>
+      </div>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Changes here are written to the audit log with your name.</span><span>Design prototype. Services, timings and message wording are invented examples.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/system.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

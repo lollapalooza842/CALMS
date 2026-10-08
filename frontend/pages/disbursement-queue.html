@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Disbursement Queue</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/disbursement-queue.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/disbursement-queue.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Corazon Ilagan</b><span>Disbursement Officer</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb">The paymaster's window</p><h1>Disbursement queue</h1><p class="sub">Signed, locked and waiting for their money</p></div>
+      <div class="tools"><label class="proto">Prototype clock <select id="pclock"><option value="">Live time</option><option value="37800">10:30 in the morning</option><option value="52860">2:41 in the afternoon</option><option value="55200">3:20 in the afternoon</option></select></label><button class="btn" type="button" id="reset">Prototype only: start over</button></div>
+    </div>
+    <ul class="cnts" id="cnts" aria-label="Today at the window"></ul>
+    <div class="boardwrap">
+      <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+      <section class="board" aria-labelledby="bh"><h2 id="bh">Departures <span id="clock"></span></h2><ul class="rows" id="board"></ul></section>
+    </div>
+    <div class="desk">
+      <section aria-labelledby="sh">
+        <h2 class="sec" id="sh">On the shelf <small id="shn"></small></h2>
+        <div class="bar" style="margin-top:10px"><span id="chips" class="bar" style="margin:0" role="group" aria-label="Show"></span></div>
+        <div class="bar"><input id="q" type="search" placeholder="Name or application number" aria-label="Find a box by name or application number"><label>Order <select id="sort"><option value="wait">Longest waiting</option><option value="amt">Largest amount</option><option value="dep">Leaving soonest</option></select></label></div>
+        <ul class="shelf" id="list"></ul>
+        <p class="empty" id="empty" hidden></p>
+      </section>
+      <div class="side">
+        <p class="says" id="says" role="status"></p>
+        <section class="card man" id="man" aria-label="Manifest" tabindex="-1"></section>
+      </div>
+    </div>
+    <h2 class="sec">Not at this window <small>Approved, but something is still missing. They do not reach the shelf until it is done.</small></h2>
+    <div class="held"><div class="cellw" aria-hidden="true"></div><ul class="hl" id="held"></ul></div>
+    <h2 class="sec">Paid out today <small>Every release, with its reference. The loan account opens when the bank confirms.</small></h2>
+    <div class="card ledger" id="ledger" tabindex="0" role="region" aria-label="Paid out today"></div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>This window releases money. It cannot change a credit decision or the approved terms.</span><span>Design prototype. Cut-off times, channel limits and all people here are examples. No real money moves.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/disbursement-queue.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>
