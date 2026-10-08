@@ -1,0 +1,63 @@
+{
+  "name": "calms-desktop",
+  "productName": "CALMS",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CALMS as a desktop app: the same screens in their own window, with the back end running inside.",
+  "author": "CPE-3C Group 2-3, Bulacan State University",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "demo": "electron . --demo",
+    "dist": "electron-builder --win nsis",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "ph.edu.bulsu.cpe3c.calms",
+    "productName": "CALMS",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "server.json",
+      "build/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "../frontend",
+        "to": "frontend"
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "CALMS",
+      "createDesktopShortcut": true
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.finance"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office"
+    },
+    "afterPack": "scripts/after-pack.js"
+  }
+}

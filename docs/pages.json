@@ -1,0 +1,127 @@
+[
+ {
+  "title": "Sign in",
+  "file": "index.html",
+  "role": "Everyone"
+ },
+ {
+  "title": "My Queue",
+  "file": "pages/my-queue.html",
+  "role": "Everyone (role switcher)"
+ },
+ {
+  "title": "Applications",
+  "file": "pages/applications.html",
+  "role": "Sales Agent, Loan Processor"
+ },
+ {
+  "title": "New application",
+  "file": "pages/new-application.html",
+  "role": "Sales Agent, Loan Processor"
+ },
+ {
+  "title": "Application detail",
+  "file": "pages/application-detail.html",
+  "role": "Loan Processor"
+ },
+ {
+  "title": "Documents",
+  "file": "pages/documents.html",
+  "role": "Loan Processor"
+ },
+ {
+  "title": "Encode and verify",
+  "file": "pages/encode-verify.html",
+  "role": "Loan Processor"
+ },
+ {
+  "title": "Review queue",
+  "file": "pages/review-queue.html",
+  "role": "Lead Underwriter"
+ },
+ {
+  "title": "Credit assessment",
+  "file": "pages/credit-assessment.html",
+  "role": "Underwriter"
+ },
+ {
+  "title": "Decision",
+  "file": "pages/decision.html",
+  "role": "Underwriter"
+ },
+ {
+  "title": "Counter-offers",
+  "file": "pages/counter-offers.html",
+  "role": "Underwriter"
+ },
+ {
+  "title": "Record her answer",
+  "file": "pages/record-answer.html",
+  "role": "Sales Agent"
+ },
+ {
+  "title": "Loan agreement",
+  "file": "pages/loan-agreement.html",
+  "role": "Loan Processor"
+ },
+ {
+  "title": "Disbursement queue",
+  "file": "pages/disbursement-queue.html",
+  "role": "Disbursement Officer"
+ },
+ {
+  "title": "Release loan",
+  "file": "pages/release-loan.html",
+  "role": "Disbursement Officer"
+ },
+ {
+  "title": "Loan accounts",
+  "file": "pages/loan-accounts.html",
+  "role": "Loan Account Officer"
+ },
+ {
+  "title": "Loan account detail",
+  "file": "pages/loan-account.html",
+  "role": "Loan Account Officer"
+ },
+ {
+  "title": "Post payment and reversal",
+  "file": "pages/post-payment.html",
+  "role": "Loan Account Officer"
+ },
+ {
+  "title": "Reports",
+  "file": "pages/reports.html",
+  "role": "Operations Manager"
+ },
+ {
+  "title": "Audit log",
+  "file": "pages/audit-log.html",
+  "role": "Compliance Auditor"
+ },
+ {
+  "title": "Users and roles",
+  "file": "pages/users-roles.html",
+  "role": "System Administrator"
+ },
+ {
+  "title": "Products and rules",
+  "file": "pages/products-rules.html",
+  "role": "System Administrator"
+ },
+ {
+  "title": "System health and messages",
+  "file": "pages/system.html",
+  "role": "System Administrator"
+ },
+ {
+  "title": "Notifications",
+  "file": "pages/notifications.html",
+  "role": "Everyone"
+ },
+ {
+  "title": "My profile",
+  "file": "pages/my-profile.html",
+  "role": "Everyone"
+ }
+]
