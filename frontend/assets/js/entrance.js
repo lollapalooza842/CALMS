@@ -25,6 +25,15 @@
    in the address chooses it too. Kept per device; set before anything is drawn so the page never flashes the other one. */
 (function () { try { var q = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1]; if (q) localStorage.setItem("calms-ui", q);
   if ((q || localStorage.getItem("calms-ui")) === "classic") document.documentElement.setAttribute("data-ui", "classic"); } catch (e) {} })();
+/* the classic look inside the app: its type, its sheet and its script (classic-app.css/.js). Just signed in: everything
+   slides in (c-arrive); any other page: a lighter slide (c-page). My Queue online becomes a dashboard (c-dash). */
+(function () { var r = document.documentElement; if (r.getAttribute("data-ui") !== "classic" || !/\/pages\/[^/]*$/.test(location.pathname)) return;
+  r.setAttribute("data-theme", "light");
+  ["classic-fonts.css", "classic-app.css"].forEach(function (f) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "../assets/css/" + f; document.head.appendChild(l); });
+  var s = document.createElement("script"); s.src = "../assets/js/classic-app.js"; document.head.appendChild(s);
+  var arrived = false; try { arrived = sessionStorage.getItem("calms-entered") === "1"; } catch (e) {}
+  r.classList.add(arrived ? "c-arrive" : "c-page");
+  if (/\/my-queue\.html$/.test(location.pathname) && /^https?:$/.test(location.protocol)) r.classList.add("c-dash"); })();
 /* Kuwa's hat, chosen on the sign-in card (index.js): set before anything is drawn, so he wears it on every page */
 (function () { try { var h = localStorage.getItem("calms-hat"); if (h && h !== "cowboy" && /^(sheriff|bowler|sombrero)$/.test(h)) document.documentElement.setAttribute("data-hat", h); } catch (e) {} })();
 (function () {
