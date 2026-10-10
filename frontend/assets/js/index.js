@@ -38,7 +38,7 @@
     kuwa.style.setProperty("--k", K + "px");
     kb.style.backgroundSize = (768 * K) + "px " + (768 * K) + "px";
     var u = ke.children;
-    [[33, 40], [55, 40]].forEach(function (p, i) { u[i].style.left = p[0] * K + "px"; u[i].style.top = p[1] * K + "px"; u[i].style.width = u[i].style.height = 8 * K + "px"; });
+    [[35, 48], [54, 48]].forEach(function (p, i) { u[i].style.left = p[0] * K + "px"; u[i].style.top = p[1] * K + "px"; u[i].style.width = u[i].style.height = 7 * K + "px"; });   /* his eyes, as drawn at FIT .85 in kuwa.py */
   }
   function wideOff(ms) {                                  /* the phone's full-screen town glides up into its band */
     if (!wide) return; wide = false; scene.style.transform = "none";
@@ -191,7 +191,7 @@
   var lastHoot = 0;
   clerk.addEventListener("click", function (e) {
     var r = clerk.getBoundingClientRect();
-    if (e.clientY - r.top < r.height * 0.36) { swapHat(); return; }          /* on his hat: a different hat */
+    if (e.clientY - r.top < r.height * 0.46) { swapHat(); return; }          /* on his hat: a different hat */
     if (Date.now() - lastHoot > 1500) { lastHoot = Date.now(); Sound.fx("hoot", 0.8); }
   });
   function swapHat() {

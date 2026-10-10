@@ -9,9 +9,26 @@ TN=h('#c98f4a'); TD=h('#9a6a30'); C=h('#f3ddb0'); CD=h('#dcbf88')
 A=h('#f0a81e'); AD=h('#c47a12'); K=h('#1a120c'); W=h('#fff6dc')
 R=h('#b4362c'); RD=h('#7e221c'); RL=h('#cf5444')
 S=96
+# He is drawn a little smaller than his 96 x 96 cell (FIT, about his feet), so the brim of his hat and his wing tips
+# keep a clear edge instead of running into the side of the cell and being cut off there.
+FIT=float(os.environ.get('KUWA_FIT','0.85'))
+def T(x,y): return (48+(x-48)*FIT, 96-(96-y)*FIT)
+class Pen:
+    """ImageDraw, with every coordinate passed through T()."""
+    def __init__(s,im): s.d=ImageDraw.Draw(im)
+    def _pts(s,pts): return [T(x,y) for x,y in pts]
+    def _box(s,b): a=T(b[0],b[1]); c=T(b[2],b[3]); return [a[0],a[1],c[0],c[1]]
+    def ellipse(s,b,**k): s.d.ellipse(s._box(b),**k)
+    def rectangle(s,b,**k): s.d.rectangle(s._box(b),**k)
+    def chord(s,b,a0,a1,**k): s.d.chord(s._box(b),a0,a1,**k)
+    def arc(s,b,a0,a1,**k): s.d.arc(s._box(b),a0,a1,**k)
+    def pieslice(s,b,a0,a1,**k): s.d.pieslice(s._box(b),a0,a1,**k)
+    def polygon(s,pts,**k): s.d.polygon(s._pts(pts),**k)
+    def line(s,pts,**k): s.d.line(s._pts(pts),**k)
+    def point(s,xy,c=None,**k): s.d.point(T(*xy),c,**k)
 class Cv:
     def __init__(s):
-        s.im=Image.new('RGBA',(S,S),(0,0,0,0)); s.d=ImageDraw.Draw(s.im)
+        s.im=Image.new('RGBA',(S,S),(0,0,0,0)); s.d=Pen(s.im)
     def E(s,box,f,ol=None,dy=0): s.d.ellipse([box[0],box[1]+dy,box[2],box[3]+dy],fill=f,outline=ol)
     def P(s,pts,f,ol=None,dy=0): s.d.polygon([(x,y+dy) for x,y in pts],fill=f,outline=ol)
     def L(s,pts,f,w=1,dy=0): s.d.line([(x,y+dy) for x,y in pts],fill=f,width=w)
