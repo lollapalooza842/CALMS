@@ -181,7 +181,7 @@
   function beat() { var t = now(); if (document.hidden) return; if (t < pageBusyUntil || pageBusy()) { if (pageBusy()) pageBusyUntil = t + 1300; return; } take(); if (peeking) return; watchTrain(); if (acting || moving) return;
     if (!reduce && state === "awake") { var idle = t - lastSeen; if ((off.x || off.y) && t - lastTouch > 20000) { goHome(); return; } if (idle > 16000 && idle < 26000 && t - lastPeek > 120000 && !(off.x || off.y) && !carry) { peek(); return; } }
     if (t > nextFace && t > faceUntil && state === "awake") driftFace();   /* no face-pulling in his sleep */
-    if (reduce) { bi = (bi + 1) % 4; show(breath()[bi]); if (t > nextBlink) blink(); return; }
+    if (reduce) { if (t - lastSeen > 60000) { show(N.sitZ1); return; } bi = (bi + 1) % 4; show(breath()[bi]); if (t > nextBlink) blink(); return; }   /* with animations turned off he still naps, just without the show */
     doze(); if (acting) return;
     if (state === "asleep") { bi = (bi + 1) % SLEEP.length; show(SLEEP[bi]); return; }
     if (state === "drowsy") { bi = (bi + 1) % DROWSY.length; show(DROWSY[bi]); return; }
