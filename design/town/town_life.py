@@ -83,11 +83,18 @@ def batwing(open_=0):
     return im
 
 os.makedirs(OUT, exist_ok=True)
+def padded(sheet, fw, fh):
+    """A 1-pixel clear gutter round every frame, so a phone's fractional scaling cannot bleed the next frame into view."""
+    cols = sheet.width // fw
+    out = Image.new("RGBA", (cols * (fw + 2), fh + 2), (0, 0, 0, 0))
+    for c in range(cols): out.paste(sheet.crop((c * fw, 0, c * fw + fw, fh)), (c * (fw + 2) + 1, 1))
+    return out
+
 sheet = Image.new("RGBA", (24 * 4, 18), (0, 0, 0, 0))
 for k, f in enumerate([horse(0), horse(1), horse(2), horse(0, True)]): sheet.paste(f, (k * 24, 0))
-sheet.save(os.path.join(OUT, "horse.png"))
+padded(sheet, 24, 18).save(os.path.join(OUT, "horse.png"))
 lantern().save(os.path.join(OUT, "lantern.png"))
 bw = Image.new("RGBA", (11 * 3, 9), (0, 0, 0, 0))
 for k in range(3): bw.paste(batwing(k), (k * 11, 0))
-bw.save(os.path.join(OUT, "batwing.png"))
+padded(bw, 11, 9).save(os.path.join(OUT, "batwing.png"))
 print("wrote horse.png, lantern.png, batwing.png")

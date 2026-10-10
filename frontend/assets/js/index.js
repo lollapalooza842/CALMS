@@ -16,7 +16,7 @@
       sil = $("sil"), shade = $("shade"), fake = $("fake"), tumble = $("tumble"), l4g = $("l4g"), skip = $("skip"), replay = $("replay");
   var CAM = [["l1", 1.03, 0], ["l2", 1.07, 0], ["l3", 1.12, 0], ["l4", 1.24, 0], ["l4g", 1.24, 0], ["l5", 1.7, 16]];
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var K = 3, timers = [], anims = [], ivs = [], running = false, W = 0, H = 0;
+  var K = 3, timers = [], anims = [], ivs = [], running = false, W = 0, H = 0, PH = 1, PY = 0, wide = false;
   glint.style.webkitMaskImage = glint.style.maskImage = "url(" + $("logo").src + ")";
 
   function layout() {
@@ -25,7 +25,11 @@
     var sh = phone ? Math.round(H * .47) : Math.max(H, W * 0.375), sw = sh * 480 / 180;
     scene.style.width = sw + "px"; scene.style.height = sh + "px"; scene.style.left = (W - sw) / 2 + "px"; scene.style.top = (phone ? 0 : (H - sh) / 2) + "px";
     scene.style.setProperty("--u", (sh / 180) + "px");
-    K = Math.max(2, Math.min(4, Math.round(H / 240)));
+    /* a portrait phone: during the intro the town fills the whole screen (scaled up from the top band), so Kuwa's flight
+       and the street are not cut off above an empty dark half; when the card arrives it glides up into its band (wideOff) */
+    PH = phone ? Math.min(H / sh, 1.5) : 1; PY = phone ? (H - sh * PH) / 2 : 0;   /* not the whole height: that crops the street to the bank's door. Centred, with a dark band above and below, like a film */
+    scene.style.transformOrigin = "50% 0"; scene.style.transform = wide && PH > 1 ? camWide() : "none";
+    K = phone ? 2 : Math.max(2, Math.min(4, Math.round(H / 240)));     /* the close-up peeks: a phone is narrow, so Kuwa stays a size that fits it */
     var s = 96 * K;
     kuwa.style.width = kuwa.style.height = s + "px"; kuwa.style.margin = (-s / 2) + "px 0 0 " + (-s / 2) + "px";
     kuwa.style.setProperty("--k", K + "px");
@@ -33,6 +37,11 @@
     var u = ke.children;
     [[33, 40], [55, 40]].forEach(function (p, i) { u[i].style.left = p[0] * K + "px"; u[i].style.top = p[1] * K + "px"; u[i].style.width = u[i].style.height = 8 * K + "px"; });
   }
+  function wideOff(ms) {                                  /* the phone's full-screen town glides up into its band */
+    if (!wide) return; wide = false; scene.style.transform = "none";
+    if (ms && PH > 1) scene.animate([{ transform: camWide() }, { transform: "none" }], { duration: ms, easing: "cubic-bezier(.4,0,.2,1)" });
+  }
+  function camWide() { return "translateY(" + PY + "px) scale(" + PH + ")"; }
   function frame(el, i, k) { el.style.backgroundPosition = (-96 * k * FR[i][0]) + "px " + (-96 * k * FR[i][1]) + "px"; }
   function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
   function every(ms, fn) { var id = setInterval(fn, ms); ivs.push(id); return id; }
@@ -399,8 +408,8 @@
   /* ---- town life: the horse outside the bank and the saloon's swing doors ----
      Sprites from design/town/town_life.py; the lantern on the porch swings by itself (CSS). */
   var horse = $("horse"), doors = $("batwing");
-  function hframe(i) { horse.style.backgroundPosition = (i * 100 / 3) + "% 0"; }
-  function dframe(i) { doors.style.backgroundPosition = (i * 50) + "% 0"; }
+  function hframe(i) { horse.style.backgroundPosition = "calc(var(--u) * " + -(i * 26 + 1) + ") calc(var(--u) * -1)"; }   /* 26 x 20 cells with a 1px gutter */
+  function dframe(i) { doors.style.backgroundPosition = "calc(var(--u) * " + -(i * 13 + 1) + ") calc(var(--u) * -1)"; }
   function seq(set, list, ms, done) { var k = 0; (function nx() { if (k >= list.length) { if (done) done(); return; } set(list[k++]); setTimeout(nx, ms); })(); }
   function horseLife() {
     setTimeout(function () {
@@ -612,7 +621,7 @@
         var a = b.ph + b.w * t * dir, x = cx + dir * t * .25 + b.rx * Math.cos(a), y = cy + b.ry * Math.sin(a), vx = -Math.sin(a) * dir;
         b.el.style.left = x + "%"; b.el.style.top = y + "%"; b.el.style.transform = vx < 0 ? "scaleX(-1)" : "none";
         var f = ((now - t0 + b.flapAt) % 4200) < 600 ? [0, 1, 2, 1][Math.floor(((now - t0 + b.flapAt) % 4200) / 150)] : 1;   /* soaring, with a flap now and then */
-        b.el.style.backgroundPosition = (f * 50) + "% 0";
+        b.el.style.backgroundPosition = "calc(var(--u) * " + -(f * 21 + 1) + ") calc(var(--u) * -1)";
       });
       if (now - t0 > dur - 2500) birds.forEach(function (b) { b.el.style.opacity = 0; });
       if (now - t0 < dur) requestAnimationFrame(fly); else birds.forEach(function (b) { b.el.remove(); });
@@ -628,7 +637,7 @@
     (function go(now) {
       var u = (now - t0) / dur, left = 102 - 118 * u;
       trainEl.style.left = left + "%";
-      if (now - lastF > 150) { lastF = now; fr ^= 1; trainEl.style.backgroundPosition = (fr * 100) + "% 0"; }
+      if (now - lastF > 150) { lastF = now; fr ^= 1; trainEl.style.backgroundPosition = "calc(var(--u) * " + -(fr * 66 + 1) + ") calc(var(--u) * -1)"; }
       if (now - lastP > 240) { lastP = now; puff(left + 4.5 / 4.8, 65.56); }
       if (u < 1) requestAnimationFrame(go); else { trainOn = false; trainEl.style.left = "102%"; }
     })(t0);
@@ -642,7 +651,7 @@
 
   /* ---- townsfolk ---- */
   function fpos(el, x, feet) { el.style.left = (x / 480 * 100) + "%"; el.style.top = ((feet - 18) / 180 * 100) + "%"; el.style.zIndex = feet; }
-  function fframe(el, col, row) { el.style.backgroundPosition = (col / 12 * 100) + "% " + (row / 3 * 100) + "%"; }
+  function fframe(el, col, row) { el.style.backgroundPosition = "calc(var(--u) * " + -(col * 18 + 1) + ") calc(var(--u) * " + -(row * 20 + 1) + ")"; }   /* 18 x 20 cells with a 1px gutter */
   function person(row, x, feet) { var el = document.createElement("div"); el.className = "px folk"; l4.appendChild(el); fframe(el, 4, row); fpos(el, x, feet); return el; }
   /* walk from x0 to x1 (town pixels); resolves on arrival. opt: hatless, fast, spur (jingle every other step) */
   function walk(el, row, x0, x1, feet, speed, opt) {
@@ -866,7 +875,7 @@
 
   /* ---- the intro ---- */
   function finish(focus, natural) {
-    clearAll(); stopLasso(); running = false;
+    clearAll(); stopLasso(); running = false; wideOff(0);
     introGoing = false;
     if (natural) { if (Sound.live()) Sound.playMusic("signin-loop", { loop: true, vol: 0.45, delay: 0.76, fadeIn: 0.8 }); }   /* the intro rings out; the loop comes in on the next bar */
     else musicNow(1.2);
@@ -883,7 +892,7 @@
     if (focus) ($("user").value ? $("pass") : $("user")).focus({ preventScroll: true });
   }
   function play() {
-    clearAll(); stopLasso(); stopWeather(true); clearTod(); Sound.piano(0); running = true; layout();
+    clearAll(); stopLasso(); stopWeather(true); clearTod(); Sound.piano(0); running = true; wide = true; layout();
     t0 = performance.now(); introGoing = true; Sound.stopMusic(0.3); musicNow();
     var s = 96 * K;
     skip.hidden = false; replay.hidden = true;
@@ -1004,6 +1013,7 @@
       anim(night, [{ opacity: .3 }, { opacity: T.night }], { duration: 1500 });
       anim(l4g, [{ opacity: .5 }, { opacity: T.glow }], { duration: 1500 });
       running = false; applyTod(true); running = true;
+      wideOff(900);
     });
     at(14350, lassoIn);   /* the card is lassoed in: the rope is whirled (heard) from here, caught at 15400 and the card is hauled in */
     /* 9. he lands on the window, shakes off the dust, straightens his hat */

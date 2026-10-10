@@ -97,13 +97,22 @@ def lone_hat(p):
     rect(im, 6, 7, 9, 8, p["hat"]); rect(im, 6, 8, 9, 8, p["band"]); rect(im, 4, 9, 11, 9, p["hat"])
     return outline(im)
 
+def padded(sheet, fw, fh):
+    """The sheet with a 1-pixel clear gutter round every frame. A phone scales the town by a fraction, and without
+    the gutter the edge of the next frame can bleed into view (a sliver of another pose beside a walker)."""
+    cols, rows = sheet.width // fw, sheet.height // fh
+    out = Image.new("RGBA", (cols * (fw + 2), rows * (fh + 2)), (0, 0, 0, 0))
+    for r in range(rows):
+        for c in range(cols): out.paste(sheet.crop((c * fw, r * fh, c * fw + fw, r * fh + fh)), (c * (fw + 2) + 1, r * (fh + 2) + 1))
+    return out
+
 def folk():
     cols = 13; sheet = Image.new("RGBA", (FW * cols, FH * len(PEOPLE)))
     for r, p in enumerate(PEOPLE):
         frames = [person(p, k) for k in range(4)] + [person(p), person(p, pose="draw"), person(p, pose="tip")]
         frames += [person(p, k, hat=False) for k in range(4)] + [person(p, hat=False), lone_hat(p)]
         for c, f in enumerate(frames): sheet.paste(f, (c * FW, r * FH))
-    sheet.save(os.path.join(OUT, "folk.png"), optimize=True)
+    padded(sheet, FW, FH).save(os.path.join(OUT, "folk.png"), optimize=True)
     return sheet
 
 # ---------------- the far train ----------------
@@ -133,7 +142,7 @@ def train(fr):
 def trains():
     a, b = train(0), train(1)
     sheet = Image.new("RGBA", (a.width * 2, a.height)); sheet.paste(a, (0, 0)); sheet.paste(b, (a.width, 0))
-    sheet.save(os.path.join(OUT, "train-far.png"), optimize=True)
+    padded(sheet, a.width, a.height).save(os.path.join(OUT, "train-far.png"), optimize=True)
     return sheet
 
 # ---------------- vultures ----------------
@@ -156,7 +165,7 @@ def vulture(w):
 def vultures():
     sheet = Image.new("RGBA", (57, 8))
     for k, w in enumerate(["up", "mid", "down"]): sheet.paste(vulture(w), (k * 19, 0))
-    sheet.save(os.path.join(OUT, "vulture.png"), optimize=True)
+    padded(sheet, 19, 8).save(os.path.join(OUT, "vulture.png"), optimize=True)
     return sheet
 
 # ---------------- skies ----------------
