@@ -19,7 +19,8 @@ html, body { margin: 0; }
 body { background: var(--night); color: var(--paper); font-family: var(--type); overflow: hidden; }
 #stage { position: relative; height: 100%; overflow: hidden; overflow: clip; background: var(--night); }   /* clip: the town is wider than the screen, and must never be scrolled sideways by a focus or a click */
 #scene { position: absolute; overflow: hidden; }
-.ly { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 100% 100%; image-rendering: pixelated; image-rendering: crisp-edges; transform-origin: 50% 64%; will-change: transform; }
+.ly { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 100% 100%; image-rendering: pixelated; image-rendering: crisp-edges; transform-origin: 50% 64%; }
+#stage.intro .ly { will-change: transform; }   /* only while the camera moves: six screen-wide layers held on the graphics card all the time are heavy for a phone */
 .px { position: absolute; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
 #l1 { background-image: url(../img/town/layer-1.png); }
 #l2 { background-image: url(../img/town/layer-2.png); }

@@ -16,13 +16,16 @@
       sil = $("sil"), shade = $("shade"), fake = $("fake"), tumble = $("tumble"), l4g = $("l4g"), skip = $("skip"), replay = $("replay");
   var CAM = [["l1", 1.03, 0], ["l2", 1.07, 0], ["l3", 1.12, 0], ["l4", 1.24, 0], ["l4g", 1.24, 0], ["l5", 1.7, 16]];
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var K = 3, timers = [], anims = [], ivs = [], running = false, W = 0, H = 0, PH = 1, PY = 0, wide = false;
+  var K = 3, timers = [], anims = [], ivs = [], running = false, W = 0, H = 0, PH = 1, PY = 0, wide = false, LW = 0, LH = 0, sceneKey = "";
   glint.style.webkitMaskImage = glint.style.maskImage = "url(" + $("logo").src + ")";
 
   function layout() {
     W = stage.clientWidth; H = stage.clientHeight;
     var phone = W <= 600 && H > W;                        /* a portrait phone: the town is a picture across the top (see the phone rules in index.css) */
-    var sh = phone ? Math.round(H * .47) : Math.max(H, W * 0.375), sw = sh * 480 / 180;
+    if (phone && W === LW && H < LH) var HT = LH; else { HT = H; LW = W; LH = H; }   /* the keyboard opening shrinks the screen: keep the town as it was, or it would jump and rescale under your thumb */
+    if (phone && sceneKey === W + "x" + HT && !wide) return;  /* nothing changed for the town (a phone's address bar sliding away) */
+    sceneKey = W + "x" + HT;
+    var sh = phone ? Math.round(HT * .47) : Math.max(H, W * 0.375), sw = sh * 480 / 180;
     scene.style.width = sw + "px"; scene.style.height = sh + "px"; scene.style.left = (W - sw) / 2 + "px"; scene.style.top = (phone ? 0 : (H - sh) / 2) + "px";
     scene.style.setProperty("--u", (sh / 180) + "px");
     /* a portrait phone: during the intro the town fills the whole screen (scaled up from the top band), so Kuwa's flight
@@ -64,12 +67,17 @@
       if (ctx || !AC) return;
       try { ctx = new AC(); } catch (e) { return; }
       out = ctx.createGain(); out.gain.value = muted ? 0 : 1; out.connect(ctx.destination);
-      NAMES.forEach(function (n) {
-        fetch("assets/audio/" + n + ".mp3").then(function (r) { return r.arrayBuffer(); })
+      function load(n) {
+        return fetch("assets/audio/" + n + ".mp3").then(function (r) { return r.arrayBuffer(); })
           .then(function (b) { return new Promise(function (ok, no) { ctx.decodeAudioData(b, ok, no); }); })
           .then(function (buf) { bufs[n] = buf; (waits[n] || []).forEach(function (f) { f(); }); delete waits[n]; })
           .catch(function () {});
-      });
+      }
+      /* the intro's sounds at once; the town's (piano, train, weather, the duel...) one at a time once the intro is over,
+         so a phone is not decoding twenty files while Kuwa is flying */
+      var LATER = ["piano", "train", "rain", "dust", "noon", "duel", "bang", "spur", "paper", "swap", "gust", "snort", "creak"];
+      NAMES.filter(function (n) { return LATER.indexOf(n) < 0; }).forEach(load);
+      setTimeout(function next() { if (introGoing) { setTimeout(next, 1000); return; } var n = LATER.shift(); if (n) load(n).then(function () { setTimeout(next, 250); }); }, 1500);
     }
     function when(n, f) { if (bufs[n]) f(); else (waits[n] = waits[n] || []).push(f); }
     function live() { return ctx && ctx.state === "running" && !muted; }
@@ -225,7 +233,9 @@
   var mp = null, blowing = false, RAD = 110, gfx = document.createElement("canvas"), g2 = gfx.getContext("2d"), DPR = Math.min(2, window.devicePixelRatio || 1);
   gfx.id = "gustfx"; gfx.setAttribute("aria-hidden", "true"); stage.appendChild(gfx);
   var G = { x: 0, y: 0, vx: 0, vy: 0, rot: 0, av: 0, hold: 0, last: 0, raf: 0, trail: [], parts: [], emit: 0, sndT: 0, featherT: 0, coolUntil: 0, bursting: false };
-  function sizeFx() { gfx.width = stage.clientWidth * DPR; gfx.height = stage.clientHeight * DPR; gfx.style.width = stage.clientWidth + "px"; gfx.style.height = stage.clientHeight + "px"; }
+  var LITE = matchMedia("(hover: none), (pointer: coarse)").matches;   /* a touch phone: smaller canvases, and the full-screen ones are hidden whenever nothing is drawn on them (a big see-through layer over the town costs every frame) */
+  gfx.style.display = "none";
+  function sizeFx() { if (gfx.width === stage.clientWidth * DPR && gfx.height === stage.clientHeight * DPR) return; gfx.width = stage.clientWidth * DPR; gfx.height = stage.clientHeight * DPR; gfx.style.width = stage.clientWidth + "px"; gfx.style.height = stage.clientHeight + "px"; }
   sizeFx(); window.addEventListener("resize", sizeFx);
   function owlAt() { var r = clerk.getBoundingClientRect(), s = stage.getBoundingClientRect(); return { x: r.left - s.left + 48, y: r.top - s.top + 54 }; }
   function lean(on, dx, t) {
@@ -253,7 +263,7 @@
     }, 230);
   }
   function gustLoop(ts) {
-    G.raf = 0; var t = ts || performance.now(), dt = Math.min(.05, (t - (G.last || t)) / 1000) || .016; G.last = t;
+    G.raf = 0; gfx.style.display = ""; var t = ts || performance.now(), dt = Math.min(.05, (t - (G.last || t)) / 1000) || .016; G.last = t;
     var c = owlAt(), live = mp && !fake.hidden;
     var dx = live ? mp.x - c.x : 0, dy = live ? mp.y - c.y : 0, dist = Math.hypot(dx, dy) || 1;
     var inside = live && dist < RAD && !cHold && !running && Date.now() > G.coolUntil;
@@ -283,8 +293,8 @@
     }
     draw(dt);
     var speed = Math.hypot(G.vx, G.vy);
-    if (!inside && !blowing && live && Math.hypot(G.x - mp.x, G.y - mp.y) < 1.5 && speed < 20 && !G.parts.length) { fake.hidden = true; stage.classList.remove("nocur"); G.trail = []; g2.clearRect(0, 0, gfx.width, gfx.height); return; }
-    if (!live && !G.parts.length) { g2.clearRect(0, 0, gfx.width, gfx.height); return; }
+    if (!inside && !blowing && live && Math.hypot(G.x - mp.x, G.y - mp.y) < 1.5 && speed < 20 && !G.parts.length) { fake.hidden = true; stage.classList.remove("nocur"); G.trail = []; g2.clearRect(0, 0, gfx.width, gfx.height); gfx.style.display = "none"; return; }
+    if (!live && !G.parts.length) { g2.clearRect(0, 0, gfx.width, gfx.height); gfx.style.display = "none"; return; }
     G.raf = requestAnimationFrame(gustLoop);
   }
   function arrow(x, y, rot, a) {   /* the same arrow as #fake, for its ghost trail */
@@ -433,7 +443,8 @@
   var WX = { kind: null, I: 0, target: 0, parts: [], raf: 0, last: 0, timer: 0, beadT: 0, squintT: 0, sq: 0 };
   var wxsky = document.createElement("div"); wxsky.id = "wxsky"; wxsky.setAttribute("aria-hidden", "true"); scene.appendChild(wxsky);
   var wxc = document.createElement("canvas"), w2 = wxc.getContext("2d"); wxc.id = "wxfx"; wxc.setAttribute("aria-hidden", "true"); stage.insertBefore(wxc, $("front"));
-  function sizeWx() { wxc.width = stage.clientWidth * DPR; wxc.height = stage.clientHeight * DPR; wxc.style.width = stage.clientWidth + "px"; wxc.style.height = stage.clientHeight + "px"; }
+  var WD = LITE ? 1 : DPR; wxc.style.display = "none";
+  function sizeWx() { if (wxc.width === stage.clientWidth * WD && wxc.height === stage.clientHeight * WD) return; wxc.width = stage.clientWidth * WD; wxc.height = stage.clientHeight * WD; wxc.style.width = stage.clientWidth + "px"; wxc.style.height = stage.clientHeight + "px"; }
   sizeWx(); window.addEventListener("resize", sizeWx);
   var forced = (function () { try { return new URLSearchParams(location.search).get("weather"); } catch (e) { return null; } })();
   function startWeather(kind, sec) {
@@ -455,7 +466,7 @@
     var was = WX.kind; WX.kind = null; WX.target = 0; wxsky.style.opacity = 0; Sound.ambient(null, 0, now ? 0.3 : 3);
     if (was === "dust" && !cHold) clerkPlay("idle");
     Array.prototype.forEach.call(card.querySelectorAll(".bead"), function (b) { b.animate ? b.animate([{ opacity: 1 }, { opacity: 0 }], { duration: now ? 200 : 2500, fill: "forwards" }).onfinish = function () { b.remove(); } : b.remove(); });
-    if (now) { WX.I = 0; WX.parts = []; w2.clearRect(0, 0, wxc.width, wxc.height); }
+    if (now) { WX.I = 0; WX.parts = []; w2.clearRect(0, 0, wxc.width, wxc.height); wxc.style.display = "none"; }
   }
   function planWeather() {
     clearTimeout(WX.timer);
@@ -481,34 +492,43 @@
     a.onfinish = function () { tumble.style.opacity = 0; };
   }
   function wxLoop(ts) {
-    WX.raf = 0; var t = ts || performance.now(), dt = Math.min(.05, (t - (WX.last || t)) / 1000) || .016; WX.last = t;
+    WX.raf = 0; wxc.style.display = ""; var t = ts || performance.now();
+    var dt = Math.min(.05, (t - (WX.last || t)) / 1000) || .016; WX.last = t;
     var w = stage.clientWidth, h = stage.clientHeight;
     WX.I += (WX.target - WX.I) * (1 - Math.exp(-dt / 1.2));      /* the weather comes and goes gradually */
-    var kind = WX.kind || WX.fading, want = Math.round((kind === "dust" ? 260 : 170) * WX.I);
+    var kind = WX.kind || WX.fading, want = Math.round((kind === "dust" ? 260 : 170) * (LITE ? .6 : 1) * WX.I);
     if (WX.kind) WX.fading = WX.kind;
     while (WX.parts.length < want) WX.parts.push(kind === "dust"
       ? { x: Math.random() * w - w * .3, y: Math.random() * h, v: 380 + Math.random() * 520, r: 1 + Math.random() * 2.6, a: .35 + Math.random() * .5, ph: Math.random() * 6 }
       : { x: Math.random() * w * 1.2, y: Math.random() * h - h, v: 700 + Math.random() * 400, len: 10 + Math.random() * 14, a: .2 + Math.random() * .3 });
     if (WX.parts.length > want) WX.parts.length = want;
-    w2.setTransform(DPR, 0, 0, DPR, 0, 0); w2.clearRect(0, 0, w, h);
+    w2.setTransform(WD, 0, 0, WD, 0, 0); w2.clearRect(0, 0, w, h);
+    /* drawn in three shades, one path each: a style change and a stroke per drop is what makes a phone stutter */
+    var B = [[], [], []]; WX.parts.forEach(function (p) { B[p.a > .62 || (kind === "rain" && p.a > .4) ? 2 : p.a > .5 || (kind === "rain" && p.a > .3) ? 1 : 0].push(p); });
     if (kind === "rain") {
-      w2.lineCap = "round"; w2.lineWidth = 1.2;
-      WX.parts.forEach(function (p) {
-        p.y += p.v * dt; p.x -= p.v * .18 * dt;
-        if (p.y > h) { p.y = -p.len - Math.random() * 60; p.x = Math.random() * w * 1.2; if (Math.random() < .5) { w2.fillStyle = "rgba(210,225,240,.35)"; w2.fillRect(p.x - 2, h - 3 - Math.random() * h * .15, 4, 1); } }
-        w2.strokeStyle = "rgba(205,220,240," + (p.a * WX.I).toFixed(3) + ")";
-        w2.beginPath(); w2.moveTo(p.x, p.y); w2.lineTo(p.x + p.len * .18, p.y - p.len); w2.stroke();
+      w2.lineCap = "round"; w2.lineWidth = 1.2; w2.fillStyle = "rgba(210,225,240,.35)";
+      B.forEach(function (bk, i) {
+        w2.strokeStyle = "rgba(205,220,240," + ((.25 + i * .1) * WX.I).toFixed(3) + ")"; w2.beginPath();
+        bk.forEach(function (p) {
+          p.y += p.v * dt; p.x -= p.v * .18 * dt;
+          if (p.y > h) { p.y = -p.len - Math.random() * 60; p.x = Math.random() * w * 1.2; if (Math.random() < .5) w2.fillRect(p.x - 2, h - 3 - Math.random() * h * .15, 4, 1); }
+          w2.moveTo(p.x, p.y); w2.lineTo(p.x + p.len * .18, p.y - p.len);
+        });
+        w2.stroke();
       });
     } else if (kind === "dust") {
       var gust = .75 + .35 * Math.sin(t / 1300) + .15 * Math.sin(t / 370);
-      WX.parts.forEach(function (p) {
-        p.x += p.v * gust * dt; p.y += Math.sin(t / 400 + p.ph) * 22 * dt + 10 * dt;
-        if (p.x > w + 10) { p.x = -10 - Math.random() * 80; p.y = Math.random() * h; }
-        w2.fillStyle = "rgba(225,180,120," + (p.a * WX.I).toFixed(3) + ")"; w2.fillRect(p.x, p.y, p.r * 2.4, p.r);
+      B.forEach(function (bk, i) {
+        w2.fillStyle = "rgba(225,180,120," + ((.42 + i * .17) * WX.I).toFixed(3) + ")";
+        bk.forEach(function (p) {
+          p.x += p.v * gust * dt; p.y += Math.sin(t / 400 + p.ph) * 22 * dt + 10 * dt;
+          if (p.x > w + 10) { p.x = -10 - Math.random() * 80; p.y = Math.random() * h; }
+          w2.fillRect(p.x, p.y, p.r * 2.4, p.r);
+        });
       });
     }
     if (WX.kind || WX.I > .01) WX.raf = requestAnimationFrame(wxLoop);
-    else { WX.parts = []; WX.fading = null; w2.clearRect(0, 0, w, h); }
+    else { WX.parts = []; WX.fading = null; w2.clearRect(0, 0, w, h); wxc.style.display = "none"; }
   }
 
   /* ---- the lasso: a rope flies in from off the right, loops the sign-in card off to the left and hauls it in ---- */
@@ -875,7 +895,7 @@
 
   /* ---- the intro ---- */
   function finish(focus, natural) {
-    clearAll(); stopLasso(); running = false; wideOff(0);
+    clearAll(); stopLasso(); running = false; wideOff(0); stage.classList.remove("intro"); grain.style.display = "none";
     introGoing = false;
     if (natural) { if (Sound.live()) Sound.playMusic("signin-loop", { loop: true, vol: 0.45, delay: 0.76, fadeIn: 0.8 }); }   /* the intro rings out; the loop comes in on the next bar */
     else musicNow(1.2);
@@ -892,7 +912,7 @@
     if (focus) ($("user").value ? $("pass") : $("user")).focus({ preventScroll: true });
   }
   function play() {
-    clearAll(); stopLasso(); stopWeather(true); clearTod(); Sound.piano(0); running = true; wide = true; layout();
+    clearAll(); stopLasso(); stopWeather(true); clearTod(); Sound.piano(0); running = true; wide = true; sceneKey = ""; stage.classList.add("intro"); grain.style.display = ""; layout();
     t0 = performance.now(); introGoing = true; Sound.stopMusic(0.3); musicNow();
     var s = 96 * K;
     skip.hidden = false; replay.hidden = true;
