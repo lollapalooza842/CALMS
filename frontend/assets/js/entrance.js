@@ -21,10 +21,14 @@
         town, the sign-in card comes up and he drops onto it.
 
    A click or any key skips either walk. With reduced motion there is only a short fade. */
+/* the look of the sign-in page: western (the town, the default) or classic (a plain form). ?ui=classic or ?ui=western
+   in the address chooses it too. Kept per device; set before anything is drawn so the page never flashes the other one. */
+(function () { try { var q = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1]; if (q) localStorage.setItem("calms-ui", q);
+  if ((q || localStorage.getItem("calms-ui")) === "classic") document.documentElement.setAttribute("data-ui", "classic"); } catch (e) {} })();
 /* Kuwa's hat, chosen on the sign-in card (index.js): set before anything is drawn, so he wears it on every page */
 (function () { try { var h = localStorage.getItem("calms-hat"); if (h && h !== "cowboy" && /^(sheriff|bowler|sombrero)$/.test(h)) document.documentElement.setAttribute("data-hat", h); } catch (e) {} })();
 (function () {
-  var KEY = "calms-entered", OUT = "calms-left", reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var KEY = "calms-entered", OUT = "calms-left", reduce = (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) || document.documentElement.getAttribute("data-ui") === "classic";   /* the classic look: the short fade, not the walk into the bank */
   window.CALMS_ENTRANCE = true;
 
   /* ---- Kuwa's wings: assets/audio/wings, takeoff, landing (made by design/sound/sfx.py) ----

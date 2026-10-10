@@ -11,7 +11,8 @@ SRC = open(os.path.join(HERE, 'kuwa.py')).read().split('tags=[')[0]
 def _sub(a, b):
     global SRC
     assert a in SRC, a; SRC = SRC.replace(a, b)
-_sub("sf=0,puff=0,extra=None):", "sf=0,puff=0,extra=None,be=(0,0,0,0),pup=3,mouth=0):")
+_sub("sf=0,puff=0,extra=None):", "sf=0,puff=0,extra=None,be=(0,0,0,0),pup=3,mouth=0,hatOn=True):")
+_sub("    hat(c,t,star=48+sf+(3 if sf else 0))", "    hat(c,t,star=48+sf+(3 if sf else 0)) if hatOn else tufts(c,o)")
 _sub("c.P([(lo,29+bd),(lo+8,29+bd),(bx-1,39+bd),(bx-1,45+bd),(bx-8,43+bd),(lo,35+bd)],HD,OL,o)", "c.P([(lo,29+bd+be[0]),(lo+8,29+bd+be[0]),(bx-1,39+bd+be[1]),(bx-1,45+bd+be[1]),(bx-8,43+bd+be[1]),(lo,35+bd+be[0])],HD,OL,o)")
 _sub("c.P([(ro,29+bd),(ro-8,29+bd),(bx+1,39+bd),(bx+1,45+bd),(bx+8,43+bd),(ro,35+bd)],HD,OL,o)", "c.P([(ro,29+bd+be[2]),(ro-8,29+bd+be[2]),(bx+1,39+bd+be[3]),(bx+1,45+bd+be[3]),(bx+8,43+bd+be[3]),(ro,35+bd+be[2])],HD,OL,o)")
 _sub("c.L([(lo+2,31+bd),(bx-4,41+bd)],HM,1,o); c.L([(ro-2,31+bd),(bx+4,41+bd)],HM,1,o)", "c.L([(lo+2,31+bd+be[0]),(bx-4,41+bd+be[1])],HM,1,o); c.L([(ro-2,31+bd+be[2]),(bx+4,41+bd+be[3])],HM,1,o)")
@@ -20,12 +21,13 @@ _sub("c.L([(cx-rx+1,47),(cx+rx-1,47)],OL,2,o); c.L([(cx-rx+3,50),(cx+rx-3,50)],B
 _sub("c.L([(46+q,47),(46+q,51)],C,1,o)", "c.L([(46+q,47),(46+q,51)],C,1,o)\n    if mouth: c.E((44+q,56,52+q,58+mouth*3),K,OL,o)")
 exec(SRC)                                    # front(), side(), back(), FLY, the palette
 F = front
+NECK = round(T(0, 58)[1])                    # where head meets body, in pixels, now that he is drawn at FIT (see kuwa.py)
 def lerp(A, B, t): return [(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t) for a, b in zip(A, B)]
 def shift(im, dx, dy=0): out = Image.new('RGBA', im.size); out.paste(im, (dx, dy), im); return out
 def lean(im, deg): return im.rotate(deg, resample=Image.NEAREST, center=(48, 90))
 def tilt_head(deg, **kw):                    # turn only the head and hat, about the neck
-    full = F(**kw); head = full.crop((0, 0, 96, 58)); body = full.copy(); ImageDraw.Draw(body).rectangle([0, 0, 96, 57], fill=(0, 0, 0, 0))
-    canvas = Image.new('RGBA', (96, 96)); canvas.paste(head, (0, 0)); canvas = canvas.rotate(deg, resample=Image.NEAREST, center=(48, 58))
+    full = F(**kw); head = full.crop((0, 0, 96, NECK)); body = full.copy(); ImageDraw.Draw(body).rectangle([0, 0, 96, NECK - 1], fill=(0, 0, 0, 0))
+    canvas = Image.new('RGBA', (96, 96)); canvas.paste(head, (0, 0)); canvas = canvas.rotate(deg, resample=Image.NEAREST, center=(48, NECK))
     out = Image.new('RGBA', (96, 96)); out.alpha_composite(canvas); out.alpha_composite(body); return out
 def one_wing(key, **kw):                     # his left wing folded, his right wing open
     FLY['w'], FLYL['w'] = FLY[key], FLYL[key]; a = F(**kw); b = F(wing='flyw', **kw); out = a.copy(); out.paste(b.crop((48, 0, 96, 96)), (48, 0)); return out
@@ -40,7 +42,7 @@ def polish(dx):
     im = F(look=(0, -2), hdy=1); d = ImageDraw.Draw(im)
     d.polygon([(66, 62), (74, 58), (70, 40), (56 + dx, 22), (50 + dx, 24), (60, 42), (62, 56)], fill=WD, outline=OL); d.line([(68, 56), (56 + dx, 28)], fill=WM); return im
 def tap():
-    im = F(brow=2, look=(-2, 0)); foot = im.crop((50, 85, 68, 93)); d = ImageDraw.Draw(im); d.rectangle([50, 85, 68, 93], fill=(0, 0, 0, 0)); im.paste(foot, (50, 81), foot); return im
+    im = F(brow=2, look=(-2, 0)); foot = im.crop((49, 86, 66, 94)); d = ImageDraw.Draw(im); d.rectangle([49, 86, 66, 94], fill=(0, 0, 0, 0)); im.paste(foot, (49, 83), foot); return im
 def watch(**kw):
     im = F(wing='chin', **kw); d = ImageDraw.Draw(im); d.line([(60, 66), (70, 72), (76, 66)], fill=AD); d.ellipse([71, 58, 83, 70], fill=A, outline=OL); d.ellipse([73, 60, 81, 68], fill=W); d.line([(77, 64), (77, 61)], fill=K); d.line([(77, 64), (79, 65)], fill=K); return im
 def stamp(up):
@@ -51,7 +53,7 @@ def stamp(up):
         for x in (74, 95): d.line([(x, 84), (x + (-3 if x < 80 else 3) * -1, 88)], fill=OL)
     return im
 def back_head():                            # the head turned right round, over a body that has not moved
-    body = F(); ImageDraw.Draw(body).rectangle([0, 0, 96, 57], fill=(0, 0, 0, 0)); head = back().crop((0, 0, 96, 58)); out = Image.new('RGBA', (96, 96)); out.paste(head, (0, 0), head); out.alpha_composite(body); return out
+    body = F(); ImageDraw.Draw(body).rectangle([0, 0, 96, NECK - 1], fill=(0, 0, 0, 0)); head = back().crop((0, 0, 96, NECK)); out = Image.new('RGBA', (96, 96)); out.paste(head, (0, 0), head); out.alpha_composite(body); return out
 L = lambda **kw: ImageOps.mirror(F(sf=7, **kw))
 FR = [
  ('base', F()), ('breathe1', F(puff=1)), ('breathe2', F(puff=2, hdy=-1)), ('half', F(eyes='half')), ('closed', F(eyes='closed')),
@@ -121,6 +123,44 @@ def wing_at(t):
 def fly(t, deg, **kw): FLY['v'], FLYL['v'] = wing_at(t); return F(wing='flyv', **kw).rotate(deg, resample=Image.NEAREST, center=(48, 60))
 for n, t in enumerate([0, .3, .7, 1, .66, .25]): FR.append(('fly%d' % n, fly(t, -7, sf=7, gy=-2 - round(4 * t), feet='tuck')))
 FR += [('flare', fly(0, 13, sf=7, gy=-3, feet='stand', brow=1)), ('land', fly(.62, 0, sf=7, gy=4, puff=3, feet='stand', eyes='half'))]
+# ---- nodding off, then sitting down like a sack of flour, hat off and onto his belly, and asleep ----
+def tufts(c, o):                             # the top of his head, seen when his hat is off: two ear tufts and a darker crown
+    c.E((30, 21, 66, 31), BD, None, o); c.E((34, 22, 62, 29), BM, None, o)
+    c.P([(24, 32), (19, 15), (25, 18), (35, 27)], BD, OL, o); c.P([(72, 32), (77, 15), (71, 18), (61, 27)], BD, OL, o)
+    c.L([(23, 20), (28, 28)], HL, 1, o); c.L([(73, 20), (68, 28)], HL, 1, o)
+def small_hat(k):                            # his hat on its own, k times its size
+    c2 = Cv(); hat(c2, 0); c2.outline(); bb = c2.im.getbbox(); im = c2.im.crop(bb)
+    return im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.NEAREST)
+def sit(eyes='open', hatpos='on', breath=0, hdy=0, squash=0, **kw):
+    """Sitting on the floor, round as a barrel, feet out in front. hatpos: on, lift (raised off his head), chest (held
+    in front), belly (resting on it), none. breath 0-2 swells the belly; squash is the bump of sitting down."""
+    c = Cv(); p = breath + squash; b = 4 + squash
+    c.E((6 - p, 42 + b, 90 + p, 97), BD, None); c.E((6 - p, 41 + b, 87 + p, 94), BM, None)        # the barrel
+    c.E((0 - p, 54 + b, 20, 92), WD, OL); c.L([(8, 62 + b), (7, 86)], WM); c.L([(13, 62 + b), (12, 88)], WM)
+    c.E((76, 54 + b, 96 + p, 92), WD, OL); c.L([(88, 62 + b), (89, 86)], WM); c.L([(83, 62 + b), (84, 88)], WM)
+    c.E((18 - p, 52 + b, 78 + p, 97), CD, None); c.E((18 - p, 51 + b, 77 + p, 95), C, None)          # the belly
+    for (x, y) in [(34, 72), (48, 70), (62, 72), (40, 80), (56, 80), (48, 88)]: c.L([(x - 2, y + b // 2), (x, y + 2 + b // 2), (x + 2, y + b // 2)], TN, 1)
+    for x0 in (16, 60):                                                       # feet, poking out under him
+        c.E((x0, 88, x0 + 20, 99), A, AD); c.L([(x0 + 6, 90), (x0 + 6, 96)], AD); c.L([(x0 + 13, 90), (x0 + 13, 96)], AD)
+    c.P([(22, 58), (74, 58), (76, 64), (60, 69), (48, 76), (36, 69), (20, 64)], R, OL, b)            # bandana
+    c.P([(22, 58), (74, 58), (75, 61), (21, 61)], RL, None, b); c.L([(36, 68), (48, 74), (60, 68)], RD, 1, b)
+    c.outline(); out = c.im
+    head = F(eyes=eyes, hatOn=hatpos == 'on', **kw).crop((0, 0, 96, NECK + 3))
+    out.paste(head, (0, round((b + hdy) * FIT)), head)
+    if hatpos == 'lift':                                                    # raised in his right wing, off his head
+        hc = Cv(); hat(hc, -7 + hdy); hc.P([(70, 72), (80, 62), (88, 40), (86, 30), (80, 30), (76, 44), (66, 60)], WD, OL); hc.L([(78, 58), (84, 38)], WM); hc.outline(); out.alpha_composite(hc.im)
+    elif hatpos in ('chest', 'belly'):
+        hs = small_hat(.7); y = (round(T(0, 60 + b)[1]) if hatpos == 'chest' else round(T(0, 70 + b)[1])) - breath
+        out.paste(hs, (48 - hs.width // 2, y), hs)
+        if hatpos == 'chest':
+            d = Cv(); d.P([(10, 84), (22, 72), (32, 70), (34, 76), (24, 80), (18, 88)], WD, OL); d.P([(86, 84), (74, 72), (64, 70), (62, 76), (72, 80), (78, 88)], WD, OL); d.outline(); out.alpha_composite(d.im)
+    return out
+SOFT = dict(be=(2, -5, 2, -5))                # the brows let go: a peaceful face, not a cross one
+FR += [('nod1', F(eyes='closed', hdy=6, hatd=6, puff=1, **SOFT)), ('nodJerk', F(eyes='half', hdy=-1, hatd=-1, be=(-1, -4, -1, -4), pup=2)),
+       ('sitDown', sit(eyes='half', hatpos='on', squash=3, **SOFT)), ('sit', sit(eyes='half', hatpos='on', **SOFT)), ('sitBlink', sit(eyes='closed', hatpos='on', **SOFT)),
+       ('sitLift', sit(eyes='half', hatpos='lift', **SOFT)), ('sitChest', sit(eyes='half', hatpos='chest', **SOFT)), ('sitBelly', sit(eyes='half', hatpos='belly', **SOFT)),
+       ('sitPat', sit(eyes='closed', hatpos='belly', breath=1, **SOFT)),
+       ('sitZ1', sit(eyes='closed', hatpos='belly', breath=0, **SOFT)), ('sitZ2', sit(eyes='closed', hatpos='belly', breath=1, hdy=1, **SOFT)), ('sitZ3', sit(eyes='closed', hatpos='belly', breath=2, hdy=1, **SOFT))]
 NAMES = [n for n, _ in FR]
 if __name__ == '__main__':
     rows = (len(FR) + 7) // 8

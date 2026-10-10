@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="assets/css/theme-ui.css">
 <link rel="stylesheet" href="assets/css/index.css">
 <link rel="stylesheet" href="assets/css/entrance.css">
+<link rel="stylesheet" href="assets/css/classic.css">
 <script src="assets/js/entrance.js"></script>
 <link rel="stylesheet" href="assets/css/icons.css">
 </head>
@@ -39,6 +40,9 @@
   <div id="bits"></div>
   <div id="flash"></div>
   <div id="front">
+    <section id="brandside" aria-hidden="true"><span class="dot" style="width:340px;height:340px;right:-90px;top:-120px"></span><span class="dot" style="width:220px;height:220px;left:-70px;bottom:-60px"></span><span class="dot" style="width:120px;height:120px;right:24%;bottom:14%"></span>
+      <img src="assets/img/logo-large.webp" alt=""><h2>Welcome back</h2><p>Credit approval and loan management for GR8 Lending staff.</p>
+      <ul><li><i>&#10003;</i>Applications, papers and credit checks in one place</li><li><i>&#9878;</i>Every decision signed and kept in the audit log</li><li><i>&#8369;</i>Releases, payments and loan accounts, to the centavo</li></ul></section>
     <div id="logoWrap"><img id="logo" alt="CALMS, Credit Approval and Loan Management System" src="assets/img/logo-large.webp"><div id="glint"></div></div>
     <div id="card">
       <div id="hook" aria-hidden="true"><svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="4,30 50,5 96,30" fill="none" stroke="#24130a" stroke-width="4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><polyline points="4,30 50,5 96,30" fill="none" stroke="#9a7a4a" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg><b></b><u style="left:calc(4% - 4px)"></u><u style="left:calc(96% - 4px)"></u></div>
@@ -85,9 +89,11 @@
       <button class="mi" id="sound" type="button" role="menuitemcheckbox" aria-checked="true">Sound on</button>
       <button class="mi" id="hatItem" type="button" role="menuitem">Kuwa's hat: Cowboy</button>
       <button class="mi" id="replay" type="button" role="menuitem" hidden>Replay intro</button>
+      <button class="mi" id="uiItem" type="button" role="menuitem">Classic look</button>
     </div>
   </div>
   <button class="ghost" id="skip" type="button">Skip intro</button>
+  <button class="inline" id="uiSwitch" type="button">Switch to the western look</button>
 </div>
 <script src="assets/js/api.js"></script>
 <script src="assets/js/app.js"></script>

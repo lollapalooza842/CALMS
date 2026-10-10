@@ -136,6 +136,8 @@ input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
   #gearMenu #replay { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
   #gearMenu #replay[hidden] { display: none; }
   #gearMenu #install { left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  #gearMenu #uiItem { z-index: 5; position: absolute; right: 16px; top: calc(62px + env(safe-area-inset-top, 0px)); font: 400 15px/1 var(--display); letter-spacing: .1em; color: var(--paper); background: rgba(26,15,8,.7); border: 1px solid var(--brass); padding: 10px 14px; cursor: var(--cur-pointer, pointer); }
+  #gearMenu #uiItem:hover { background: rgba(26,15,8,.85); } #gearMenu #uiItem:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
   #gearMenu #sound.ask { animation: askbg 1.4s ease-in-out infinite; }
   #gearMenu #sound:focus-visible, #gearMenu #replay:focus-visible, #gearMenu #install:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 }

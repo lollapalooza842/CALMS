@@ -21,7 +21,7 @@
 (function () {
   var kuwa = document.getElementById("kuwa"); if (!kuwa) return;
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var N = {base: 0, breathe1: 1, breathe2: 2, half: 3, closed: 4, lookL: 5, lookR: 6, lookU: 7, lookD: 8, lookUL: 9, lookUR: 10, lookDL: 11, lookDR: 12, leanL: 13, leanR: 14, hat1: 15, hat2: 16, hat3: 17, tug1: 18, tug2: 19, ruffle1: 20, ruffle2: 21, ruffle3: 22, preen1: 23, preen2: 24, tiltL: 25, tiltR: 26, turnR: 27, turnL: 28, turnBack: 29, scratch1: 30, scratch2: 31, wing1: 32, wing2: 33, wing3: 34, yawn1: 35, yawn2: 36, polish1: 37, polish2: 38, leanIn: 39, perk: 40, wave: 41, glare: 42, hop: 43, peck: 44, drowsy1: 45, drowsy2: 46, drowsy3: 47, sleep1: 48, sleep2: 49, startle: 50, hatBack: 51, innocent: 52, tap: 53, tapBase: 54, watch1: 55, watch2: 56, count1: 57, count2: 58, stampUp: 59, stampDown: 60, squint: 61, shakeL: 62, shakeR: 63, soft0: 64, soft1: 65, soft2: 66, softBlink: 67, curious0: 68, curious1: 69, curious2: 70, curiousBlink: 71, smug0: 72, smug1: 73, smug2: 74, smugBlink: 75, focused0: 76, focused1: 77, focused2: 78, focusedBlink: 79, pleased0: 80, pleased1: 81, pleased2: 82, pleasedBlink: 83, surprised: 84, worried: 85, seeL: 86, seeR: 87, seeU: 88, seeD: 89, seeUL: 90, seeUR: 91, seeDL: 92, seeDR: 93, softT1: 94, softT2: 95, curiousT1: 96, curiousT2: 97, smugT1: 98, smugT2: 99, focusedT1: 100, focusedT2: 101, pleasedT1: 102, pleasedT2: 103, headR: 104, headL: 105, headRlean: 106, headLlean: 107, mugHold: 108, mugSip: 109, ledger1: 110, ledger2: 111, ledgerTurn: 112, specs: 113, specsPeer: 114, duck: 115, duckPeek: 116, flinch: 117, fly0: 118, fly1: 119, fly2: 120, fly3: 121, fly4: 122, fly5: 123, flare: 124, land: 125};
+  var N = {base: 0, breathe1: 1, breathe2: 2, half: 3, closed: 4, lookL: 5, lookR: 6, lookU: 7, lookD: 8, lookUL: 9, lookUR: 10, lookDL: 11, lookDR: 12, leanL: 13, leanR: 14, hat1: 15, hat2: 16, hat3: 17, tug1: 18, tug2: 19, ruffle1: 20, ruffle2: 21, ruffle3: 22, preen1: 23, preen2: 24, tiltL: 25, tiltR: 26, turnR: 27, turnL: 28, turnBack: 29, scratch1: 30, scratch2: 31, wing1: 32, wing2: 33, wing3: 34, yawn1: 35, yawn2: 36, polish1: 37, polish2: 38, leanIn: 39, perk: 40, wave: 41, glare: 42, hop: 43, peck: 44, drowsy1: 45, drowsy2: 46, drowsy3: 47, sleep1: 48, sleep2: 49, startle: 50, hatBack: 51, innocent: 52, tap: 53, tapBase: 54, watch1: 55, watch2: 56, count1: 57, count2: 58, stampUp: 59, stampDown: 60, squint: 61, shakeL: 62, shakeR: 63, soft0: 64, soft1: 65, soft2: 66, softBlink: 67, curious0: 68, curious1: 69, curious2: 70, curiousBlink: 71, smug0: 72, smug1: 73, smug2: 74, smugBlink: 75, focused0: 76, focused1: 77, focused2: 78, focusedBlink: 79, pleased0: 80, pleased1: 81, pleased2: 82, pleasedBlink: 83, surprised: 84, worried: 85, seeL: 86, seeR: 87, seeU: 88, seeD: 89, seeUL: 90, seeUR: 91, seeDL: 92, seeDR: 93, softT1: 94, softT2: 95, curiousT1: 96, curiousT2: 97, smugT1: 98, smugT2: 99, focusedT1: 100, focusedT2: 101, pleasedT1: 102, pleasedT2: 103, headR: 104, headL: 105, headRlean: 106, headLlean: 107, mugHold: 108, mugSip: 109, ledger1: 110, ledger2: 111, ledgerTurn: 112, specs: 113, specsPeer: 114, duck: 115, duckPeek: 116, flinch: 117, fly0: 118, fly1: 119, fly2: 120, fly3: 121, fly4: 122, fly5: 123, flare: 124, land: 125, nod1: 126, nodJerk: 127, sitDown: 128, sit: 129, sitBlink: 130, sitLift: 131, sitChest: 132, sitBelly: 133, sitPat: 134, sitZ1: 135, sitZ2: 136, sitZ3: 137};
   var layer = document.createElement("span"); layer.className = "klife"; layer.setAttribute("aria-hidden", "true"); kuwa.appendChild(layer);
   function show(f) { layer.style.backgroundPosition = (-96 * (f % 8)) + "px " + (-96 * Math.floor(f / 8)) + "px"; }
   function rnd(a, b) { return a + Math.random() * (b - a); }
@@ -34,7 +34,7 @@
   var PLAIN = { 0: 1, 1: 1, 2: 1, 3: 1, 24: 1, 25: 1, 26: 1, 27: 1, 28: 1 };        /* the page's own standing, blinking, frowning and looking frames (in kuwa.png) */
   var pageBusyUntil = 0, mine = false;
   function pageFrame() { var m = /(-?[\d.]+)px\s+(-?[\d.]+)px/.exec(kuwa.style.backgroundPosition || ""); return m ? Math.round(-m[1] / 96) + Math.round(-m[2] / 96) * 8 : 0; }
-  function pageBusy() { for (var i = 0; i < kuwa.classList.length; i++) if (kuwa.classList[i] !== "alive" && kuwa.classList[i] !== "kuwa-out" && kuwa.classList[i] !== "kuwa-moved") return true; return !PLAIN[pageFrame()]; }
+  function pageBusy() { for (var i = 0; i < kuwa.classList.length; i++) if (kuwa.classList[i] !== "alive" && kuwa.classList[i] !== "kuwa-out" && kuwa.classList[i] !== "kuwa-moved") return true; return state === "awake" && !PLAIN[pageFrame()]; }   /* the page's own looping moods (an alert, say) do not wake him: you do */
   function watchPage() { if (pageBusy()) { pageBusyUntil = now() + 1300; if (mine) release(); } }
   if (window.MutationObserver) new MutationObserver(watchPage).observe(kuwa, { attributes: true, attributeFilter: ["style", "class"] });
   function take() { if (mine) return; mine = true; kuwa.classList.add("alive"); }
@@ -104,10 +104,16 @@
 
   /* ---- 5 and 1. left alone, and waking ---- */
   var state = "awake", sleepT = null;
-  function seen() { var was = state; lastSeen = now(); if (was === "asleep") { state = "awake"; clearInterval(sleepT); act([[N.startle, 380], [N.surprised, 260], [N.hatBack, 320], [N.innocent, 900], [N.smug0, 300]], 9); setFace("smug", 3000); } else if (was === "drowsy") { state = "awake"; act([[N.surprised, 320], [N.soft0, 160]], 8); setFace("soft", 3000); } }
+  function seen() { var was = state; lastSeen = now(); if (was === "asleep") { state = "awake"; clearInterval(sleepT); act([[N.sitBelly, 160], [N.sitChest, 120], [N.sitLift, 140], [N.startle, 380], [N.surprised, 260], [N.hatBack, 320], [N.innocent, 900], [N.smug0, 300]], 9); setFace("smug", 3000); }   /* hat back on in a hurry, and up he jumps */ else if (was === "drowsy") { state = "awake"; act([[N.surprised, 320], [N.soft0, 160]], 8); setFace("soft", 3000); } }
   function doze() { if (state === "awake" && now() - lastSeen > 30000) { state = "drowsy"; }
-    if (state === "drowsy" && now() - lastSeen > 60000) { state = "asleep"; act([[N.drowsy3, 500], [N.sleep1, 400]], 7); sleepT = setInterval(function () { if (mine && state === "asleep") zed(); }, 1900); } }
-  var SLEEP = [N.sleep1, N.sleep1, N.sleep2, N.sleep2], DROWSY = [N.drowsy1, N.drowsy1, N.drowsy2, N.drowsy3, N.drowsy3, N.drowsy2];
+    if (state === "drowsy" && now() - lastSeen > 60000) { state = "asleep"; act(BEDTIME, 7); sleepT = setInterval(function () { if (mine && state === "asleep") zed(); }, 1900); } }
+  /* drowsy: his eyes droop and now and then his head drops and jerks back up. Then he gives in: a yawn, one last nod,
+     he plops down on his bottom like a sack of flour, takes his hat off, sets it on his belly, and sleeps with it rising and falling */
+  var SLEEP = [N.sitZ1, N.sitZ1, N.sitZ2, N.sitZ3, N.sitZ3, N.sitZ2], DROWSY = [N.drowsy1, N.drowsy1, N.drowsy2, N.drowsy3, N.drowsy3, N.nod1, N.nodJerk, N.drowsy2];
+  var BEDTIME = [[N.drowsy3, 500], [N.yawn1, 260], [N.yawn2, 900], [N.drowsy3, 400], [N.nod1, 700], [N.nodJerk, 240], [N.drowsy3, 500],
+                 [N.sitDown, 150], [N.sit, 600], [N.sitBlink, 220], [N.sit, 500], [N.sitLift, 600], [N.sitChest, 500], [N.sitBelly, 700], [N.sitBlink, 0], [N.sitPat, 600], [N.sitZ1, 400]];
+  BEDTIME = BEDTIME.filter(function (f) { return f[1]; });
+  if (/[?&]kuwa=sleep\b/.test(location.search)) setTimeout(function () { lastSeen = now() - 50000; }, 1500);   /* to watch him nod off at once: add ?kuwa=sleep to the address and keep still */
 
   document.addEventListener("mousemove", function (e) { mx = e.clientX; my = e.clientY; seen(); }, { passive: true });
   document.addEventListener("scroll", seen, { passive: true, capture: true });
@@ -174,9 +180,9 @@
   /* ---- the heartbeat: one beat every 720 ms ---- */
   function beat() { var t = now(); if (document.hidden) return; if (t < pageBusyUntil || pageBusy()) { if (pageBusy()) pageBusyUntil = t + 1300; return; } take(); if (peeking) return; watchTrain(); if (acting || moving) return;
     if (!reduce && state === "awake") { var idle = t - lastSeen; if ((off.x || off.y) && t - lastTouch > 20000) { goHome(); return; } if (idle > 16000 && idle < 26000 && t - lastPeek > 120000 && !(off.x || off.y) && !carry) { peek(); return; } }
-    if (t > nextFace && t > faceUntil) driftFace();
+    if (t > nextFace && t > faceUntil && state === "awake") driftFace();   /* no face-pulling in his sleep */
     if (reduce) { bi = (bi + 1) % 4; show(breath()[bi]); if (t > nextBlink) blink(); return; }
-    doze();
+    doze(); if (acting) return;
     if (state === "asleep") { bi = (bi + 1) % SLEEP.length; show(SLEEP[bi]); return; }
     if (state === "drowsy") { bi = (bi + 1) % DROWSY.length; show(DROWSY[bi]); return; }
     if (t < typingUntil) { show(N.leanIn); face = "focused"; faceUntil = t + 2500; return; }

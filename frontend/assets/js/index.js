@@ -16,6 +16,10 @@
       sil = $("sil"), shade = $("shade"), fake = $("fake"), tumble = $("tumble"), l4g = $("l4g"), skip = $("skip"), replay = $("replay");
   var CAM = [["l1", 1.03, 0], ["l2", 1.07, 0], ["l3", 1.12, 0], ["l4", 1.24, 0], ["l4g", 1.24, 0], ["l5", 1.7, 16]];
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* the classic look (classic.css): no town, no intro; the town's pointer games are switched off so nothing runs unseen */
+  var CLASSIC = document.documentElement.getAttribute("data-ui") === "classic";
+  if (CLASSIC) ["pointermove", "pointerdown", "pointerleave"].forEach(function (t) { stage.addEventListener(t, function (e) { e.stopImmediatePropagation(); }, true); });
+  function setLook(ui) { try { localStorage.setItem("calms-ui", ui); } catch (e) {} location.hash = "signin"; location.reload(); }   /* #signin: no intro on the way back */
   var K = 3, timers = [], anims = [], ivs = [], running = false, W = 0, H = 0, PH = 1, PY = 0, wide = false, LW = 0, LH = 0, sceneKey = "";
   glint.style.webkitMaskImage = glint.style.maskImage = "url(" + $("logo").src + ")";
 
@@ -1059,5 +1063,8 @@
      by signing out (the link ends in #signin), so you are not made to watch it again. */
   var seen = location.hash === "#signin";
   layout(); frame(clerk, 0, 1);
-  if (reduce || seen) finish(false); else play();
+  $("uiItem").addEventListener("click", function (e) { e.stopPropagation(); setLook("classic"); });
+  $("uiSwitch").addEventListener("click", function () { setLook("western"); });
+  if (CLASSIC) { card.style.opacity = 1; logoWrap.style.opacity = 1; skip.hidden = true; replay.hidden = true; }
+  else if (reduce || seen) finish(false); else play();
 })();
