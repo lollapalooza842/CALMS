@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Applications</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/applications.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/applications.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>Applications</h1><p class="lede" id="lede"></p></div>
+      <label class="proto" for="role">Prototype only: view this page as <select id="role"></select></label>
+    </div>
+    <div class="rails"><div class="line" id="line" role="group" aria-label="Filter by status"><div id="train"></div></div></div>
+    <div class="tools">
+      <label for="q">Find<input id="q" type="search" placeholder="Reference or borrower" autocomplete="off"></label>
+      <label for="prod">Product<select id="prod"><option value="">All products</option><option>Salary loan</option><option>Personal loan</option><option>SME loan</option></select></label>
+      <button class="plain" type="button" id="all">All stations</button>
+      <div class="live" id="live"><i></i><span id="liveText">Live</span><button class="plain" type="button" id="pause" aria-pressed="false">Pause</button></div>
+    </div>
+    <div class="book">
+      <div class="spine"><div id="kuwa" role="img" aria-label="Kuwa the owl, beside the application that has waited longest in its stage"></div></div>
+      <div class="pages">
+        <div class="pagehead"><b>Ledger of Applications</b><span id="count"></span></div>
+        <div class="scroll"><table><thead><tr id="head"></tr></thead><tbody id="rows"></tbody></table></div>
+      </div>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Kuwa stands beside the application that has waited longest in its current stage. The red lamp marks the station where applications wait longest on average.</span><span>Example data for a design prototype. Status changes are simulated. No real borrowers.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/applications.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

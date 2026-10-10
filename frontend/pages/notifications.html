@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Notifications</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/notifications.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/notifications.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Liza Mendoza</b><span>Loan Processor</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>Notifications</h1><p class="sub">What CALMS has told you, newest first. The ones marked “Needs you” are waiting on something only you can do.</p></div>
+      <button class="btn wall" type="button" id="arrive">Prototype: a new notice arrives</button>
+    </div>
+    <section class="perch" aria-labelledby="ph">
+      <div class="post" aria-hidden="true"><div id="kuwa"></div></div>
+      <div><h2 id="ph"></h2><p id="pp" role="status"></p></div>
+      <div class="acts"><button class="btn" type="button" id="allread">Mark all as read</button></div>
+    </section>
+    <div class="bar"><div class="chips" id="chips" role="group" aria-label="Show"></div></div>
+    <ul class="list" id="list" aria-label="Notifications"></ul>
+    <p class="empty" id="empty" hidden></p>
+    <div class="below"><span>A “Needs you” mark clears by itself once the work is done. Reading it does not clear it.</span><button class="btn wall" type="button" id="prefs">Choose which notices I get</button></div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Notices never show amounts or credit details. Open the record to see those.</span><span>Design prototype. People and applications are invented examples.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/notifications.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

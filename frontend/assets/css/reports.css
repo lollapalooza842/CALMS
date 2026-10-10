@@ -1,0 +1,73 @@
+/* Layout: deliberately quiet. A period switch, four plain numbers, then the page's one showpiece: a trail of the seven steps with a post for how long applications wait at each, Kuwa standing on the slowest. Below it, one report at a time behind tabs, each a labelled bar list with a one-line takeaway and export buttons. Scheduled regulatory reports sit last as a plain list. */
+:root { --low: #2c5a38; --high: #8f2a22; --s1: #1877a0; --s2: #b4532a; --bar: #5e3a1f; }
+[hidden] { display: none !important; }
+.card, .tiles { color-scheme: light; }
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; }
+h1 { margin: 0; font: 400 clamp(30px, 4vw, 46px)/1.05 var(--display); letter-spacing: .03em; }
+.sub { margin: 4px 0 0; font-size: 15.5px; line-height: 1.4; color: var(--text-soft); max-width: 60ch; }
+.per { display: flex; flex-wrap: wrap; gap: 6px; } .per button, .tabs button { font: 400 16px/1.1 var(--display); letter-spacing: .06em; padding: 10px 12px 8px; min-height: 42px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); cursor: var(--cur-pointer, pointer); } .per button[aria-pressed="true"], .tabs button[aria-pressed="true"] { background: var(--ink); color: #f7e8c6; }
+.btn { font: 400 16px/1.1 var(--display); letter-spacing: .06em; padding: 10px 12px 8px; background: transparent; color: #16110c; border: 2px solid #16110c; cursor: var(--cur-pointer, pointer); min-height: 40px; }
+h2.sec { margin: 10px 0 0; font: 400 24px/1.1 var(--display); letter-spacing: .06em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; } h2.sec small { font: 400 15px/1.35 var(--body); letter-spacing: 0; color: var(--text-soft); }
+.card { background: var(--paper); color: var(--ink); border: 1px solid rgba(36,19,10,.5); box-shadow: 3px 4px 0 var(--shade); padding: 16px clamp(12px, 2vw, 20px) 18px; min-width: 0; }
+
+/* four numbers */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.tiles li { container-type: inline-size; background: var(--paper); color: var(--ink); border: 1px solid rgba(36,19,10,.5); box-shadow: 3px 4px 0 var(--shade); padding: 14px 16px; min-width: 0; }
+.tiles span { font: 400 14.5px/1.2 var(--display); letter-spacing: .1em; color: var(--ink-soft); display: block; } .tiles b { display: block; font: 700 34px/1.15 var(--figure); font-size: clamp(22px, 15cqi, 38px); overflow-wrap: anywhere; } .tiles small { display: block; font-size: 14.5px; line-height: 1.35; color: var(--ink-soft); }
+.tiles small.up::before { content: "\25B2  "; } .tiles small.dn::before { content: "\25BC  "; } .tiles small.good { color: var(--low); } .tiles small.bad { color: var(--high); }
+
+/* the one showpiece: where applications wait */
+.trailcard { background: linear-gradient(#cfe3ea 0 62%, #c9a66b 62% 100%); color: #16110c; border: 2px solid #24130a; box-shadow: 5px 6px 0 var(--shade); padding: 14px clamp(12px, 2vw, 20px) 16px; min-width: 0; }
+.trailcard h2 { margin: 0; font: 400 24px/1.1 var(--display); letter-spacing: .06em; } .trailcard p { margin: 4px 0 0; font-size: 15.5px; line-height: 1.4; max-width: 70ch; }
+.trail { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 116px 0 0; list-style: none; align-items: end; position: relative; }
+.trail::after { content: ""; position: absolute; left: 0; right: 0; bottom: 58px; border-bottom: 4px dotted #5e3a1f; }
+.stg { position: relative; display: grid; justify-items: center; gap: 6px; min-width: 0; z-index: 1; }
+.stg .v { font: 700 16px/1.1 var(--figure); text-align: center; } .stg .col { width: min(54px, 70%); height: calc(var(--h) * 1.5px); min-height: 4px; background: var(--bar); border: 2px solid #120a05; border-bottom: 0; }
+.stg .sign { width: 100%; box-sizing: border-box; background: #f7e8c6; border: 2px solid #24130a; padding: 6px 4px 4px; text-align: center; font: 400 14px/1.15 var(--display); letter-spacing: .04em; min-height: 46px; display: grid; align-content: center; overflow-wrap: anywhere; } .stg .w { font-size: 13.5px; line-height: 1.3; text-align: center; }
+.stg.worst .col { background: repeating-linear-gradient(135deg, #8f2a22 0 7px, #b4532a 7px 14px); } .stg.worst .sign { background: #8f2a22; color: #fffdf6; } .stg.worst .v::after { content: " · longest"; }
+#kuwa { position: absolute; left: 50%; bottom: 100%; margin: 0 0 4px -48px; width: 96px; height: 96px; background: url(../img/kuwa.png) no-repeat; background-size: 768px 768px; image-rendering: pixelated; image-rendering: crisp-edges; }
+.says { display: inline-block; margin: 10px 0 0; font-size: 15.5px; line-height: 1.35; background: #fffdf6; border: 2px solid #24130a; padding: 7px 11px 5px; box-shadow: 3px 3px 0 rgba(36,19,10,.3); }
+
+/* one report at a time */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.rhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px 20px; margin-bottom: 12px; } .rhead h3 { margin: 0; font: 400 22px/1.1 var(--display); letter-spacing: .05em; } .rhead p { margin: 4px 0 0; font-size: 15px; line-height: 1.4; color: var(--ink-soft); max-width: 60ch; } .rhead .ex { display: flex; flex-wrap: wrap; gap: 8px; }
+.bars { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.bars li { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) minmax(86px, auto); gap: 12px; align-items: center; font-size: 15.5px; line-height: 1.3; }
+.bars .l small { display: block; font-size: 13.5px; color: var(--ink-soft); } .bars .b { display: grid; gap: 3px; min-width: 0; position: relative; } .bars .b i { display: block; height: 20px; width: max(3px, calc(var(--w) * 1%)); background: var(--c, var(--bar)); border-radius: 0 4px 4px 0; } .bars .b.two i { height: 12px; }
+.bars .n { font: 700 15.5px/1.3 var(--figure); text-align: right; overflow-wrap: anywhere; } .bars .n small { display: block; font: 400 13px/1.3 var(--body); color: var(--ink-soft); }
+.bars .b .tg { position: absolute; top: -4px; bottom: -4px; left: calc(var(--t) * 1%); border-left: 2px dashed #16110c; }
+.lgd { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 12px; padding: 0; list-style: none; font-size: 14.5px; } .lgd li { display: flex; align-items: center; gap: 7px; } .lgd i { width: 16px; height: 12px; background: var(--c); } .lgd i.t { width: 0; height: 16px; background: none; border-left: 2px dashed #16110c; }
+.take { margin: 14px 0 0; padding: 8px 12px; border-left: 6px solid var(--ink); background: rgba(255,250,232,.7); font-size: 15.5px; line-height: 1.4; }
+
+/* regulatory */
+.reg { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; } .reg li { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; padding: 10px 0; border-top: 1px dotted var(--ink-soft); font-size: 15.5px; line-height: 1.35; } .reg li:first-child { border-top: 0; } .reg b { font-weight: 400; font-family: var(--display); letter-spacing: .05em; font-size: 17px; display: block; } .reg small { font-size: 14px; color: var(--ink-soft); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; font-size: 14px; color: var(--text-soft); }
+.note { min-height: 24px; font-size: 16px; margin: 0; }
+@media (max-width: 900px) {
+  .trail { grid-template-columns: minmax(0, 1fr); padding-top: 0; gap: 8px; margin-top: 12px; } .trail::after { display: none; }
+  .stg { grid-template-columns: minmax(0, 130px) minmax(0, 1fr) auto; justify-items: stretch; align-items: center; gap: 10px; } .stg .sign { order: 1; min-height: 40px; } .stg .col { order: 2; width: max(4px, calc(var(--h) * 1%)); height: 20px; border: 2px solid #120a05; border-left: 0; } .stg .v { order: 3; text-align: right; } .stg .w { order: 4; grid-column: 1 / -1; text-align: left; margin-top: -4px; }
+  .stg.worst .v::after { content: ""; } #kuwa { position: static; margin: 0; order: 5; grid-column: 1 / -1; justify-self: end; margin: -6px 0 -10px; }
+  .bars li { grid-template-columns: minmax(0, 1fr) auto; } .bars .b { grid-column: 1 / -1; order: 3; } .reg li { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 820px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 16px; border-right: 0; border-bottom: 4px solid var(--brass); padding: 10px 16px; }
+  .brand img { width: 44px; height: 44px; } .brand span { display: none; }
+  .nav { flex-direction: row; overflow-x: auto; flex: 1 1 100%; min-width: 0; order: 3; gap: 6px; padding-bottom: 4px; }
+  .nav a { white-space: nowrap; } .nav a[aria-current="page"], .nav a:hover, .nav a[aria-current="page"]:hover { transform: translateY(4px); box-shadow: inset 0 2px 0 rgba(255,220,160,.3), inset 0 -4px 0 rgba(0,0,0,.28); }
+  .who { margin: 0 0 0 auto; border: 0; padding: 0; text-align: right; }
+}
+@media (prefers-reduced-motion: reduce) { .nav a { transition: none !important; } }
+/* phones: the period switch as three even buttons, the four numbers two a row, Kuwa a size down beside the slowest post, report tabs in one swipeable row */
+@media (max-width: 600px) {
+  .per { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; width: 100%; } .per button { font-size: 14px; padding: 8px 4px 6px; min-height: 44px; letter-spacing: .03em; }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .tiles li { padding: 10px 10px 9px; } .tiles span { font-size: 12.5px; letter-spacing: .06em; } .tiles b { font-size: clamp(20px, 17cqi, 30px); } .tiles small { font-size: 12.5px; line-height: 1.3; }
+  h2.sec { font-size: 21px; }
+  .trailcard { padding: 12px 12px 14px; } .trailcard h2 { font-size: 21px; } .trailcard p { font-size: 14.5px; }
+  .stg { grid-template-columns: minmax(0, 112px) minmax(0, 1fr) auto; gap: 8px; } .stg .sign { font-size: 13px; min-height: 38px; }
+  #kuwa { zoom: .7; margin: -18px 0 -14px; }
+  .says { font-size: 14px; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; } .tabs::-webkit-scrollbar { display: none; } .tabs li { flex: none; } .tabs button { white-space: nowrap; font-size: 15px; }
+  .rhead h3 { font-size: 20px; } .rhead .btn { min-height: 44px; }
+  .bars li { font-size: 14.5px; gap: 6px 10px; }
+}

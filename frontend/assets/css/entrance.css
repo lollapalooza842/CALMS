@@ -1,0 +1,77 @@
+/* The walk into the bank: the move from the sign-in screen to My Queue.
+   Part 1 runs on index.html: the camera zooms from the town to a close shot of the porch
+   (drawn in assets/img/porch/), the doors open onto light, and the camera goes through.
+   Part 2 runs on my-queue.html: the office appears out of that light.
+   entrance.js builds the elements and adds the classes; nothing here applies without them. */
+
+/* ---- Part 1: from the street to the porch (index.html) ---- */
+#front.leaving { transition: opacity .3s ease, transform .3s ease; opacity: 0; transform: translateY(14px); pointer-events: none; }
+#sign.lifted { animation: none !important; transition: opacity .3s; opacity: 0; }
+.ghost.leaving { opacity: 0 !important; pointer-events: none; transition: opacity .2s; }
+#clerk.hop { transition: transform .26s cubic-bezier(.3,0,.6,1), opacity .2s linear .06s; transform: translateY(-52px) scale(1.1); opacity: 0; }
+#porch { position: fixed; inset: 0; z-index: 9000; overflow: hidden; visibility: hidden; --u: 5px; }
+#porch.on { visibility: visible; }
+#porch.solid { background: linear-gradient(#120a05 0 50%, #1d120b 50%); }
+/* the camera: everything drawn on the 256 x 144 porch grid. While the zoom is running its edges are
+   feathered so the close shot grows out of the town instead of sliding over it as a rectangle. */
+#pcam { position: absolute; width: calc(var(--u) * 256); height: calc(var(--u) * 144); opacity: 0;
+  -webkit-mask: radial-gradient(ellipse closest-side at 50% 50%, #000 50%, transparent 100%) 50% 58% / 100% 100% no-repeat; mask: radial-gradient(ellipse closest-side at 50% 50%, #000 50%, transparent 100%) 50% 58% / 100% 100% no-repeat; }
+#pcam.clear { -webkit-mask: none; mask: none; opacity: 1; }
+/* on a narrow screen the grid does not reach the top and bottom; these continue the eave and the porch floor */
+#pcam::before, #pcam::after { content: ""; position: absolute; left: -100vw; right: -100vw; height: 200vh; } #pcam::before { bottom: 100%; background: #120a05; } #pcam::after { top: 100%; background: #1d120b; }
+#pcam > div { position: absolute; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+#pscene, #pspill, #pglow { inset: 0; background-size: 100% 100%; }
+#pscene { background-image: url(../img/porch/scene.png); }
+#pspill { background-image: url(../img/porch/spill.png); opacity: 0; transition: opacity .09s linear; }
+#pglow { background-image: url(../img/porch/glow.png); animation: p-flicker 1.7s steps(1) infinite; }
+@keyframes p-flicker { 0% { opacity: 1; } 38% { opacity: .82; } 46% { opacity: 1; } 71% { opacity: .9; } 80% { opacity: 1; } }
+/* behind the doors there is only light; you do not see the room until you are in it */
+#plight { left: calc(var(--u) * 80); top: calc(var(--u) * 54); width: calc(var(--u) * 96); height: calc(var(--u) * 60); background: radial-gradient(ellipse at 50% 55%, #fff6d6 0, #ffe9b0 45%, #f3cf86 100%); }
+/* the double doors: five frames side by side, stepped by --f */
+#pdoors { left: calc(var(--u) * 80); top: calc(var(--u) * 54); width: calc(var(--u) * 96); height: calc(var(--u) * 60); background-image: url(../img/porch/doors.png); background-size: 500% 100%; background-position: calc(var(--f, 0) * 25%) 0; }
+/* Kuwa in the walk: his own sheet of flying, landing and standing frames (assets/img/kuwa-fly.png) */
+.kfly { position: absolute; width: 96px; height: 96px; transform-origin: 0 0; pointer-events: none; }
+.kfly i { position: absolute; inset: 0; background: url(../img/kuwa-fly.png) 0 0 / 768px auto no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+.kfly.left i { transform: scaleX(-1); }
+#pkuwa { left: calc(var(--u) * 207); top: calc(var(--u) * 76); transform: scale(calc(var(--k, 2))); visibility: hidden; }
+#kflier { position: fixed; left: 0; top: 0; z-index: 9990; }
+/* what he leaves in the air: feathers that drift down, and dust where he lands */
+.feather { position: fixed; z-index: 9995; width: 12px; height: 6px; margin: -3px 0 0 -6px; background: url(../img/town/feather.png) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.dust { position: fixed; z-index: 9994; width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #e2c58c; pointer-events: none; }
+/* the light that takes over the screen as the camera goes through the doorway */
+#roomlight { position: fixed; inset: 0; z-index: 9500; background: #ffe9b0; opacity: 0; pointer-events: none; transition: opacity .3s ease-in; }
+#roomlight.on { opacity: 1; }
+
+/* ---- Part 2: arriving inside (my-queue.html) ---- */
+html.arriving body::before { content: ""; position: fixed; inset: 0; z-index: 9999; background: #ffe9b0; pointer-events: none; animation: ent-light .7s ease-out .1s both; }
+@keyframes ent-light { to { opacity: 0; visibility: hidden; } }
+html.arriving main { animation: ent-room .7s cubic-bezier(.2,.7,.2,1) both; transform-origin: 50% 40%; }
+@keyframes ent-room { from { transform: scale(1.05); } }
+html.arriving .nav li { animation: ent-drawer .4s cubic-bezier(.3,1.4,.5,1) both; }
+html.arriving .nav li:nth-child(1) { animation-delay: .35s; } html.arriving .nav li:nth-child(2) { animation-delay: .41s; } html.arriving .nav li:nth-child(3) { animation-delay: .47s; }
+html.arriving .nav li:nth-child(4) { animation-delay: .53s; } html.arriving .nav li:nth-child(5) { animation-delay: .59s; } html.arriving .nav li:nth-child(n+6) { animation-delay: .65s; }
+@keyframes ent-drawer { from { transform: translateX(-115%); } }
+/* the page's own Kuwa waits out of sight while entrance.js flies him in */
+html.kuwa-away #kuwa, html.kuwa-away .kcarry { visibility: hidden; }
+
+/* ---- Closing time: signing out ---- */
+/* inside: the drawers shut one after another while Kuwa leaves */
+html.leaving .nav li { animation: ext-drawer .3s cubic-bezier(.5,0,.8,.4) both; }
+html.leaving .nav li:nth-child(2) { animation-delay: .04s; } html.leaving .nav li:nth-child(3) { animation-delay: .08s; } html.leaving .nav li:nth-child(4) { animation-delay: .12s; }
+html.leaving .nav li:nth-child(5) { animation-delay: .16s; } html.leaving .nav li:nth-child(n+6) { animation-delay: .2s; }
+@keyframes ext-drawer { to { transform: translateX(-115%); } }
+html.leaving, html.leaving body { overflow-x: hidden; }
+/* outside: the sign-in card waits out of sight until the camera is back in the street */
+html.returning body::before { content: ""; position: fixed; inset: 0; z-index: 9999; background: #ffe9b0; pointer-events: none; }
+html.returning.out body::before { animation: ent-light .55s ease-out both; }
+html.returning #front, html.returning #sign, html.returning .ghost { opacity: 0 !important; pointer-events: none; animation: none !important; }
+html.returned #front { animation: ext-card .4s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes ext-card { from { opacity: 0; transform: translateY(14px); } }
+html.returned #sign, html.returned .ghost { transition: opacity .4s; }
+
+@media (prefers-reduced-motion: reduce) { html.leaving .nav li { animation: none !important; } #porch { display: none; } html.arriving main, html.arriving .nav li { animation: none !important; } .feather, .dust, #kflier { display: none; } html.arriving body::before { animation-duration: .3s; } }
+
+/* Kuwa's other hats (see kuwa-life.css) */
+html[data-hat="sheriff"] .kfly i { background-image: url(../img/kuwa-fly-sheriff.png); }
+html[data-hat="bowler"] .kfly i { background-image: url(../img/kuwa-fly-bowler.png); }
+html[data-hat="sombrero"] .kfly i { background-image: url(../img/kuwa-fly-sombrero.png); }

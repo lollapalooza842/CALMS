@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Reports</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/reports.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/reports.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Mila Ramos</b><span>Operations Manager</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>Reports</h1><p class="sub" id="sub"></p></div>
+      <div class="per" id="per" role="group" aria-label="Period"></div>
+    </div>
+    <ul class="tiles" id="tiles" aria-label="Four numbers for the period"></ul>
+    <section class="trailcard" aria-labelledby="th">
+      <h2 id="th">Where applications wait</h2>
+      <p>Average hours an application sat at each step before someone moved it on. The tallest post is where to look first.</p>
+      <ul class="trail" id="trail"></ul>
+      <p class="says" id="says" role="status"></p>
+    </section>
+    <h2 class="sec" id="rh">Reports <small>One at a time. Choose a report, then export it if you need to hand it on.</small></h2>
+    <ul class="tabs" id="tabs" aria-labelledby="rh"></ul>
+    <section class="card" id="rep" aria-live="polite"></section>
+    <h2 class="sec">For the regulator <small>These run on a schedule. You can also run one now.</small></h2>
+    <section class="card"><ul class="reg" id="reg"></ul></section>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>You see the reports an Operations Manager is allowed to see. Other roles see fewer.</span><span>Design prototype. Every number here is an invented example.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/reports.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

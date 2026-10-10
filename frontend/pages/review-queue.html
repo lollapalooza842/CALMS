@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Review Queue</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/review-queue.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/review-queue.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b id="whoName"></b><span id="whoRole"></span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>Review queue</h1><p class="lede" id="lede"></p></div>
+      <label class="proto" for="role">Prototype only: view as <select id="role"></select></label>
+    </div>
+    <div class="things">
+      <div class="thing"><span class="cap">In manual review</span><div class="flip" id="fAll"></div></div>
+      <div class="thing"><span class="cap">Not yet assigned</span><div class="flip" id="fNew"></div></div>
+      <div class="thing"><span class="cap">Past 48 hours</span><div class="flip red" id="fLate"></div></div>
+      <div class="thing"><span class="cap">Oldest</span><div class="tag" id="tOld"></div></div>
+      <div class="thing"><span class="cap">Risk tiers</span><div class="mix" id="mix"></div></div>
+      <div class="thing" id="dealBox"><span class="cap">Lead only</span><button class="btnp" type="button" id="deal">Deal them out</button></div>
+    </div>
+    <div class="tapebox"><div class="key"><span><i></i>Telegraph</span></div><ul class="tape" id="tape" aria-label="Routing telegraph" role="log"></ul></div>
+    <div class="filters" role="group" aria-label="Show"><span class="cap">Show</span><span id="fl"></span></div>
+    <div class="floor">
+      <div class="office" id="office">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div><p id="says" role="status"></p>
+        <div class="desks" id="desks"></div>
+      </div>
+      <aside class="dos" id="dos" data-ref="No folder pulled" aria-label="Dossier"></aside>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div><span class="cap">Reassignment log</span><ul class="log" id="log"></ul></div>
+    <div class="foot"><span>Seals: L low, M moderate, H high risk. Drag a folder by the ridged edge on its left, or pull it and use "Assign to".</span><span>Example data and example policy thresholds for a design prototype. Arrivals are simulated. No real borrowers.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/review-queue.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

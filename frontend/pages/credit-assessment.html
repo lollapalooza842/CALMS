@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Credit Assessment</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/credit-assessment.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/credit-assessment.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Antonio Reyes</b><span>Lead Underwriter</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><p class="crumb"><a href="#" class="px" id="cQ">Review queue</a> / <a href="#" class="px" id="cRef">APP-2026-0409</a> / Credit assessment</p><h1>Credit assessment</h1><p class="sub" id="subline">Norma Estrella &middot; SME loan &middot; asked for &#8369; 300,000.00 over 24 months</p></div>
+      <label class="proto" for="resp"><span id="respLab">Prototype only: FinScore answers with</span> <select id="resp"><option value="ok">A report</option><option value="down">Service unavailable</option><option value="consent">No consent on file</option></select></label>
+    </div>
+    <div class="row r2">
+      <section class="wire" aria-label="FinScore wire">
+        <div class="wirehead">FinScore wire <span id="wstat"></span></div>
+        <div class="wirebody">
+          <pre class="tele" id="tele" role="log"></pre>
+          <div class="wrow"><div class="watch" id="watch"><i></i><span id="wsec">0.0 s</span></div><button class="btn" type="button" id="wireBtn">Wire FinScore again</button></div>
+          <div class="att" id="att"></div>
+          <span class="k">Inquiry log</span><ul class="ilog" id="ilog"></ul>
+        </div>
+      </section>
+      <div class="verdwrap"><section class="card verd" aria-label="Assessment">
+        <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+        <span class="whatif" id="wi" hidden>What-if. Not the saved assessment.</span>
+        <div class="bigseal"><div class="wax" id="wax"></div><div class="tier" id="tier"></div></div>
+        <div class="rec" id="rec"></div>
+        <p class="says" id="says" role="status"></p>
+      </section></div>
+    </div>
+    <div class="dials" id="dials"></div>
+    <section class="card" aria-label="What-if bench">
+      <h2>What-if bench <small>try terms before you decide</small></h2>
+      <div class="bench">
+        <div class="ctl">
+          <label for="amt">Amount <output id="amtO" for="amt"></output><input type="range" id="amt" min="100000" max="1000000" step="10000"></label>
+          <label for="term">Term <select id="term"></select></label>
+          <div class="acts" style="margin:0"><button class="btn" type="button" id="reset">Back to what she asked for</button><button class="btn" type="button" id="fit">Largest amount inside 40%</button></div>
+          <p class="k" style="letter-spacing:0;font:400 14px/1.4 var(--body)">Moving these changes nothing on record. The saved assessment is always at the terms the borrower asked for.</p>
+        </div>
+        <dl class="sumx" id="sumx"></dl>
+      </div>
+    </section>
+    <section class="card" aria-label="Tradelines">
+      <h2>What FinScore sent <small id="tlsum"></small></h2>
+      <div id="tlbox"></div>
+    </section>
+    <div class="row r2">
+      <section class="card" aria-label="The rules"><h2>The rules, one by one <small>rule set version 14</small></h2><div id="rules"></div></section>
+      <section class="card" aria-label="Credit memo"><h2>Credit memo <small id="memoAt"></small></h2><div class="memo" id="memo"></div>
+        <div class="acts"><button class="btn red" type="button" id="toDec">Take these terms to the decision</button><button class="btn" type="button" id="dl">Download memo</button></div></section>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot" id="foot"><span>The ratios are computed by the system from verified entries. No figure on this page can be typed over.</span><span>Example data, example product terms and example policy thresholds for a design prototype. No real borrower or bureau.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/credit-assessment.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

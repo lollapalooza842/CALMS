@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS My Profile</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/my-profile.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/my-profile.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Liza Mendoza</b><span>Loan Processor</span></div>
+  </nav>
+  <main>
+    <div><h1>My profile</h1><p class="sub">Your own account: how to reach you, which notices you get, and how you sign in. Your role is set by an administrator.</p></div>
+    <div class="desk">
+      <div class="col">
+        <section class="badge" aria-labelledby="bn">
+          <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+          <span class="co">GR8 Lending Company</span>
+          <h2 id="bn">Liza Mendoza</h2>
+          <span class="role">Loan Processor</span>
+          <dl class="rcd"><dt>Username</dt><dd>liza.mendoza</dd><dt>Branch</dt><dd>Malolos</dd><dt>Signed in</dt><dd>Today 08:12, this computer</dd></dl>
+          <small>To change your name, role or branch, ask the System Administrator.</small>
+        </section>
+        <section class="card" aria-labelledby="ch">
+          <h2 id="ch">How to reach you</h2>
+          <div class="f"><label class="k" for="mob">Mobile number for texts</label><input id="mob" type="tel" inputmode="tel" autocomplete="off" aria-describedby="mobe mobh"><span class="e" id="mobe" role="status"></span><span class="h" id="mobh">Eleven digits starting with 09, for example 0917 555 0188.</span></div>
+          <div class="f"><span class="k">Work email</span><span style="font:700 16px/1.4 var(--figure);overflow-wrap:anywhere">liza.mendoza@gr8lending.example</span><span class="h">Set by the administrator.</span></div>
+          <div class="acts"><button class="btn grn" type="button" id="msave">Save my number</button></div>
+        </section>
+        <section class="card" aria-labelledby="sh">
+          <h2 id="sh">Signing in</h2>
+          <label class="check"><input type="checkbox" id="mfa"><span>Ask me for a second factor when I sign in. Optional for your role, and safer.</span></label>
+          <details id="pwd"><summary>Change my password</summary><div id="pwb"></div></details>
+          <details id="ses"><summary>Where I am signed in</summary><div><ul class="sess" id="sess"></ul></div></details>
+        </section>
+      </div>
+      <section class="card" aria-labelledby="nh">
+        <h2 id="nh">Which notices I get</h2>
+        <p class="lead">Tick how you want to hear about each thing. The ones marked “Always sent” cannot be switched off, because the work stops without them.</p>
+        <table class="pref"><thead><tr><th scope="col">When this happens</th><th scope="col">Inside CALMS</th><th scope="col">Email</th><th scope="col">Text</th></tr></thead><tbody id="pref"></tbody></table>
+        <div class="quiet2"><label class="check"><input type="checkbox" id="qh"><span>Hold emails and texts outside working hours. They still show inside CALMS, and are sent when the hours start.</span></label><div class="qrow" id="qrow"><label for="q1">From</label><select id="q1"></select><label for="q2">until</label><select id="q2"></select><span class="h">“Always sent” notices are never held.</span></div></div>
+        <div class="acts"><button class="btn grn" type="button" id="psave">Save my choices</button><button class="btn quiet" type="button" id="pundo" hidden>Undo</button><span class="h" id="pcount" role="status"></span></div>
+      </section>
+    </div>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Changes to your sign-in settings are written to the audit log.</span><span>Design prototype. Nothing here is saved or sent.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/my-profile.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

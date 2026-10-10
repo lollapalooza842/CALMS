@@ -1,0 +1,29 @@
+/* KUWA's idle life. kuwa-life.js adds a layer inside #kuwa that shows frames from kuwa-idle.png,
+   and adds the class "alive" while that layer is in charge. When a page plays one of its own
+   reactions the class comes off and the page's own picture shows again. */
+#kuwa.alive { background-image: none !important; }
+#kuwa > .klife { position: absolute; left: 0; top: 0; width: 96px; height: 96px; display: none; pointer-events: none; background: url(../img/kuwa-idle.png) 0 0 / 768px auto no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+#kuwa.alive > .klife { display: block; }
+.kfeather { position: fixed; z-index: 50; width: 12px; height: 6px; margin: -3px 0 0 -6px; background: url(../img/town/feather.png) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.kzed { position: fixed; z-index: 50; font: 700 16px/1 "Courier Prime", "Courier New", monospace; color: #5e3a1f; text-shadow: 1px 1px 0 #f7e8c6, -1px -1px 0 #f7e8c6, 1px -1px 0 #f7e8c6, -1px 1px 0 #f7e8c6; pointer-events: none; }
+#kuwa.kuwa-out { visibility: hidden; }
+/* the peek: a narrow window at the edge of the side rail that he slides into */
+.kpeek { position: fixed; z-index: 40; width: 64px; height: 96px; overflow: hidden; pointer-events: none; }
+.kpeek span { position: absolute; left: 0; top: 0; width: 96px; height: 96px; background: url(../img/kuwa-idle.png) 0 0 / 768px auto no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* picking him up (kuwa-life.js): a hand over him, the stand-in that stays where you put him, hearts when petted */
+#kuwa, .kcarry { cursor: var(--cur-grab, grab); touch-action: none; }
+body.kdrag, body.kdrag * { cursor: var(--cur-grab, grabbing) !important; user-select: none !important; }
+#kuwa.kuwa-moved { visibility: hidden; }
+.kcarry { position: fixed; z-index: 60; width: 96px; height: 96px; transform-origin: 50% 70%; }
+.kcarry i { position: absolute; inset: 0; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+.kcarry.held { z-index: 70; filter: drop-shadow(0 14px 6px rgba(36,19,10,.28)); }
+.kheart { position: fixed; z-index: 61; font: 700 18px/1 "Courier Prime", "Courier New", monospace; color: #b8362a; text-shadow: 1px 1px 0 #f7e8c6, -1px -1px 0 #f7e8c6, 1px -1px 0 #f7e8c6, -1px 1px 0 #f7e8c6; pointer-events: none; }
+
+/* Kuwa's other hats (chosen on the sign-in card; index.js and entrance.js set html[data-hat]) */
+html[data-hat="sheriff"] #kuwa { background-image: url(../img/kuwa-sheriff.png); }
+html[data-hat="sheriff"] #kuwa > .klife, html[data-hat="sheriff"] .kpeek span { background-image: url(../img/kuwa-idle-sheriff.png); }
+html[data-hat="bowler"] #kuwa { background-image: url(../img/kuwa-bowler.png); }
+html[data-hat="bowler"] #kuwa > .klife, html[data-hat="bowler"] .kpeek span { background-image: url(../img/kuwa-idle-bowler.png); }
+html[data-hat="sombrero"] #kuwa { background-image: url(../img/kuwa-sombrero.png); }
+html[data-hat="sombrero"] #kuwa > .klife, html[data-hat="sombrero"] .kpeek span { background-image: url(../img/kuwa-idle-sombrero.png); }

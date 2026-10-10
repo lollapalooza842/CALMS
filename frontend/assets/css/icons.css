@@ -1,0 +1,42 @@
+/* CALMS icons. Written by design/icons/icons.py; do not edit by hand.
+   Use: <i class="ic ic-decision"></i>. Add "ic-lg" for 32 px or "ic-xl" for 48 px. */
+.ic { display: inline-block; flex: none; width: 16px; height: 16px; vertical-align: -3px; background: url(../img/icons/icons.png) 0 0 / 512px 16px no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; --i: 0; background-position: calc(var(--i) * -16px) 0; }
+.ic-lg { width: 32px; height: 32px; background-size: 1024px 32px; background-position: calc(var(--i) * -32px) 0; vertical-align: -8px; }
+.ic-xl { width: 48px; height: 48px; background-size: 1536px 48px; background-position: calc(var(--i) * -48px) 0; vertical-align: -10px; }
+.ic-my-queue { --i: 0; }
+.ic-applications { --i: 1; }
+.ic-new-application { --i: 2; }
+.ic-application-detail { --i: 3; }
+.ic-documents { --i: 4; }
+.ic-encode-verify { --i: 5; }
+.ic-review-queue { --i: 6; }
+.ic-credit-assessment { --i: 7; }
+.ic-decision { --i: 8; }
+.ic-counter-offers { --i: 9; }
+.ic-record-answer { --i: 10; }
+.ic-loan-agreement { --i: 11; }
+.ic-disbursement-queue { --i: 12; }
+.ic-release-loan { --i: 13; }
+.ic-loan-accounts { --i: 14; }
+.ic-loan-account { --i: 15; }
+.ic-post-payment { --i: 16; }
+.ic-reports { --i: 17; }
+.ic-audit-log { --i: 18; }
+.ic-users-roles { --i: 19; }
+.ic-products-rules { --i: 20; }
+.ic-system { --i: 21; }
+.ic-notifications { --i: 22; }
+.ic-my-profile { --i: 23; }
+.ic-sign-in { --i: 24; }
+.ic-ok { --i: 25; }
+.ic-warn { --i: 26; }
+.ic-stop { --i: 27; }
+.ic-clock { --i: 28; }
+.ic-lock { --i: 29; }
+.ic-search { --i: 30; }
+.ic-peso { --i: 31; }
+/* where the icons sit: in each side-rail drawer, and before each page title */
+.nav a .ic { margin-right: 8px; filter: drop-shadow(1px 1px 0 rgba(0,0,0,.45)); }
+.nav a .plate { margin-right: auto; }
+h1.ich::before { content: ""; display: inline-block; flex: none; box-sizing: content-box; width: 32px; height: 32px; padding: 4px; margin-right: 12px; vertical-align: -5px; border: 2px solid #24130a; box-shadow: 2px 3px 0 rgba(36,19,10,.35); background: #f7e8c6 url(../img/icons/icons.png) calc(var(--i) * -32px) 0 / 1024px 32px no-repeat content-box; image-rendering: pixelated; image-rendering: crisp-edges; }
+@media (max-width: 820px) { .nav a .ic { margin-right: 6px; } }

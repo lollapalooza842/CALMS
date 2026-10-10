@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALMS Products and Rules</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#24130a">
+<link rel="apple-touch-icon" href="../assets/img/app/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../assets/img/icons/products-rules.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/theme-ui.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/products-rules.css">
+<link rel="stylesheet" href="../assets/css/kuwa-life.css">
+<link rel="stylesheet" href="../assets/css/icons.css">
+<link rel="stylesheet" href="../assets/css/rail.css">
+<link rel="stylesheet" href="../assets/css/entrance.css">
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="CALMS">
+    <div class="brand"><img alt="" src="../assets/img/logo.webp"><div><b>CALMS</b><span>GR8 Lending Company</span></div></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="who"><b>Paolo Ventura</b><span>System Administrator</span></div>
+  </nav>
+  <main>
+    <div class="top">
+      <div><h1>Products and rules</h1><p class="sub">The terms of each loan product and the lines CALMS uses to approve, refer or decline. Nothing you type here takes effect until you publish it at the bottom.</p></div>
+      <p class="ver" id="ver"></p>
+    </div>
+    <section class="card" aria-labelledby="ph">
+      <h2 id="ph">Loan product</h2>
+      <ul class="tabs" id="tabs" aria-label="Choose a product"></ul>
+      <div class="grid" id="terms"></div>
+      <fieldset><legend class="k">Papers the borrower must hand in</legend><div class="docs" id="docs"></div></fieldset>
+    </section>
+    <section class="card" aria-labelledby="rh" style="margin-top:46px">
+      <div id="kuwa" role="img" aria-label="Kuwa the owl"></div>
+      <h2 id="rh" style="padding-right:110px">Where the lines are drawn</h2>
+      <p style="padding-right:110px">These three lines apply to every product. Move a line and see where a real applicant would land.</p>
+      <ul class="lgd" aria-label="How to read the tracks"><li><i class="a"></i>Approved automatically</li><li><i class="r"></i>An underwriter decides</li><li><i class="d"></i>Declined</li><li><i class="s"></i>The sample applicant</li></ul>
+      <div class="f" style="max-width:420px"><label class="k" for="samp">Sample applicant</label><select id="samp"></select></div>
+      <div id="rules" style="display:grid;gap:16px"></div>
+      <div class="verdict" id="verdict" role="status"></div>
+    </section>
+    <section class="card" aria-labelledby="hh">
+      <h2 id="hh">House rules</h2>
+      <div class="grid" id="house"></div>
+    </section>
+    <section class="pub" aria-labelledby="pubh">
+      <h2 id="pubh"></h2>
+      <div id="pubb" style="display:grid;gap:12px"></div>
+    </section>
+    <details class="hist"><summary>Earlier versions</summary><ol id="hist"></ol></details>
+    <p class="note" id="note" role="status"></p>
+    <div class="foot"><span>Every decision records the rule version it was made under. Publishing never rewrites an old decision.</span><span>Design prototype. Every rate, limit and line here is an invented example, not GR8's policy.</span></div>
+  </main>
+</div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/products-rules.js"></script>
+<script src="../assets/js/kuwa-life.js"></script>
+<script src="../assets/js/entrance.js"></script>
+<script src="../assets/js/links.js"></script>
+</body>
+</html>

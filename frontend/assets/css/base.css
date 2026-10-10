@@ -1,0 +1,52 @@
+/* CALMS shared base: font, colour tokens (light and dark), the drawer-cabinet rail and the plank wall.
+   Every page loads this first, then its own stylesheet. */
+html, body { margin: 0; }
+@font-face { font-family: "Badhorse"; src: url(../fonts/badhorse.otf) format("opentype"); font-display: swap; }
+:root {
+  --plank: #d9bd8a; --plank-2: #cfb07a; --plank-line: #b08f5c;   /* wall */
+  --text: #24130a; --text-soft: #553719;                          /* on the wall */
+  --wood: #5e3a1f; --wood-2: #6f4726; --wood-dark: #24130a;       /* frames, drawers, desk */
+  --cork: #b98a52; --cork-dot: #a3753f;
+  --paper: #f7e8c6; --paper-old: #e2c58c; --ink: #24130a; --ink-soft: #654324;
+  --brass: #c98f4a; --brass-hi: #e9c07a;
+  --slate: #2e3330; --chalk: #efe9da;
+  --red: #8f2a22; --red-on-wall: #8f2a22; --blue: #2c4868; --green: #2c5a38;
+  --focus: #1d5fa8; --on: #5e3a1f; --on-text: #f3ddb0; --shade: rgba(36,19,10,.3);
+  --display: "Badhorse", "Copperplate", "Rockwell", Georgia, serif;
+  --body: "Ovo", Georgia, "Times New Roman", serif;
+  --figure: "Courier Prime", "Courier New", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --plank: #2a1b10; --plank-2: #24170d; --plank-line: #170e07; --text: #f3ddb0; --text-soft: #c9a877;
+  --wood: #3a2413; --wood-2: #4a2f19; --wood-dark: #120a05; --cork: #5a3f25; --cork-dot: #4a321c;
+  --paper: #e9d7ad; --paper-old: #cfb27a; --red-on-wall: #ea8f80; --focus: #7db4f0; --on: #c98f4a; --on-text: #24130a; --shade: rgba(0,0,0,.5); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --plank: #2a1b10; --plank-2: #24170d; --plank-line: #170e07; --text: #f3ddb0; --text-soft: #c9a877;
+  --wood: #3a2413; --wood-2: #4a2f19; --wood-dark: #120a05; --cork: #5a3f25; --cork-dot: #4a321c;
+  --paper: #e9d7ad; --paper-old: #cfb27a; --red-on-wall: #ea8f80; --focus: #7db4f0; --on: #c98f4a; --on-text: #24130a; --shade: rgba(0,0,0,.5); color-scheme: dark }
+
+body { background: var(--plank); color: var(--text); font: 16px/1.5 var(--body); }
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100vh; }
+
+/* the cabinet of drawers */
+.rail { min-width: 0; background: var(--wood-dark); display: flex; flex-direction: column; gap: 14px; padding: 16px 12px; border-right: 4px solid var(--brass); }
+.brand { display: flex; align-items: center; gap: 10px; color: #f3ddb0; }
+.brand img { width: 60px; height: 60px; flex: none; }
+.brand b { font: 400 26px/1 var(--display); letter-spacing: .06em; }
+.brand span { display: block; font-size: 12px; line-height: 1.25; color: #c9a877; }
+.nav { display: flex; flex-direction: column; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.nav a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; text-decoration: none; background: linear-gradient(#6f4726, #5a3a1f); border: 2px solid #120a05; box-shadow: inset 0 2px 0 rgba(255,220,160,.2), inset 0 -4px 0 rgba(0,0,0,.28); transition: transform .18s ease; }
+.nav a::after { content: ""; width: 14px; height: 14px; flex: none; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #e9c07a, #c98f4a 55%, #7a4e2a); border: 1px solid #120a05; }
+.nav .plate { display: flex; align-items: baseline; gap: 8px; background: #f3ddb0; color: #24130a; border: 1px solid #24130a; padding: 4px 8px 2px; font: 400 16px/1.15 var(--display); letter-spacing: .05em; min-width: 0; }
+.nav .plate i { font: 700 13px/1 var(--figure); font-style: normal; color: #8f2a22; }
+.nav a[aria-current="page"] { transform: translateX(10px); background: linear-gradient(#855a31, #6f4726); box-shadow: inset 0 2px 0 rgba(255,220,160,.3), inset 0 -4px 0 rgba(0,0,0,.28), -10px 0 0 #120a05, 4px 5px 0 rgba(0,0,0,.4); }
+.nav a[aria-disabled="true"] .plate { background: #d9c090; color: #553719; }
+.nav a:hover { transform: translateX(5px); } .nav a[aria-current="page"]:hover { transform: translateX(10px); }
+.who { margin-top: auto; border-top: 1px solid rgba(201,143,74,.45); padding-top: 12px; font-size: 14px; line-height: 1.35; color: #c9a877; }
+.who b { display: block; font: 400 19px/1.2 var(--display); letter-spacing: .05em; color: #f3ddb0; }
+
+/* the wall */
+main { min-width: 0; display: flex; flex-direction: column; gap: 16px; padding-block: 20px 40px; padding-inline: clamp(16px, 3vw, 34px);
+  background-color: var(--plank); background-image: repeating-linear-gradient(90deg, transparent 0 118px, var(--plank-line) 118px 120px), repeating-linear-gradient(90deg, transparent 0 37px, rgba(120,84,40,.07) 37px 38px, transparent 38px 71px, rgba(120,84,40,.05) 71px 73px), linear-gradient(var(--plank), var(--plank-2)); }

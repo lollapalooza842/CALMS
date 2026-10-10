@@ -197,7 +197,6 @@ The main ones:
 
 - No link to a core banking or accounting system (FR-084).
 - No critical-priority flag (BR-016) and no past-due check on new loans (BR-018).
-- Above the Lead Underwriter's limit nobody can decide (FR-064, BR-007).
 - SMS is not connected; email works through Gmail.
 - Screens re-read every 20 seconds to 2 minutes instead of updating within two seconds.
 - The FinScore credit bureau is a stand-in that behaves like the real API.
