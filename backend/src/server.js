@@ -21,7 +21,7 @@ app.use(helmet({
       workerSrc: ["'self'"],
       manifestSrc: ["'self'"],
       imgSrc: ["'self'", "data:", "blob:"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", "'inline-speculation-rules'"],   // the rules that let the browser open the next page ahead of the click (look.js)
     },
   },
 }));

@@ -73,3 +73,14 @@
   r.classList.add(arrived ? "c-arrive" : "c-page");
   if (page === "my-queue" && web) r.classList.add("c-dash");
 })();
+/* Lightning-quick page changes: the moment the pointer rests on a link to another CALMS page (or a finger touches it),
+   the browser opens that page out of sight, data and all, and shows it the instant you click. Only the screens
+   (/pages/...) are opened ahead; papers, files, the sign-in page and anything that opens in a new tab never are, and
+   opening a screen never changes anything (it only reads). Browsers without this simply load the page on the click. */
+(function () {
+  try { if (!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) || !/^https?:$/.test(location.protocol)) return;
+    var s = document.createElement("script"); s.type = "speculationrules";
+    s.textContent = JSON.stringify({ prerender: [{ source: "document", where: { and: [{ href_matches: "/pages/*" }, { not: { selector_matches: "[target=_blank], [download], .out, [data-no-ahead]" } }] }, eagerness: "moderate" }] });
+    document.head.appendChild(s); } catch (e) {}
+})();
+
