@@ -93,7 +93,7 @@ function startJobs() {
 app.startJobs = startJobs;
 if (require.main === module) {
   startJobs();
-  app.listen(port, () => { console.log(`CALMS is running at http://localhost:${port}`); if (require("./lib/practice").on()) console.log("PRACTICE MODE: the practice code (DEV_MFA_CODE) is accepted in place of the authenticator. Remove DEV_MFA_CODE before real use."); })
+  app.listen(port, () => { console.log(`CALMS is running at http://localhost:${port}`); if (require("./lib/practice").on()) console.log("PRACTICE MODE: the practice code (DEV_MFA_CODE) is accepted in place of the authenticator. Set DEV_MFA_CODE=off before real use."); })
     .on("error", (e) => {
       if (e.code !== "EADDRINUSE") throw e;
       console.error(`Port ${port} is already in use. CALMS is probably still running in another terminal window:`);
