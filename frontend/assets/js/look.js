@@ -8,6 +8,19 @@
 (function () {
   var ui = ""; try { ui = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1] || localStorage.getItem("calms-ui") || "western"; } catch (e) {}
   var KEY = "calms-rail:" + ui, saved = null; try { saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (e) {}
+  /* the first page after signing in has no copy yet: draw the rail for the person's role (index.js notes it at sign-in)
+     so it is complete from the first paint, as links.js would draw it; the counts arrive with the server's answer */
+  if (!saved) try { var seed = JSON.parse(sessionStorage.getItem("calms-seed") || "null"); if (seed && seed.role) {
+    var RAIL = { sales_agent: ["My Queue", "Applications", "Counter-offers", "Notifications"], loan_processor: ["My Queue", "Applications", "New application", "Loan accounts", "Notifications"],
+      underwriter: ["My Queue", "Review queue", "Applications", "Counter-offers", "Notifications"], lead_underwriter: ["My Queue", "Review queue", "Applications", "Counter-offers", "Loan accounts", "Notifications"],
+      disbursement_officer: ["My Queue", "Disbursement queue", "Loan accounts", "Notifications"], loan_account_officer: ["My Queue", "Loan accounts", "Payments", "Notifications"],
+      operations_manager: ["My Queue", "Applications", "Review queue", "Loan accounts", "Reports", "Rules", "Notifications"],
+      compliance_auditor: ["My Queue", "Applications", "Loan accounts", "Reports", "Audit log", "Rules", "Notifications"], system_administrator: ["My Queue", "Users and roles", "Rules", "System", "Audit log", "Notifications"] };
+    var TO = { "my queue": "my-queue", "applications": "applications", "new application": "new-application", "notifications": "notifications", "review queue": "review-queue", "counter-offers": "counter-offers",
+      "disbursement queue": "disbursement-queue", "loan accounts": "loan-accounts", "payments": "post-payment", "reports": "reports", "audit log": "audit-log", "users and roles": "users-roles", "rules": "products-rules", "system": "system" };
+    var esc = function (t) { return String(t || "").replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    if (RAIL[seed.role]) saved = { nav: RAIL[seed.role].map(function (l) { var n = TO[l.toLowerCase()]; return '<li><a href="' + n + '.html"><i class="ic ic-lg ic-' + n + '" aria-hidden="true"></i><span class="plate">' + l + '</span></a></li>'; }).join(""),
+      who: seed.name ? "<b>" + esc(seed.name) + "</b><span>" + esc(seed.roleName) + "</span>" : "" }; } } catch (e) {}
   var page = (location.pathname.split("/").pop() || "").replace(/\.html$/, "");
   var PARENT = { "application-detail": "applications", documents: "applications", "encode-verify": "applications", "credit-assessment": "review-queue", decision: "review-queue",
     "record-answer": "counter-offers", "loan-agreement": "applications", "release-loan": "disbursement-queue", "loan-account": "loan-accounts" };
@@ -15,9 +28,16 @@
   function fill(el) {
     if (!saved || !el || el.dataset.kept) return; el.dataset.kept = "1";
     if (el.id === "nav" && saved.nav && !el.children.length) { el.innerHTML = saved.nav;
-      [].forEach.call(el.querySelectorAll("a"), function (a) { a.removeAttribute("aria-current"); if ((a.getAttribute("href") || "").split("?")[0].replace(/\.html$/, "").split("/").pop() === here) a.setAttribute("aria-current", "page"); }); }
-    if (el.classList.contains("who") && saved.who) el.innerHTML = saved.who;   /* over the sample name some pages carry for offline use */
-    if (el.classList.contains("rail") && saved.chip && !document.getElementById("practiceChip")) el.insertAdjacentHTML("afterbegin", saved.chip);
+      [].forEach.call(el.querySelectorAll("a"), function (a) { a.removeAttribute("aria-current"); if ((a.getAttribute("href") || "").split("?")[0].replace(/\.html$/, "").split("/").pop() === here) a.setAttribute("aria-current", "page"); }); 
+      /* the page's own script would now add its sample drawers (for use without a server) on top of the real rail, and
+         then the server's answer would swap them out again: that was the rail changing on every page. Only links.js
+         (which draws the rail for your role) may now put drawers in or clear it. */
+      var ap = el.appendChild, tc = Object.getOwnPropertyDescriptor(Node.prototype, "textContent");
+      el.appendChild = function (c) { return window.CALMS_RAIL_BUILD || !c || c.tagName !== "LI" ? ap.call(this, c) : c; };
+      if (tc) Object.defineProperty(el, "textContent", { configurable: true, get: function () { return tc.get.call(this); }, set: function (v) { if (window.CALMS_RAIL_BUILD) tc.set.call(this, v); } }); }
+    if (el.classList.contains("who") && saved.who) { var ob = el.querySelector("b"), os = el.querySelector("span"), bid = ob && ob.id, sid = os && os.id; el.innerHTML = saved.who;
+      var nb = el.querySelector("b"), ns = el.querySelector(":scope > span"); if (nb) nb.removeAttribute("id"); if (ns) ns.removeAttribute("id"); if (bid && nb) nb.id = bid; if (sid && ns) ns.id = sid; }   /* the page's own ids stay (its script fills them) */   /* over the sample name some pages carry for offline use */
+    if (el.classList.contains("rail") && saved.chip && !document.getElementById("practiceChip")) { var w0 = el.querySelector(".who"); if (w0) w0.insertAdjacentHTML("beforebegin", saved.chip); else el.insertAdjacentHTML("beforeend", saved.chip); }
   }
   if (saved && window.MutationObserver) {
     var mo = new MutationObserver(function () {

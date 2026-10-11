@@ -153,7 +153,7 @@
   CK.leave = function (href) { document.documentElement.classList.add("c-leaving"); setTimeout(function () { location.href = href; }, 170); };
   document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a[href]"); if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || a.target === "_blank" || a.hasAttribute("download")) return;
     var href = a.getAttribute("href"); if (!href || href.charAt(0) === "#" || /^(mailto|tel|javascript):/.test(href)) return; var u = new URL(href, location.href); if (u.origin !== location.origin || u.pathname.indexOf("/api/") === 0) return;
-    if (document.startViewTransition) return;                                  /* the browser blends the pages itself (classic-ui.css @view-transition) */
+    if (document.startViewTransition) return;                                  /* the browser blends the pages itself (rail.css @view-transition) */
     e.preventDefault(); CK.leave(u.href); });
   window.addEventListener("pageshow", function () { document.documentElement.classList.remove("c-leaving"); });
 })();

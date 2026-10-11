@@ -389,7 +389,8 @@
     $("codeSub").textContent = on ? "Then type the 6-digit code the app shows." : "Enter the 6-digit code from your authenticator.";
     if (on) { $("enrolKey").textContent = r.secret.replace(/(.{4})/g, "$1 ").trim(); $("enrolLink").href = r.uri; }
   }
-  function admitted(user) { wrongs = 0; $("pinch").hidden = true; stopWeather(); Sound.stopMusic(0.9); Sound.fx("admitted", 0.9); $("err1").textContent = $("err2").textContent = ""; $("welcome").textContent = "Welcome back, " + user.name.split(" ")[0] + ". Your queue is next."; $("pass").value = ""; show(2); cHold = true; clerkPlay("approve", true); }
+  function admitted(user) { try { sessionStorage.setItem("calms-seed", JSON.stringify({ role: user.role, name: user.name, roleName: user.roleName })); } catch (e) {}   /* look.js draws the first page's rail from this */
+    wrongs = 0; $("pinch").hidden = true; stopWeather(); Sound.stopMusic(0.9); Sound.fx("admitted", 0.9); $("err1").textContent = $("err2").textContent = ""; $("welcome").textContent = "Welcome back, " + user.name.split(" ")[0] + ". Your queue is next."; $("pass").value = ""; show(2); cHold = true; clerkPlay("approve", true); }
   $("step2").addEventListener("submit", function (e) {
     e.preventDefault();
     if (!/^\d{6}$/.test($("code").value.trim())) { scold($("err2"), "The code is 6 digits. Check your authenticator and try again."); $("code").focus(); return; }

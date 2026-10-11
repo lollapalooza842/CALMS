@@ -1,13 +1,11 @@
 /* The classic look's components (CK in assets/js/classic/kit.js). Every rebuilt page is made of these:
    an even 24px rhythm, white cards on a warm grey, Lexend for headings and figures, Inter for the rest,
    and motion that is quick and soft (things rise 12px and fade in, one after another). */
-@view-transition { navigation: auto; }
+
 ::view-transition-old(root) { animation: ck-vt-out .18s cubic-bezier(.4,0,1,1) both; }
 ::view-transition-new(root) { animation: ck-vt-in .32s cubic-bezier(.22,1,.36,1) both; }
 @keyframes ck-vt-out { to { opacity: 0; transform: translateY(-6px); } }
 @keyframes ck-vt-in { from { opacity: 0; transform: translateY(10px); } }
-/* the side rail and the phone's tab bar hold still while the page changes (named in rail.css) */
-
 html.c-own main > :not(.c-top):not(.c-view):not(#note):not(.note) { display: none !important; }
 html.c-own main #note, html.c-own main .note { display: none !important; }
 html.c-own main { gap: 0 !important; }

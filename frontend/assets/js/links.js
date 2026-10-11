@@ -67,7 +67,8 @@
     "record-answer": "counter-offers", "loan-agreement": "applications", "release-loan": "disbursement-queue", "loan-account": "loan-accounts" };
   var WANT = null, COUNTS = { queue: null, unread: null };
   function railLabels(nav) { return [].map.call(nav.querySelectorAll(".plate"), function (p) { return ((p.firstChild && p.firstChild.nodeValue) || p.textContent).trim(); }).join("|"); }
-  function railBuild(nav) { nav.textContent = ""; var here = PARENT[HERE] || HERE;
+  function railBuild(nav) { window.CALMS_RAIL_BUILD = true; try { railBuild0(nav); } finally { window.CALMS_RAIL_BUILD = false; } }   /* look.js lets only this draw the rail */
+  function railBuild0(nav) { nav.textContent = ""; var here = PARENT[HERE] || HERE;
     WANT.forEach(function (label) { var li = document.createElement("li"), a = document.createElement("a"), p = document.createElement("span"); p.className = "plate"; p.appendChild(document.createTextNode(label)); a.href = "#";
       var n = label === "My Queue" ? COUNTS.queue : label === "Notifications" ? COUNTS.unread : null; if (n) { var i = document.createElement("i"); i.textContent = String(n); p.appendChild(i); }
       if (byLabel(label) === here) a.setAttribute("aria-current", "page"); a.appendChild(p); li.appendChild(a); nav.appendChild(li); }); }
@@ -78,7 +79,7 @@
   function practiceChip(on) { var c = document.getElementById("practiceChip"), rail = document.querySelector(".rail"); if (!on || !rail) { if (c) c.remove(); return; } if (c) return;
     c = document.createElement("p"); c.id = "practiceChip"; c.setAttribute("role", "note"); c.title = "The practice code works in place of the authenticator. Remove DEV_MFA_CODE before real use.";
     c.textContent = "Practice mode"; c.style.cssText = "margin:0 0 8px;padding:4px 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:#fff6dc;background:#7e221c;border:1px solid #f0a81e";
-    rail.insertBefore(c, rail.firstChild); }
+    rail.insertBefore(c, rail.querySelector(".who")); }   /* at the foot of the rail, above the nameplate: nothing above it moves */
   if (ONLINE && !AT_ROOT) { railLoad(); setInterval(function () { if (!document.hidden) railLoad(); }, 120000); }
 
   /* 1. Side rail: give every drawer a real address and let it be clicked. */
