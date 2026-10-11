@@ -103,7 +103,6 @@ html[data-ui="classic"] #uiSwitch.inline:focus-visible { outline: 3px solid #f0a
   html[data-ui="classic"] #card::before { display: none; }
   html[data-ui="classic"] #card .plate, html[data-ui="classic"] #card .sub { text-align: center; }
   html[data-ui="classic"] #card .stamp { margin-inline: auto; }
-  html[data-ui="classic"] #gear { display: none; }
   html[data-ui="classic"] #practice { z-index: 6; }
 }
 @keyframes c-sheet { from { translate: 0 100%; } }   /* translate: #card holds transform and opacity with !important */
@@ -121,3 +120,9 @@ html[data-ui="classic"] #uiSwitch.inline:focus-visible { outline: 3px solid #f0a
 }
 html[data-ui="classic"] #install { font: 600 13.5px/1 var(--c-body); letter-spacing: 0; text-transform: none; color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 10px 16px; }
 html[data-ui="classic"] #install:hover { background: rgba(255,255,255,.24); }
+/* the cog: in the classic look its only item can be Install CALMS, so it shows only then */
+html[data-ui="classic"] #gear:not(:has(#install)) { display: none; }
+html[data-ui="classic"] #gearBtn { border-radius: 50%; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); color: #fff; box-shadow: none; }
+html[data-ui="classic"] #gearMenu { border: 0; outline: 0; border-radius: 12px; background: #fff; box-shadow: 0 12px 30px rgba(0,0,0,.25); overflow: hidden; }
+html[data-ui="classic"] #gearMenu #install { all: unset; box-sizing: border-box; display: block; padding: 12px 16px; font: 600 15px var(--c-body); color: var(--c-ink); cursor: pointer; }
+html[data-ui="classic"] #gearMenu #install:hover { background: #f6efe6; }

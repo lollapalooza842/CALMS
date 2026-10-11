@@ -125,23 +125,7 @@ input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 #gearMenu .mi.ask { color: #7e221c; }
 #gearMenu .mi b { font: inherit; font-size: 12px; padding: 2px 7px; border: 1px solid currentColor; }
 @media (prefers-reduced-motion: reduce) { #gearBtn.ask .dot { animation: none; } #gearBtn svg { transition: none; } }
-/* Not a portrait phone: no cog. Sound stays a button at the top right and Replay intro at the bottom right, as before;
-   Kuwa's hat is changed by clicking his hat, and Install sits at the bottom left. */
-@media not all and (max-width: 600px) and (orientation: portrait) {
-  #gear { position: static; }
-  #gearBtn, #hatItem { display: none !important; }
-  #gearMenu, #gearMenu[hidden] { display: contents; }
-  #gearMenu #sound:hover, #gearMenu #replay:hover, #gearMenu #install:hover { background: rgba(26,15,8,.85); }
-  #gearMenu #sound, #gearMenu #replay, #gearMenu #install { z-index: 5; position: absolute; font: 400 15px/1 var(--display); letter-spacing: .1em; color: var(--paper); background: rgba(26,15,8,.7); border: 1px solid var(--brass); padding: 10px 14px; cursor: var(--cur-pointer, pointer); }
-  #gearMenu #sound { right: 16px; top: calc(16px + env(safe-area-inset-top, 0px)); }
-  #gearMenu #replay { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
-  #gearMenu #replay[hidden] { display: none; }
-  #gearMenu #install { left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
-  #gearMenu #uiItem { z-index: 5; position: absolute; right: 16px; top: calc(62px + env(safe-area-inset-top, 0px)); font: 400 15px/1 var(--display); letter-spacing: .1em; color: var(--paper); background: rgba(26,15,8,.7); border: 1px solid var(--brass); padding: 10px 14px; cursor: var(--cur-pointer, pointer); }
-  #gearMenu #uiItem:hover { background: rgba(26,15,8,.85); } #gearMenu #uiItem:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
-  #gearMenu #sound.ask { animation: askbg 1.4s ease-in-out infinite; }
-  #gearMenu #sound:focus-visible, #gearMenu #replay:focus-visible, #gearMenu #install:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
-}
+/* Every screen size: Sound, Kuwa's hat, Replay intro, Classic look and Install all live in the cog menu at the top right. */
 @keyframes askbg { 50% { background: rgba(140,40,30,.85); } }
 @media (prefers-reduced-motion: reduce) { #sound.ask { animation: none; } }
 
