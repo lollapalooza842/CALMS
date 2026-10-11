@@ -29,8 +29,14 @@
    slides in (c-arrive); any other page: a lighter slide (c-page). My Queue online becomes a dashboard (c-dash). */
 (function () { var r = document.documentElement; if (r.getAttribute("data-ui") !== "classic" || !/\/pages\/[^/]*$/.test(location.pathname)) return;
   r.setAttribute("data-theme", "light");
-  ["classic-fonts.css", "classic-app.css"].forEach(function (f) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "../assets/css/" + f; document.head.appendChild(l); });
-  var s = document.createElement("script"); s.src = "../assets/js/classic-app.js"; document.head.appendChild(s);
+  (document.querySelector('link[href$="/base.css"]') ? [] : ["base.css"]).concat(["classic-fonts.css", "classic-app.css", "classic-ui.css", "classic-pages.css"]).forEach(function (f) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "../assets/css/" + f; document.head.appendChild(l); });
+  /* pages rebuilt for the classic look draw themselves (assets/js/classic/<page>.js); the western page stays loaded but hidden */
+  var page = (location.pathname.split("/").pop() || "").replace(/\.html$/, ""), OWN = window.CK_PAGES = ["applications", "application-detail", "notifications", "loan-accounts", "loan-account", "audit-log", "reports",
+    "users-roles", "system", "products-rules", "my-profile", "review-queue", "disbursement-queue", "counter-offers", "record-answer", "documents", "encode-verify", "credit-assessment", "decision",
+    "loan-agreement", "release-loan", "post-payment", "new-application"];
+  var own = OWN.indexOf(page) >= 0 && /^https?:$/.test(location.protocol); if (own) r.classList.add("c-own");
+  if (own) [].forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), function (l) { if (l.href.split("/").pop() === page + ".css") l.media = "not all"; });   /* the western page's own sheet would fight the rebuilt page */
+  ["classic-app.js"].concat(own ? ["classic/kit.js", "classic/" + page + ".js"] : []).forEach(function (f) { var s = document.createElement("script"); s.src = "../assets/js/" + f; s.async = false; document.head.appendChild(s); });
   var arrived = false; try { arrived = sessionStorage.getItem("calms-entered") === "1"; } catch (e) {}
   r.classList.add(arrived ? "c-arrive" : "c-page");
   if (/\/my-queue\.html$/.test(location.pathname) && /^https?:$/.test(location.protocol)) r.classList.add("c-dash"); })();

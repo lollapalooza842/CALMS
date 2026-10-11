@@ -51,8 +51,46 @@
     right.appendChild(date); right.appendChild(bell); top.appendChild(crumb); top.appendChild(right); main.insertBefore(top, main.firstChild);
     if (window.CALMS && CALMS.online) CALMS.api("GET", "/api/rail").then(function (d) { if (d.unread) { var b = el("b", "", d.unread > 99 ? "99+" : String(d.unread)); bell.appendChild(b); bell.setAttribute("aria-label", d.unread + " unread notices"); } }, function () {});
 
+    /* ---- every page, made plain: classify what the western sheets drew (see the end of classic-app.css) ---- */
+    var done = new WeakSet();
+    function rgb(str) { var m = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/.exec(str || ""); return m ? [+m[1], +m[2], +m[3], m[4] == null ? 1 : +m[4]] : null; }
+    function lum(c) { return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
+    function bgOf(cs) { var c = rgb(cs.backgroundColor); if (c && c[3] > .5) return c; if (/gradient/.test(cs.backgroundImage)) { var g = rgb(cs.backgroundImage); if (g && g[3] > .5) return g; } return null; }
+    function warm(c) { var mx = Math.max(c[0], c[1], c[2]), mn = Math.min(c[0], c[1], c[2]); return mx - mn > 18 && c[0] >= c[2]; }
+    function flatten(root) {
+      var all = [].slice.call(root.querySelectorAll("*")), fresh = [];
+      all.forEach(function (e) { if (done.has(e) || e.closest("svg, .c-dash, .c-top, .c-fab, #tabbar, #tabmore, canvas, img, video, iframe")) return; done.add(e); fresh.push(e); });
+      fresh.forEach(function (e) {
+        var cs = getComputedStyle(e); if (cs.display === "none") return;
+        var r = e.getBoundingClientRect(), big = r.width > 220 && r.height > 70, bg = bgOf(cs), tag = e.tagName;
+        var isBtn = tag === "BUTTON" || (tag === "A" && /btn|act|go/.test(e.className)) || e.getAttribute("role") === "button";
+        var hasText = /\S/.test(e.textContent || "") || /^(INPUT|SELECT|TEXTAREA)$/.test(tag);
+        if (bg && hasText) {                                   /* a box with no words in it is a bar, a swatch or a dot: its colour is the point, so it keeps it */
+          var L = lum(bg);
+          if (L < .42 && !isBtn) e.classList.add(big ? "c-card" : "c-chip2");
+          else if (L < .42 && isBtn && e.getAttribute("aria-pressed") !== "true") e.classList.add("c-btn");
+          else if (L >= .42 && L < .97 && warm(bg) && bg[2] < 225 && !isBtn) e.classList.add("c-paper", big ? "c-big" : "c-small");
+          if (e.classList.contains("c-card") && e.parentElement && e.parentElement.closest(".c-card")) e.classList.add("c-inner");
+        }
+        var bw = Math.max(parseFloat(cs.borderTopWidth) || 0, parseFloat(cs.borderLeftWidth) || 0, parseFloat(cs.borderBottomWidth) || 0);
+        if (bw >= 3 || /double|dashed|dotted/.test(cs.borderTopStyle + cs.borderBottomStyle) && bw >= 2 || cs.borderImageSource !== "none") { if (!e.classList.contains("c-card")) e.classList.add("c-thin"); }
+        else if (bw >= 1 && /^(rgb\(1[0-9]|rgb\([0-4]?\d,)/.test(cs.borderTopColor) && !isBtn) e.classList.add("c-thin");
+        var sh = cs.boxShadow; if (sh && sh !== "none" && !/inset/.test(sh) && /\d+px \d+px 0px/.test(sh)) e.classList.add(big ? "c-soft" : "c-flat");
+        if (cs.transform !== "none" && /^matrix\(([-\d.e]+), ([-\d.e]+)/.test(cs.transform)) { var b = +RegExp.$2; if (Math.abs(b) > .005 && !e.getAnimations().length) e.classList.add("c-norot"); }
+      });
+      [].forEach.call(root.querySelectorAll("*"), function (e) { if (e.classList.contains("c-ink") || e.classList.contains("c-ink2") || e.closest("svg, .c-dash, .c-top, .c-btn, .c-go, button[aria-pressed='true'], .act, .btn.grn, .hold")) return; var cs = getComputedStyle(e); if (cs.display === "none" || !/\S/.test(e.textContent || "")) return;
+        var c = rgb(cs.color); if (!c || lum(c) < .6) return; var p = e, back = null; while (p && p !== document.body) { back = bgOf(getComputedStyle(p)); if (back) break; p = p.parentElement; }
+        if (!back || lum(back) > .6) e.classList.add(lum(c) > .85 ? "c-ink" : "c-ink2"); });
+    }
+    var fT = 0; function soon() { clearTimeout(fT); fT = setTimeout(function () { flatten(main); }, 60); }
+    if (document.documentElement.classList.contains("c-own")) { /* rebuilt page: nothing western to flatten */ }
+    else if (HERE !== "my-queue" || !document.documentElement.classList.contains("c-dash")) { flatten(main); setTimeout(soon, 400); setTimeout(soon, 1500);
+      if (window.MutationObserver) new MutationObserver(soon).observe(main, { childList: true, subtree: true }); }
+    var ch = document.querySelector(".chooser"); if (ch) flatten(ch);
+
     /* ---- every page: its parts slide up in turn ---- */
     function slide(list) { var k = 0; [].forEach.call(list, function (e) { if (e === top || e.id === "note" || e.classList.contains("c-dash")) return; e.classList.add("c-slide"); e.style.setProperty("--i", k++); }); }
+    if (document.documentElement.classList.contains("c-own")) return;
     if (HERE !== "my-queue") { slide(main.children); return; }
 
     /* ---- My Queue, the dashboard ---- */

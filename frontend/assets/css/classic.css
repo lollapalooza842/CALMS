@@ -87,3 +87,17 @@ html[data-ui="classic"] #uiSwitch.inline:focus-visible { outline: 3px solid #f0a
   html[data-ui="classic"] #gear { display: none; }
   html[data-ui="classic"] #stage:has(#practice) #front { padding-top: 22px; }
 }
+
+/* full screen on a computer: the brand half fills the left, the form the right (no card floating on a background) */
+@media (min-width: 861px) {
+  html[data-ui="classic"] #front { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); place-content: stretch; padding: 0; }
+  html[data-ui="classic"] #brandside { border-radius: 0; box-shadow: none; padding: 56px clamp(40px, 7vw, 120px); align-content: center; justify-items: start; }
+  html[data-ui="classic"] #brandside > * { max-width: 460px; }
+  html[data-ui="classic"] #brandside::after { right: -90px; width: 180px; }
+  html[data-ui="classic"] #card { border-radius: 0; box-shadow: none; padding: 48px clamp(40px, 6vw, 110px) 64px; justify-content: center; grid-template-columns: minmax(0, 440px); }
+  html[data-ui="classic"] #card > * { width: 100%; }
+  html[data-ui="classic"] #uiSwitch.inline { left: 75%; color: var(--c-brand); bottom: 22px; }
+  html[data-ui="classic"] #practice { left: 16px; top: 16px; }
+}
+html[data-ui="classic"] #install { font: 600 13.5px/1 var(--c-body); letter-spacing: 0; text-transform: none; color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 10px 16px; }
+html[data-ui="classic"] #install:hover { background: rgba(255,255,255,.24); }

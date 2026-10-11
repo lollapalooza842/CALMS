@@ -12,8 +12,9 @@
   function api(method, path, body) {
     return fetch(path, { method: method, credentials: "same-origin", headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined })
       .then(function (res) { return res.json().catch(function () { return {}; }).then(function (data) {
-        if (res.status === 401 && !atRoot) { location.href = signIn; }             /* session ended: back to sign-in */
-        if (!res.ok) { var e = new Error(data.error || "Something went wrong."); e.status = res.status; e.fields = data.fields; throw e; }
+        var badCode = res.status === 401 && data.field === "mfa";                 /* a wrong authenticator code is a typo, not a lost session */
+        if (res.status === 401 && !badCode && !atRoot) { location.href = signIn; }  /* session ended: back to sign-in */
+        if (!res.ok) { var e = new Error(data.error || "Something went wrong."); e.status = badCode ? 400 : res.status; e.fields = data.fields; e.field = data.field; throw e; }
         return data; }); });
   }
 
