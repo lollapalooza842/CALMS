@@ -8,6 +8,7 @@
   var desktop = /\bElectron\//.test(navigator.userAgent);
   var installed = desktop || (window.matchMedia && (matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: window-controls-overlay)").matches)) || navigator.standalone === true;
   if (installed) root.classList.add("is-app"); if (desktop) root.classList.add("is-desktop");
+  if (atRoot) try { sessionStorage.removeItem("calms-rail:western"); sessionStorage.removeItem("calms-rail:classic"); } catch (e) {}   /* the sign-in screen: the next person gets their own rail (look.js) */
   window.CALMS = window.CALMS || {}; window.CALMS.app = installed ? (desktop ? "desktop" : "installed") : "browser";
 
   if (desktop || !/^https?:$/.test(location.protocol) || !("serviceWorker" in navigator)) return;

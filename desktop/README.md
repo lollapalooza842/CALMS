@@ -65,4 +65,5 @@ certificate and is not needed for the defense.
 
 - `main.js`: the whole app: picks the mode, starts the back end, opens the window, builds the menu.
 - `package.json`: scripts and the installer settings (`build`).
-- `build/icon.ico`, `build/icon.png`: the app icon, drawn by `design/app-icon/app_icon.py`.
+- `build/icon.ico`, `build/icon.png`: the app icon (Kuwa swooping in front of the setting sun), drawn by `design/app-icon/app_icon.py`.
+- `build/installer.nsh`, `build/installerSidebar.bmp`, `build/uninstallerSidebar.bmp`, `build/installerHeader.bmp`: the installer's western look (parchment pages, the town at dusk, Kuwa asleep in the uninstaller), drawn by `design/installer/make.py`.

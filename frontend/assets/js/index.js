@@ -817,7 +817,7 @@
   stage.addEventListener("scroll", function () { if (stage.scrollLeft || stage.scrollTop) stage.scrollLeft = stage.scrollTop = 0; });   /* older browsers without overflow: clip */
   var SW = { a: 0, v: 0, raf: 0, x: 0, t: 0, creak: 0 };
   stage.addEventListener("pointermove", function (e) {
-    if (running || reduce || (W <= 600 && H > W)) return;           /* on a phone the card is a sheet, not a sign on a nail */
+    return;                                                        /* the sign stays still: no swinging (it made the form hard to read) */
     var now = performance.now(), dt = now - SW.t, cr = card.getBoundingClientRect();
     if (dt > 0 && dt < 80 && e.clientX > cr.left - 160 && e.clientX < cr.right + 160 && e.clientY > cr.top - 120 && e.clientY < cr.bottom + 60) {
       var vx = (e.clientX - SW.x) / dt * 1000;

@@ -36,7 +36,7 @@
     function dress() { if (!nav) return; [].forEach.call(nav.querySelectorAll("li"), function (li, i) { li.style.setProperty("--i", i); var a = li.querySelector("a"); if (!a || a.querySelector(".c-ic")) return;
       var p = a.querySelector(".plate"), label = p ? ((p.firstChild && p.firstChild.nodeValue) || p.textContent) : a.textContent, s = icon(label); if (s) a.insertAdjacentHTML("afterbegin", s); });
       [].forEach.call(document.querySelectorAll("#tabbar .tab, #tabmore .row"), function (t) { if (t.querySelector(".c-ic")) return; var s = icon(t.getAttribute("aria-label") || t.textContent); if (s) t.insertAdjacentHTML("afterbegin", s); }); }
-    dress(); if (nav && window.MutationObserver) new MutationObserver(function () { setTimeout(dress, 0); }).observe(nav, { childList: true, subtree: true });
+    dress(); if (nav && window.MutationObserver) new MutationObserver(dress).observe(nav, { childList: true, subtree: true });   /* at once, before the next paint: the icons never blink out */
     if (window.MutationObserver) new MutationObserver(function () { setTimeout(dress, 0); }).observe(document.body, { childList: true });
     var who = document.querySelector(".rail .who");
     function badge() { if (!who) return; var n = (who.querySelector("b") || {}).textContent || ""; var av = who.querySelector(".c-av"); if (!av) { av = el("span", "c-av"); av.setAttribute("aria-hidden", "true"); who.insertBefore(av, who.firstChild); } av.textContent = initials(n); }

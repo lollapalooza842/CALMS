@@ -6,8 +6,7 @@
 ::view-transition-new(root) { animation: ck-vt-in .32s cubic-bezier(.22,1,.36,1) both; }
 @keyframes ck-vt-out { to { opacity: 0; transform: translateY(-6px); } }
 @keyframes ck-vt-in { from { opacity: 0; transform: translateY(10px); } }
-.rail, #tabbar { view-transition-name: ck-side; }
-::view-transition-old(ck-side), ::view-transition-new(ck-side) { animation: none; }
+/* the side rail and the phone's tab bar hold still while the page changes (named in rail.css) */
 
 html.c-own main > :not(.c-top):not(.c-view):not(#note):not(.note) { display: none !important; }
 html.c-own main #note, html.c-own main .note { display: none !important; }

@@ -87,3 +87,22 @@
   main .top .sub, main .top .lede, main .top > div > p { font-size: 14px !important; line-height: 1.4; }
   main input:not([type=checkbox]):not([type=radio]):not([type=file]), main select { min-height: 44px; font-size: 16px; }
 }
+
+/* Moving between pages (both looks): the browser blends the page itself, but the side rail and the phone's tab bar
+   are their own layers that do not move or fade, so they look like one rail that never reloads. look.js draws the
+   rail from the last page's copy before the first paint, so old and new are the same picture. */
+@view-transition { navigation: auto; }
+.rail { view-transition-name: calms-rail; }
+#tabbar { view-transition-name: calms-tabs; }
+::view-transition-old(calms-rail), ::view-transition-old(calms-tabs) { animation: none; }
+/* the old rail stays on screen for the whole change; the new one (the same picture) takes over at the end, once its
+   lettering and icons are drawn, so nothing in it ever blinks */
+::view-transition-new(calms-rail), ::view-transition-new(calms-tabs) { animation: calms-hold .3s step-end both; }
+@keyframes calms-hold { from { opacity: 0; } to { opacity: 1; } }
+::view-transition-group(calms-rail), ::view-transition-group(calms-tabs) { animation-duration: 0s; }
+html:not([data-ui="classic"])::view-transition-old(root) { animation-duration: .16s; }
+html:not([data-ui="classic"])::view-transition-new(root) { animation-duration: .22s; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+/* on a computer the rail stays in view while the page scrolls (its nameplate at the foot of the window, always in the
+   same place), so changing pages never moves it */
+@media (min-width: 821px) and (min-height: 641px) { html:not([data-ui="classic"]) .app > .rail { position: sticky; top: 0; align-self: start; height: 100vh; height: 100dvh; box-sizing: border-box; } }
