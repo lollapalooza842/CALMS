@@ -213,7 +213,7 @@
   var SFX = (function () {
     var AC = window.AudioContext || window.webkitAudioContext, ctx = null, bufs = {}, base = "";
     try { base = new URL("../audio/", (document.currentScript && document.currentScript.src) || location.href).href; } catch (e) {}
-    function off_() { try { return localStorage.getItem("calms-sound") === "off"; } catch (e) { return false; } }
+    function off_() { try { return document.documentElement.getAttribute("data-ui") === "classic" || localStorage.getItem("calms-sound") === "off"; } catch (e) { return false; } }
     function init() { if (ctx || !AC || off_() || !base) return; try { ctx = new AC(); } catch (e) { return; }
       ["hoot", "wings", "takeoff", "landing"].forEach(function (n) { bufs[n] = fetch(base + n + ".mp3").then(function (r) { return r.arrayBuffer(); }).then(function (b) { return new Promise(function (ok, no) { ctx.decodeAudioData(b, ok, no); }); }).catch(function () { return null; }); }); }
     function play(n, vol, rate) { init(); if (!ctx || off_() || !bufs[n]) return null; if (ctx.state !== "running") ctx.resume().catch(function () {});

@@ -34,7 +34,7 @@
     scene.style.setProperty("--u", (sh / 180) + "px");
     /* a portrait phone: during the intro the town fills the whole screen (scaled up from the top band), so Kuwa's flight
        and the street are not cut off above an empty dark half; when the card arrives it glides up into its band (wideOff) */
-    PH = phone ? Math.min(H / sh, 1.5) : 1; PY = phone ? (H - sh * PH) / 2 : 0;   /* not the whole height: that crops the street to the bank's door. Centred, with a dark band above and below, like a film */
+    PH = phone ? H / sh : 1; PY = 0;                     /* the whole height: a portrait phone gets a full-screen town (the bank in the middle, the street running off both sides) */
     scene.style.transformOrigin = "50% 0"; scene.style.transform = wide && PH > 1 ? camWide() : "none";
     K = phone ? 2 : Math.max(2, Math.min(4, Math.round(H / 240)));     /* the close-up peeks: a phone is narrow, so Kuwa stays a size that fits it */
     var s = 96 * K;
@@ -66,7 +66,7 @@
     var amb = null, ambWant = null;                       /* a second channel, for the weather */
     var bed = null, bedT = 0;                             /* a third, for the saloon piano (kept in step with the music) */
     var LOOP_LEN = 32 * 60 / 82;                          /* the loop is exactly 8 bars at 82 bpm */
-    var muted = false; try { muted = localStorage.getItem("calms-sound") === "off"; } catch (e) {}
+    var muted = CLASSIC; try { muted = muted || localStorage.getItem("calms-sound") === "off"; } catch (e) {}   /* the classic look is a quiet office: no music, no town */
     function init() {
       if (ctx || !AC) return;
       try { ctx = new AC(); } catch (e) { return; }

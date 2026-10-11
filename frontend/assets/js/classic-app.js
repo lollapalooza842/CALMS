@@ -96,6 +96,10 @@
     /* ---- My Queue, the dashboard ---- */
     if (!(window.CALMS && CALMS.online)) { document.documentElement.classList.remove("c-dash"); slide(main.children); return; }
     var dash = el("section", "c-dash"); dash.setAttribute("aria-label", "My Queue"); main.insertBefore(dash, top.nextSibling);
+    /* while the server answers (it can take a minute to wake): a calm skeleton of the dashboard, never the western page */
+    dash.innerHTML = '<div class="ck-skel big"><i style="width:30%"></i><i style="width:46%"></i></div>' +
+      '<div class="c-skelrow">' + [0, 1, 2, 3].map(function () { return '<div class="ck-card"><div class="ck-skel"><i style="width:40%"></i><i style="width:25%"></i><i style="width:60%"></i></div></div>'; }).join("") + '</div>' +
+      '<div class="ck-card"><div class="ck-skel"><i style="width:90%"></i><i style="width:70%"></i><i style="width:84%"></i><i style="width:62%"></i><i style="width:76%"></i></div></div>';
     var filter = "all", Q = null, ME = null;
     function hrs(h) { return h >= 48 ? Math.floor(h / 24) + " days" : h >= 1 ? Math.floor(h) + " h" : Math.max(1, Math.round(h * 60)) + " min"; }
     function peso(n) { return "₱" + Number(n || 0).toLocaleString("en-PH", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }

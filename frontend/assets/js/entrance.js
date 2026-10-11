@@ -28,18 +28,10 @@
 /* the classic look inside the app: its type, its sheet and its script (classic-app.css/.js). Just signed in: everything
    slides in (c-arrive); any other page: a lighter slide (c-page). My Queue online becomes a dashboard (c-dash). */
 (function () { var r = document.documentElement; if (r.getAttribute("data-ui") !== "classic" || !/\/pages\/[^/]*$/.test(location.pathname)) return;
-  r.setAttribute("data-theme", "light");
-  (document.querySelector('link[href$="/base.css"]') ? [] : ["base.css"]).concat(["classic-fonts.css", "classic-app.css", "classic-ui.css", "classic-pages.css"]).forEach(function (f) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "../assets/css/" + f; document.head.appendChild(l); });
+  if (!window.CK_LOOK) return;                                   /* look.js (in the head) sets the classic look up */
+  var page = (location.pathname.split("/").pop() || "").replace(/\.html$/, ""), own = r.classList.contains("c-own");
   /* pages rebuilt for the classic look draw themselves (assets/js/classic/<page>.js); the western page stays loaded but hidden */
-  var page = (location.pathname.split("/").pop() || "").replace(/\.html$/, ""), OWN = window.CK_PAGES = ["applications", "application-detail", "notifications", "loan-accounts", "loan-account", "audit-log", "reports",
-    "users-roles", "system", "products-rules", "my-profile", "review-queue", "disbursement-queue", "counter-offers", "record-answer", "documents", "encode-verify", "credit-assessment", "decision",
-    "loan-agreement", "release-loan", "post-payment", "new-application"];
-  var own = OWN.indexOf(page) >= 0 && /^https?:$/.test(location.protocol); if (own) r.classList.add("c-own");
-  if (own) [].forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), function (l) { if (l.href.split("/").pop() === page + ".css") l.media = "not all"; });   /* the western page's own sheet would fight the rebuilt page */
-  ["classic-app.js"].concat(own ? ["classic/kit.js", "classic/" + page + ".js"] : []).forEach(function (f) { var s = document.createElement("script"); s.src = "../assets/js/" + f; s.async = false; document.head.appendChild(s); });
-  var arrived = false; try { arrived = sessionStorage.getItem("calms-entered") === "1"; } catch (e) {}
-  r.classList.add(arrived ? "c-arrive" : "c-page");
-  if (/\/my-queue\.html$/.test(location.pathname) && /^https?:$/.test(location.protocol)) r.classList.add("c-dash"); })();
+  ["classic-app.js"].concat(own ? ["classic/kit.js", "classic/" + page + ".js"] : []).forEach(function (f) { var s = document.createElement("script"); s.src = "../assets/js/" + f; s.async = false; document.head.appendChild(s); }); })();
 /* Kuwa's hat, chosen on the sign-in card (index.js): set before anything is drawn, so he wears it on every page */
 (function () { try { var h = localStorage.getItem("calms-hat"); if (h && h !== "cowboy" && /^(sheriff|bowler|sombrero)$/.test(h)) document.documentElement.setAttribute("data-hat", h); } catch (e) {} })();
 (function () {
@@ -155,7 +147,7 @@
     function zoom() {
       /* lay the porch grid over the screen (on a narrow screen, shrink it so the whole doorway shows) */
       var vw = window.innerWidth, vh = window.innerHeight, u = Math.min(Math.max(vw / GRID_W, vh / GRID_H), vw * .86 / DOOR.w), left = (vw - GRID_W * u) / 2, top = (vh - GRID_H * u) / 2;
-      porch.style.setProperty("--u", u + "px"); cam.style.left = left + "px"; cam.style.top = top + "px"; pk.style.setProperty("--k", (u * 28 / 96).toFixed(3));
+      porch.style.setProperty("--u", u + "px"); cam.style.left = left + "px"; cam.style.top = top + "px"; pk.style.setProperty("--k", (u * 28 / 96).toFixed(3)); if ((vw - left) / u < 240) { pk.style.left = Math.min(207, (vw - left) / u - 34) * u + "px"; pk.style.top = 109 * u + "px"; }   /* a narrow screen cannot show the rail: he lands on the boards by the door instead, in view */
       /* the door in the town (P0) and the door in the close shot (P1); s0 is how small the close shot must start to sit over the building */
       var r = scene.getBoundingClientRect(), p0x = r.left + r.width * TOWN_DOOR.x, p0y = r.top + r.height * TOWN_DOOR.y, dcx = (DOOR.x + DOOR.w / 2) * u, dcy = (DOOR.y + DOOR.h) * u, p1x = left + dcx, p1y = top + dcy;
       var s0 = Math.max(.28, Math.min(.7, r.width * TOWN_BANK_W / (GRID_W * u))), K = 1 / s0, T = 1150, ease = "cubic-bezier(.5,0,.2,1)";
@@ -197,7 +189,7 @@
       if (!scene.animate) { root.classList.remove("returning"); return; }
       build(); document.addEventListener("keydown", quit, true); document.addEventListener("pointerdown", quit, true);
       var vw = window.innerWidth, vh = window.innerHeight, u = Math.min(Math.max(vw / GRID_W, vh / GRID_H), vw * .86 / DOOR.w), left = (vw - GRID_W * u) / 2, top = (vh - GRID_H * u) / 2;
-      porch.style.setProperty("--u", u + "px"); cam.style.left = left + "px"; cam.style.top = top + "px"; pk.style.setProperty("--k", (u * 28 / 96).toFixed(3));
+      porch.style.setProperty("--u", u + "px"); cam.style.left = left + "px"; cam.style.top = top + "px"; pk.style.setProperty("--k", (u * 28 / 96).toFixed(3)); if ((vw - left) / u < 240) { pk.style.left = Math.min(207, (vw - left) / u - 34) * u + "px"; pk.style.top = 109 * u + "px"; }   /* a narrow screen cannot show the rail: he lands on the boards by the door instead, in view */
       var r = scene.getBoundingClientRect(), p0x = r.left + r.width * TOWN_DOOR.x, p0y = r.top + r.height * TOWN_DOOR.y, dcx = (DOOR.x + DOOR.w / 2) * u, dcy = (DOOR.y + DOOR.h) * u, p1x = left + dcx, p1y = top + dcy;
       var s0 = Math.max(.28, Math.min(.7, r.width * TOWN_BANK_W / (GRID_W * u))), K = 1 / s0, mx = left + dcx, my = top + (DOOR.y + DOOR.h / 2) * u, K2 = Math.max(vw / (DOOR.w * u), vh / (DOOR.h * u)) * 1.15;
       /* start where the walk in ended: in the doorway, in the light, doors open */

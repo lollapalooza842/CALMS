@@ -75,3 +75,10 @@ html.returned #sign, html.returned .ghost { transition: opacity .4s; }
 html[data-hat="sheriff"] .kfly i { background-image: url(../img/kuwa-fly-sheriff.png); }
 html[data-hat="bowler"] .kfly i { background-image: url(../img/kuwa-fly-bowler.png); }
 html[data-hat="sombrero"] .kfly i { background-image: url(../img/kuwa-fly-sombrero.png); }
+/* a portrait phone: the porch is wider than the screen and shorter than it, so the wall above and the boards below are
+   carried on to the screen's edges (one row of the wall and one of the boards, stretched), fading into the dark */
+@media (max-width: 600px) and (orientation: portrait) {
+  #pcam::before, #pcam::after { left: 0; right: 0; height: 60vh; background-image: linear-gradient(var(--fade)), url(../img/porch/scene.png); background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+  #pcam::before { --fade: to top, rgba(18,10,5,.35) 0, rgba(18,10,5,.75) 55%, #120a05 100%; background-size: 100% 100%, 100% calc(60vh * 144); background-position: 0 0, 0 calc(-60vh * 46); }
+  #pcam::after { --fade: to bottom, rgba(29,18,11,.15) 0, rgba(29,18,11,.6) 60%, #1d120b 100%; background-size: 100% 100%, 100% calc(60vh * 144); background-position: 0 0, 0 calc(-60vh * 131); }
+}

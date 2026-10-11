@@ -63,6 +63,7 @@ body { background: var(--night); color: var(--paper); font-family: var(--type); 
 #ke u::after { content: ""; position: absolute; left: 50%; top: 30%; width: 40%; height: 45%; background: var(--night); }
 .bar { position: absolute; left: 0; right: 0; height: 11%; background: #000; pointer-events: none; }
 #barT { top: 0; } #barB { bottom: 0; }
+@media (max-width: 600px) and (orientation: portrait) { .bar { height: 5%; } }   /* a tall phone: thin film bars, so the town fills the screen */
 #grain { position: absolute; inset: 0; background-image: url(../img/town/grain.png); background-size: 256px 256px; image-rendering: pixelated; pointer-events: none; animation: grain .5s steps(4) infinite; }
 @keyframes grain { 0%{background-position:0 0} 25%{background-position:-70px 40px} 50%{background-position:50px -90px} 75%{background-position:-120px -30px} 100%{background-position:0 0} }
 #kuwahd { position: absolute; left: 50%; top: 50%; width: 256px; height: 256px; margin: -128px 0 0 -128px; background-image: url(../img/kuwa-closeup.png); background-size: 2048px 256px; image-rendering: pixelated; opacity: 0; pointer-events: none; will-change: transform; }

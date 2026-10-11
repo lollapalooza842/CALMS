@@ -1,7 +1,7 @@
 /* The classic look for the sign-in page: a plain, quiet form instead of the western town. Chosen with "Classic look"
    (settings), kept per device in localStorage "calms-ui"; entrance.js sets html[data-ui="classic"] before anything is drawn.
    One rounded card on the brand's dark red-brown: the brand half on the left, the form on the right. On a phone, the
-   form alone, with the logo on top.
+   logo large on the red-brown and the form as a white sheet below it.
    Type: Lexend for headings and Inter for everything you read and type (classic-fonts.css), the same as the classic
    look inside the app (classic-app.css). */
 #brandside, #uiSwitch.inline { display: none; }
@@ -27,7 +27,10 @@ html[data-ui="classic"] #brandside { position: relative; overflow: hidden; displ
   color: #fff6e6; background: linear-gradient(150deg, #4a2817 0%, #6b2a1b 55%, #8f2a22 100%); border-radius: 22px 0 0 22px; box-shadow: -14px 30px 50px -12px rgba(0,0,0,.4); }
 html[data-ui="classic"] #brandside::after { content: ""; position: absolute; top: -10%; bottom: -10%; right: -70px; width: 140px; border-radius: 50%; background: #fff; }   /* the curve into the form */
 html[data-ui="classic"] #brandside .dot { position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(240,168,30,.33), rgba(240,168,30,.05) 70%); }
-html[data-ui="classic"] #brandside img { width: 150px; height: auto; position: relative; }
+html[data-ui="classic"] #brandside h2, html[data-ui="classic"] #brandside p, html[data-ui="classic"] #brandside ul { display: none !important; }   /* the brand half is the logo alone */
+html[data-ui="classic"] #brandside { justify-items: center; }
+html[data-ui="classic"] #brandside img { width: min(78%, 420px); height: auto; position: relative; filter: drop-shadow(0 18px 30px rgba(0,0,0,.35)); animation: c-logoin .9s cubic-bezier(.22,1,.36,1) both; }
+@keyframes c-logoin { from { opacity: 0; transform: translateY(16px) scale(.94); } }
 html[data-ui="classic"] #brandside h2 { position: relative; margin: 0; font: 700 34px/1.15 var(--c-head); letter-spacing: -.005em; }
 html[data-ui="classic"] #brandside p { position: relative; margin: 0; font: 400 17px/1.55 var(--c-body); color: #f3dcc0; max-width: 32ch; }
 html[data-ui="classic"] #brandside ul { position: relative; margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; font: 400 15.5px/1.4 var(--c-body); color: #f7e6cf; max-width: 34ch; }
@@ -60,7 +63,15 @@ html[data-ui="classic"] #card .caps { color: #a3261c; font: 400 14px var(--c-bod
 html[data-ui="classic"] #card .fine { font: 400 14px/1.5 var(--c-body); color: #7a6858; text-align: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-line); }
 html[data-ui="classic"] #card .note { font: 400 15px/1.5 var(--c-body); color: var(--c-ink); background: #fbf3e4; border-left: 3px solid #e2b565; border-radius: 6px; }
 html[data-ui="classic"] #card .key { font-family: "Courier Prime", monospace; }
-html[data-ui="classic"] #card .stamp { font-family: var(--c-head); border-radius: 8px; }
+/* signed in: a green tick that pops in, not the western "Admitted" stamp */
+html[data-ui="classic"] #card .stamp { display: block; width: 64px; height: 64px; margin: 4px 0 14px; padding: 0; border: 0; border-radius: 50%; font-size: 0; color: transparent; transform: none;
+  background: #2f7a4f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") 50% 50% / 34px no-repeat;
+  box-shadow: 0 0 0 8px rgba(47,122,79,.14); animation: c-tick .55s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes c-tick { from { transform: scale(.4); opacity: 0; } }
+html[data-ui="classic"] #step3:not([hidden]) > * { animation: c-rise .5s cubic-bezier(.22,1,.36,1) both; }
+html[data-ui="classic"] #step3 > :nth-child(2) { animation-name: c-tick; animation-duration: .55s; }
+html[data-ui="classic"] #step3 > :nth-child(3) { animation-delay: .08s; } html[data-ui="classic"] #step3 > :nth-child(4) { animation-delay: .14s; }
+@keyframes c-rise { from { opacity: 0; transform: translateY(10px); } }
 html[data-ui="classic"] #card .bead { display: none; }
 html[data-ui="classic"] #pinch { font-family: var(--c-body); border-radius: 12px; rotate: none; transform: none; background: #fff; color: var(--c-ink); border: 1px solid var(--c-line); box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 html[data-ui="classic"] #pinch i { display: none; }
@@ -68,35 +79,44 @@ html[data-ui="classic"] #practice { font-family: var(--c-body); border-radius: 0
 html[data-ui="classic"] #practice b { font-family: var(--c-body); font-weight: 700; letter-spacing: .02em; }
 html[data-ui="classic"] #install { font-family: var(--c-body); }
 
-/* the switch back, under the card */
-html[data-ui="classic"] #uiSwitch.inline { display: block; position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 5; background: none; border: 0; padding: 8px 12px;
-  font: 600 14px var(--c-body); color: #f3dcc0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+/* the switch back, at the foot of the form */
+html[data-ui="classic"] #uiSwitch.inline { display: block; justify-self: center; margin: 22px auto 0; background: none; border: 0; padding: 8px 12px;
+  font: 600 14px var(--c-body); color: var(--c-brand); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 html[data-ui="classic"] #uiSwitch.inline:focus-visible { outline: 3px solid #f0a81e; outline-offset: 2px; border-radius: 6px; }
 
-/* ---- phones and narrow windows: the form alone, the logo on top ---- */
+/* ---- phones and narrow windows: the whole screen is the brand's red-brown with the logo large, and the form is a
+   white sheet that rises up over it ---- */
 @media (max-width: 860px) {
-  html[data-ui="classic"] #stage { background: #fff; overflow-y: auto; }
-  html[data-ui="classic"] #front { display: block; padding: 0; position: absolute; inset: 0; overflow-y: auto; border-top: 6px solid; border-image: linear-gradient(90deg, #3f2414, #8f2a22, #f0a81e) 1; }
+  html[data-ui="classic"] #stage { background: linear-gradient(165deg, #4a2817 0%, #6b2a1b 45%, #8f2a22 100%); overflow-y: auto; }
+  html[data-ui="classic"] #front { display: flex; flex-direction: column; padding: 0; position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; }
   html[data-ui="classic"] #brandside { display: none; }
-  html[data-ui="classic"] #logoWrap { display: block; position: static; width: 132px; margin: 34px auto 6px; opacity: 1 !important; transform: none !important; filter: none !important; }
+  html[data-ui="classic"] #logoWrap { display: grid; place-items: center; position: relative; flex: 1 0 auto; min-height: max(220px, 34vh); width: auto; margin: 0; padding: 40px 24px 44px;
+    opacity: 1 !important; transform: none !important; filter: none !important; }
+  html[data-ui="classic"] #logoWrap::before, html[data-ui="classic"] #logoWrap::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 35% 30%, rgba(240,168,30,.32), rgba(240,168,30,.04) 70%); }
+  html[data-ui="classic"] #logoWrap::before { width: 260px; height: 260px; right: -90px; top: -80px; }
+  html[data-ui="classic"] #logoWrap::after { width: 170px; height: 170px; left: -60px; bottom: 10px; }
+  html[data-ui="classic"] #logo { position: relative; z-index: 1; width: min(62vw, 250px); height: auto; filter: drop-shadow(0 14px 24px rgba(0,0,0,.4)); animation: c-logoin .9s cubic-bezier(.22,1,.36,1) both; }
   html[data-ui="classic"] #logoWrap #glint { display: none; }
-  html[data-ui="classic"] #card { max-width: 440px; margin: 0 auto; padding: 8px 22px 70px; border-radius: 0; box-shadow: none; }
+  html[data-ui="classic"] #card { flex: 0 0 auto; width: 100%; max-width: none; box-sizing: border-box; margin: 0; padding: 30px max(22px, calc((100% - 440px) / 2)) 28px; border-radius: 26px 26px 0 0;
+    box-shadow: 0 -12px 30px rgba(0,0,0,.18); animation: c-sheet .75s .12s cubic-bezier(.22,1,.36,1) both; }
   html[data-ui="classic"] #card::before { display: none; }
   html[data-ui="classic"] #card .plate, html[data-ui="classic"] #card .sub { text-align: center; }
-  html[data-ui="classic"] #uiSwitch.inline { color: var(--c-brand); bottom: 14px; position: fixed; }
+  html[data-ui="classic"] #card .stamp { margin-inline: auto; }
   html[data-ui="classic"] #gear { display: none; }
-  html[data-ui="classic"] #stage:has(#practice) #front { padding-top: 22px; }
+  html[data-ui="classic"] #practice { z-index: 6; }
 }
+@keyframes c-sheet { from { translate: 0 100%; } }   /* translate: #card holds transform and opacity with !important */
+@media (prefers-reduced-motion: reduce) { html[data-ui="classic"] #card, html[data-ui="classic"] #logo, html[data-ui="classic"] #brandside img, html[data-ui="classic"] #step3 > * { animation: none !important; } }
 
 /* full screen on a computer: the brand half fills the left, the form the right (no card floating on a background) */
 @media (min-width: 861px) {
   html[data-ui="classic"] #front { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); place-content: stretch; padding: 0; }
-  html[data-ui="classic"] #brandside { border-radius: 0; box-shadow: none; padding: 56px clamp(40px, 7vw, 120px); align-content: center; justify-items: start; }
-  html[data-ui="classic"] #brandside > * { max-width: 460px; }
+  html[data-ui="classic"] #brandside { border-radius: 0; box-shadow: none; padding: 56px clamp(40px, 7vw, 120px); align-content: center; justify-items: center; }
+  html[data-ui="classic"] #brandside img { width: min(72%, 460px); }
   html[data-ui="classic"] #brandside::after { right: -90px; width: 180px; }
   html[data-ui="classic"] #card { border-radius: 0; box-shadow: none; padding: 48px clamp(40px, 6vw, 110px) 64px; justify-content: center; grid-template-columns: minmax(0, 440px); }
   html[data-ui="classic"] #card > * { width: 100%; }
-  html[data-ui="classic"] #uiSwitch.inline { left: 75%; color: var(--c-brand); bottom: 22px; }
   html[data-ui="classic"] #practice { left: 16px; top: 16px; }
 }
 html[data-ui="classic"] #install { font: 600 13.5px/1 var(--c-body); letter-spacing: 0; text-transform: none; color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 10px 16px; }
