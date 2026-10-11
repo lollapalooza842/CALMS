@@ -86,7 +86,9 @@ async function latest(table, ids, cols = "*") {
 async function accounts() {
   const rows = (await db.query(`select l.*, b.full_name, p.name as product, x.reference from loan_accounts l join applications x on x.id = l.application_id
       join borrowers b on b.id = x.borrower_id join loan_products p on p.id = x.product_id order by l.number`)).rows;
-  for (const r of rows) r.st = loans.standing((await db.query("select * from installments where account_id = $1 order by n", [r.id])).rows, today(), Number(r.late_penalty));
+  const all = rows.length ? (await db.query("select * from installments where account_id = any($1) order by account_id, n", [rows.map((r) => r.id)])).rows : [];   /* one trip for every account */
+  const by = {}; all.forEach((i) => { (by[i.account_id] = by[i.account_id] || []).push(i); });
+  for (const r of rows) r.st = loans.standing(by[r.id] || [], today(), Number(r.late_penalty));
   return rows;
 }
 const acctItem = (r, kind, stamp, tone, act, why, page, hours, amt) => ({ ref: r.number, who: r.full_name, prod: r.product, amt, term: r.term_months + " months", kind, hours, stamp, tone, act, why, page: page + "?no=" + r.number, escalated: false });
@@ -211,10 +213,17 @@ router.get("/queue", wrap(async (req, res) => {
   const q = await queue(req.user), n = await oversight.notices(req.user);
   res.json({ ...q, unread: n.filter((x) => x.un).length });
 }));
+// The side rail asks for its two counts on every page. Working them out means building the whole queue, so the answer
+// is kept for 20 seconds per person; any change anyone makes (server.js: forgetRail) clears it at once.
+const railKept = new Map();
 router.get("/rail", wrap(async (req, res) => {
+  const k = railKept.get(req.user.id);
+  if (k && Date.now() - k.t < 20000) return res.json(k.v);
   const [q, n] = await Promise.all([queue(req.user), oversight.notices(req.user)]);
-  res.json({ queue: q.items.length, unread: n.filter((x) => x.un).length, role: req.user.role, practice: require("../lib/practice").on() });
+  const v = { queue: q.items.length, unread: n.filter((x) => x.un).length, role: req.user.role, practice: require("../lib/practice").on() };
+  railKept.set(req.user.id, { t: Date.now(), v }); res.json(v);
 }));
+router.forgetRail = () => railKept.clear();
 
 // ===================================================================== Review queue
 const UW = ["underwriter", "lead_underwriter"];

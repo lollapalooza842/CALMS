@@ -69,13 +69,24 @@ function publicUser(u) {
   return { id: u.id, username: u.username, name: u.full_name, shortName: u.short_name, role: u.role, roleName: ROLE_NAMES[u.role], mustChangePassword: !!u.must_change_password };
 }
 
+// Each page asks the server for several things at once, and every request checks the user again. The user's row is
+// kept for a few seconds so those checks cost one database trip, not one each. A sign-out, lock or deactivation still
+// takes effect within that time (and at once for anything that changes the row: forgetUser).
+const USERS_FOR = 5000, users = new Map();
+async function userById(id) {
+  const k = users.get(id); if (k && Date.now() - k.t < USERS_FOR) return k.u;
+  const { rows } = await db.query("select * from users where id = $1", [id]);
+  if (rows[0]) users.set(id, { t: Date.now(), u: rows[0] }); else users.delete(id);
+  return rows[0];
+}
+function forgetUser(id) { if (id) users.delete(id); else users.clear(); }
+
 // Middleware: the request must come from a signed-in, active user.
 async function requireUser(req, res, next) {
   const tok = readPayload(req, "calms_session", "session");
   if (!tok) return res.status(401).json({ error: "Please sign in." });
   await settings.load();
-  const { rows } = await db.query("select * from users where id = $1", [tok.sub]);
-  const user = rows[0];
+  const user = await userById(tok.sub);
   if (!user || !user.is_active) {
     clear(res);
     return res.status(401).json({ error: "This account can no longer sign in." });
@@ -93,4 +104,4 @@ async function requireUser(req, res, next) {
 const allow = (...roles) => (req, res, next) =>
   roles.includes(req.user.role) ? next() : res.status(403).json({ error: "Your role cannot open this." });
 
-module.exports = { MFA_ROLES, ROLE_NAMES, idleMinutes, setSession, setPending, setEnrol, readEnrol, readToken, clear, publicUser, requireUser, allow };
+module.exports = { forgetUser, MFA_ROLES, ROLE_NAMES, idleMinutes, setSession, setPending, setEnrol, readEnrol, readToken, clear, publicUser, requireUser, allow };

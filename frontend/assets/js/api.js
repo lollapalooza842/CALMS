@@ -9,14 +9,23 @@
   var atRoot = !/\/pages\/[^/]*$/.test(location.pathname);
   var signIn = (atRoot ? "" : "../") + "index.html#signin";
 
+  /* The same read asked for twice on one page (the classic look's screen and the page underneath it, the rail and the
+     top bar) goes to the server once: both get their own copy of the one answer. Kept for 4 seconds; any change
+     (a POST, PUT, PATCH or DELETE) forgets every kept answer, so nothing stale is shown after an action. */
+  var shared = {};
   function api(method, path, body) {
-    return fetch(path, { method: method, credentials: "same-origin", headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined })
+    if (method !== "GET") shared = {};
+    else { var hit = shared[path]; if (hit && Date.now() - hit.t < 4000) return hit.p.then(copy); }
+    var p = fetch(path, { method: method, credentials: "same-origin", headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined })
       .then(function (res) { return res.json().catch(function () { return {}; }).then(function (data) {
         var badCode = res.status === 401 && data.field === "mfa";                 /* a wrong authenticator code is a typo, not a lost session */
         if (res.status === 401 && !badCode && !atRoot) { location.href = signIn; }  /* session ended: back to sign-in */
         if (!res.ok) { var e = new Error(data.error || "Something went wrong."); e.status = badCode ? 400 : res.status; e.fields = data.fields; e.field = data.field; throw e; }
         return data; }); });
+    if (method === "GET") { shared[path] = { t: Date.now(), p: p }; p.catch(function () { delete shared[path]; }); return p.then(copy); }
+    return p;
   }
+  function copy(d) { return d && typeof d === "object" ? JSON.parse(JSON.stringify(d)) : d; }
 
   /* Start a page. Fetches `path` first when online and hands the result to start(data);
      offline (opened from the folder) start(null) runs and the page uses its sample data. */

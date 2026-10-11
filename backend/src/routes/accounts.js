@@ -55,9 +55,13 @@ function shapeList(a, on) {
 }
 
 router.get("/loan-accounts", allow(...VIEW), wrap(async (req, res) => {
-  const nos = (await db.query("select number from loan_accounts order by released_on desc, number desc")).rows;
-  const on = today(), list = [];
-  for (const r of nos) list.push(shapeList(await account(r.number), on));
+  /* every account and every installment in two trips, not two per account */
+  const A = (await db.query(`select l.*, ap.reference, b.full_name, b.mobile, b.address, b.email, b.id as borrower_id, p.name as product, ag.short_name as agent
+      from loan_accounts l join applications ap on ap.id = l.application_id join borrowers b on b.id = ap.borrower_id
+      join loan_products p on p.id = ap.product_id left join users ag on ag.id = ap.agent_id order by l.released_on desc, l.number desc`)).rows;
+  const all = A.length ? (await db.query("select * from installments where account_id = any($1) order by account_id, n", [A.map((a) => a.id)])).rows : [];
+  const by = {}; all.forEach((i) => { (by[i.account_id] = by[i.account_id] || []).push({ ...i, due_on: iso(i.due_on) }); });
+  const on = today(), list = A.map((a) => { a.insts = by[a.id] || []; return shapeList(a, on); });
   res.json({ today: on, accounts: list });
 }));
 

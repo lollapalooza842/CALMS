@@ -4,12 +4,14 @@ const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
+const compression = require("compression");
 const db = require("./db");
 const auth = require("./lib/auth");
 const audit = require("./lib/audit");
 
 const app = express();
 app.set("trust proxy", 1);
+app.use(compression());                      // the screens and the API answers travel zipped: several times smaller, so pages open faster
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -43,6 +45,9 @@ app.get("/api/health", async (req, res) => {
     res.status(503).json({ ok: false, error: "The database is not answering." });
   }
 });
+// Any change (a POST, PUT, PATCH or DELETE) clears what the server keeps for a few seconds to answer page loads fast:
+// the signed-in users (lib/auth.js) and the side rail's counts (routes/queues.js).
+app.use("/api", (req, res, next) => { if (req.method !== "GET") res.on("finish", () => { auth.forgetUser(); require("./routes/queues").forgetRail(); }); next(); });
 app.use("/api/auth", require("./routes/auth"));
 // Everything below needs a signed-in user (checked once per request).
 app.use("/api", (req, res, next) => Promise.resolve(auth.requireUser(req, res, next)).catch(next));
@@ -65,7 +70,12 @@ app.get("/api/audit/verify", auth.allow("compliance_auditor", "system_administra
 app.use("/api", (req, res) => res.status(404).json({ error: "No such address." }));
 
 // ---- the front end ----
-app.use(express.static(path.join(__dirname, "..", "..", "frontend"), { extensions: ["html"] }));
+// Pictures, sounds and fonts hardly ever change: the browser keeps them for a day instead of asking again on every page.
+// Pages, styles and scripts are checked each time (a quick "not changed" when they have not), so an update shows at once.
+app.use(express.static(path.join(__dirname, "..", "..", "frontend"), { extensions: ["html"], setHeaders: (res, file) => {
+  if (/\.(png|jpe?g|webp|gif|svg|ico|mp3|ogg|wav|woff2?|otf|ttf)$/i.test(file)) res.setHeader("Cache-Control", "public, max-age=86400");
+  else res.setHeader("Cache-Control", "no-cache");
+} }));
 
 // ---- errors ----
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
