@@ -38,6 +38,7 @@
   /* ---- layer 2: copies of what the server said ---- */
   var puts = 0, pending = [];
   function keep(path, data) {
+    if (slow) { slow = 0; if (!down) stale = 0; paint(); }   /* the server answered: no longer slow */
     if (path === "/api/auth/me" && data && data.user) {
       var was = uid(), first = !ls("calms-uid");
       if (was && was !== data.user.id) clear("cache").catch(function () {});   /* someone else signed in: the last person's copies go */
@@ -56,6 +57,18 @@
       return copy(hit.data);
     }, function () { failedLoad = true; throw err("You are offline, and the copies on this computer could not be read."); });
   }
+  /* the server is up but slow: a copy, if this computer has one (undefined if not), and the bar says why */
+  var slow = 0;
+  /* the page itself came slowly (the service worker waited, then used its copy): treat the server as slow from the start */
+  try { var nav = performance.getEntriesByType("navigation")[0]; if (nav && nav.responseStart - nav.requestStart > 2000) slow = Date.now(); } catch (e) {}
+  function copyIfSlow(path) { probe(); return get("cache", uid() + "|" + path).then(function (hit) { if (!hit) return undefined; slow = Date.now(); if (!stale || hit.at < stale) stale = hit.at; paint(); return copy(hit.data); }, function () { return undefined; }); }
+  /* Slow, or offline? A connection with no internet behind it (Wi-Fi with no data, a dead hotspot) makes every request
+     hang instead of fail. A quick check settles it: if even the server's health check does not answer in 5 seconds,
+     CALMS is offline (the bar, the outbox) until it does. */
+  var probing = 0;
+  function probe() { if (down || Date.now() - probing < 15000) return; probing = Date.now();
+    var ctl = window.AbortController ? new AbortController() : null, t = setTimeout(function () { if (ctl) ctl.abort(); }, 5000);
+    fetch("/api/health", { cache: "no-store", signal: ctl ? ctl.signal : undefined }).then(function (r) { clearTimeout(t); if (!r.ok) goDown(); }, function () { clearTimeout(t); goDown(); }); }
   function wipe() { return Promise.all([clear("cache")]).catch(function () {}).then(function () { ls("calms-uid", null); ls("calms-uid-last", null); ls("calms-uname", null); }); }
   function err(msg, extra) { var e = new Error(msg); e.status = 0; e.offline = true; if (extra) for (var k in extra) e[k] = extra[k]; return e; }
 
@@ -125,7 +138,7 @@
       fetch("/api/health", { cache: "no-store", signal: ctl ? ctl.signal : undefined })
         .then(function (r) { clearTimeout(t); if (r.ok) comeBack(); else heartbeat(); }, function () { clearTimeout(t); heartbeat(); });
     }, navigator.onLine ? 4000 : 8000); }
-  function comeBack() { if (!down) return; down = false; stale = 0; flash = { text: "Back online.", until: Date.now() + 4000 }; paint(); setTimeout(paint, 4100);
+  function comeBack() { if (!down) return; down = false; slow = 0; probing = 0; stale = 0; flash = { text: "Back online.", until: Date.now() + 4000 }; paint(); setTimeout(paint, 4100);
     if (failedLoad && document.querySelector("#calmsDown, [data-offline-error]")) { setTimeout(function () { location.reload(); }, 600); return; }   /* the page could not open offline: open it now */
     flush(); }
   window.addEventListener("offline", goDown);
@@ -137,7 +150,7 @@
     isDown: function () { return down; },
     down: goDown,
     keep: keep, fromCache: fromCache, wipe: wipe, why: why, err: err,
-    queue: enqueue, flush: flush, newId: newId,
+    queue: enqueue, flush: flush, newId: newId, copyIfSlow: copyIfSlow, probe: probe, isSlow: function () { return slow && Date.now() - slow < 30000; },
     open: function () { openPanel(); },
   };
 
@@ -171,6 +184,7 @@
     readOnly();
     var n = counts.waiting, look = counts.look, text = "", tone = "", act = null;
     if (down) { text = "You're offline. Work you save here is kept on this computer and sent when you're back." + (stale ? " Showing copies from " + hhmm(stale) + "." : ""); if (n) act = n + " waiting"; }
+    else if (slow) { text = "The server is slow to answer (it may be waking up). Showing copies from " + hhmm(stale) + " until it does."; tone = "busy"; }
     else if (sending) { text = "Back online. Sending " + n + " saved item" + (n === 1 ? "" : "s") + "…"; tone = "busy"; }
     else if (needSignIn && n) { text = "Sign in again to send " + n + " saved item" + (n === 1 ? "" : "s") + ". They stay on this computer until then."; act = "Sign in"; }
     else if (flash && Date.now() < flash.until) { text = flash.text; tone = "ok"; }

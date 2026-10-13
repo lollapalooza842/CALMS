@@ -36,8 +36,20 @@
     function later() { return wait ? N.queue(method, path, body, wait, key) : Promise.reject(N.err(N.why(method, path))); }
     if (method === "GET") {
       p = p.then(function (data) { if (N) N.keep(path, data); return data; }, function (e) { if (e.lost && N) { N.down(); return N.fromCache(path); } throw e; });
+      /* the server is slow to answer (a free server waking up can take a minute): after a few seconds, show the copy
+         kept on this computer, if there is one, instead of a page that keeps loading */
+      if (N && N.copyIfSlow) { var real = p; p = new Promise(function (ok, no) { var settled = false;
+        var t = setTimeout(function () { N.copyIfSlow(path).then(function (d) { if (!settled && d !== undefined) { settled = true; ok(d); } }); }, N.isSlow() ? 0 : 5000);   /* once slow, the next reads use their copies at once (each still refreshes it) */
+        real.then(function (d) { clearTimeout(t); if (!settled) { settled = true; ok(d); } }, function (e) { clearTimeout(t); if (!settled) { settled = true; no(e); } }); }); }
       shared[path] = { t: Date.now(), p: p }; p.catch(function () { delete shared[path]; }); return p.then(copy); }
-    return p.catch(function (e) { if (e.lost && N) { N.down(); return later(); } throw e; });
+    p = p.catch(function (e) { if (e.lost && N) { N.down(); return later(); } throw e; });
+    /* a change that may wait, with no answer in 8 seconds (a connection with no internet behind it hangs instead of
+       failing): it goes to the outbox under the same key. If the server did get it after all, sending it again later
+       is recognised and not done twice. */
+    if (wait) { var sent = p; p = new Promise(function (ok, no) { var settled = false;
+      var t = setTimeout(function () { if (settled) return; settled = true; N.probe(); later().then(ok, no); }, 8000);
+      sent.then(function (d) { clearTimeout(t); if (!settled) { settled = true; ok(d); } }, function (e) { clearTimeout(t); if (!settled) { settled = true; no(e); } }); }); }
+    return p;
   }
   function copy(d) { return d && typeof d === "object" ? JSON.parse(JSON.stringify(d)) : d; }
 
