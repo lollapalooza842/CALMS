@@ -71,6 +71,34 @@
   document.write(css.map(function (f) { return '<link rel="stylesheet" href="../assets/css/' + f + '">'; }).join(""));
   var arrived = false; try { arrived = sessionStorage.getItem("calms-entered") === "1"; } catch (e) {}
   r.classList.add(arrived ? "c-arrive" : "c-page");
+  /* the sidebar's extras (classic-app.css): folded to icons or not (remembered per device), the "Main" label, the chevron
+     that folds it, and the card for what your role does most. Added the moment the rail arrives, before the first paint. */
+  try { if (localStorage.getItem("calms-rail-mini") === "1") r.classList.add("c-mini"); } catch (e) {}
+  var SVG = function (d) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>"; };
+  var CTA = { loan_processor: ["Start an application", "Encode a borrower's papers in a few steps.", "New application", "new-application"],
+    sales_agent: ["Your borrowers", "Answers to counter-offers and papers still missing.", "Counter-offers", "counter-offers"],
+    underwriter: ["Next in line", "Pick up the next application waiting for a decision.", "Review queue", "review-queue"],
+    lead_underwriter: ["Next in line", "Assign desks and decide what was endorsed to you.", "Review queue", "review-queue"],
+    disbursement_officer: ["Ready to release", "Loans with a signed agreement, waiting for their money.", "Disbursement queue", "disbursement-queue"],
+    loan_account_officer: ["Money came in?", "Post it to the loan account in seconds.", "Post a payment", "post-payment"],
+    operations_manager: ["How lending is going", "Waiting times, decisions and collections this month.", "Reports", "reports"],
+    compliance_auditor: ["Check the seals", "Every entry is sealed to the one before it.", "Audit log", "audit-log"],
+    system_administrator: ["Add a person", "Accounts, roles and approval limits.", "Users and roles", "users-roles"] };
+  window.CK_CTA = function (role) {
+    var rail = document.querySelector(".rail"), c = CTA[role]; if (!rail || !c) return; var card = rail.querySelector(".c-card-cta"); if (card && card.dataset.role === role) return;
+    if (!card) { card = document.createElement("div"); card.className = "c-card-cta"; rail.appendChild(card); }
+    card.dataset.role = role; card.innerHTML = "<b>" + c[0] + "</b><p>" + c[1] + '</p><a class="c-cta" href="' + c[3] + '.html" title="' + c[2] + '">' + SVG(c[3] === "new-application" || c[3] === "users-roles" ? '<path d="M12 5v14M5 12h14"/>' : '<path d="M5 12h14M13 6l6 6-6 6"/>') + "<span>" + c[2] + "</span></a>";
+    try { sessionStorage.setItem("calms-role", role); } catch (e) {} };
+  function dress(rail) {
+    if (rail.dataset.dressed) return; rail.dataset.dressed = "1";
+    var nav = rail.querySelector("#nav"), sec = document.createElement("p"); sec.className = "c-sec"; sec.textContent = "Main"; if (nav) rail.insertBefore(sec, nav);
+    var fold = document.createElement("button"); fold.type = "button"; fold.className = "c-fold"; fold.setAttribute("aria-label", "Fold the sidebar"); fold.title = "Fold or open the sidebar";
+    fold.innerHTML = SVG('<path d="M15 6l-6 6 6 6"/>'); rail.appendChild(fold);
+    fold.addEventListener("click", function () { var on = !r.classList.contains("c-mini"); r.classList.toggle("c-mini", on); fold.setAttribute("aria-expanded", String(!on)); try { localStorage.setItem("calms-rail-mini", on ? "1" : "0"); } catch (e) {} });
+    var role = ""; try { role = sessionStorage.getItem("calms-role") || (JSON.parse(sessionStorage.getItem("calms-seed") || "null") || {}).role || ""; } catch (e) {}
+    if (role) window.CK_CTA(role); }
+  if (window.MutationObserver) { var mo2 = new MutationObserver(function () { var rail = document.querySelector(".rail"); if (rail && rail.querySelector(".who")) { dress(rail); mo2.disconnect(); } });
+    mo2.observe(r, { childList: true, subtree: true }); }
   if (page === "my-queue" && web) r.classList.add("c-dash");
 })();
 /* Lightning-quick page changes: the moment the pointer rests on a link to another CALMS page (or a finger touches it),

@@ -74,7 +74,7 @@
       if (byLabel(label) === here) a.setAttribute("aria-current", "page"); a.appendChild(p); li.appendChild(a); nav.appendChild(li); }); }
   function railLoad() { if (!window.CALMS) return; CALMS.api("GET", "/api/rail").then(function (d) { WANT = RAIL[d.role] || null; COUNTS = d; var nav = document.getElementById("nav"); if (nav && WANT) { var t = document.createElement("ul"); railBuild(t); var cur = function (n) { var a = n.querySelector("[aria-current]"); return a ? a.textContent.trim() : ""; };
       if (t.textContent !== nav.textContent || cur(t) !== cur(nav)) railBuild(nav); }   /* unchanged (the rail kept from the last page): leave it be, nothing blinks */
-    practiceChip(d.practice); }, function () {}); }
+    practiceChip(d.practice); if (window.CK_CTA) window.CK_CTA(d.role); }, function () {}); }   /* the classic sidebar's card for this role (look.js) */
   /* practice mode (the practice code works in place of the authenticator): a chip at the top of the rail, so it is never forgotten */
   function practiceChip(on) { var c = document.getElementById("practiceChip"), rail = document.querySelector(".rail"); if (!on || !rail) { if (c) c.remove(); return; } if (c) return;
     c = document.createElement("p"); c.id = "practiceChip"; c.setAttribute("role", "note"); c.title = "The practice code works in place of the authenticator. Remove DEV_MFA_CODE before real use.";

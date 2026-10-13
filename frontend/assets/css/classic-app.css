@@ -21,42 +21,88 @@ html[data-ui="classic"] #kuwa, html[data-ui="classic"] .kpeek, html[data-ui="cla
 html[data-ui="classic"] main h1.ich::before { display: none !important; }
 html[data-ui="classic"] main h1 { font-family: var(--c-head); font-weight: 600; letter-spacing: -.01em; }
 
-/* ---- the sidebar ---- */
-html[data-ui="classic"] .app { grid-template-columns: 252px minmax(0, 1fr); }
-html[data-ui="classic"] .rail { position: sticky; top: 0; height: 100vh; box-sizing: border-box; overflow: visible; gap: 6px; padding: 26px 0 20px 16px; border: 0;
-  background: linear-gradient(170deg, var(--c-side-1) 0%, #5a2416 55%, var(--c-side-2) 100%); color: #f5e6d6; z-index: 20; }
-html[data-ui="classic"] .rail .brand { margin: 0 16px 22px 6px; padding: 0; gap: 12px; background: none; border: 0; box-shadow: none; transform: none; animation: none; }
+/* ---- the sidebar: a floating dark panel, rounded, with you at the top, the drawers under "Main", and the one thing
+   your role does most as a card at the foot. It folds down to icons (the chevron on its edge, remembered per device);
+   folded, each drawer's name shows beside it on hover. look.js adds the chevron, the section label and the card before
+   the first paint, so nothing pops in. ---- */
+html[data-ui="classic"] { --c-railw: 268px; --c-panel: #2a1410; --c-panel-2: #1f0e0a; --c-orange: #e8892a; --c-orange-2: #d9761b; }
+html[data-ui="classic"].c-mini { --c-railw: 104px; }
+html[data-ui="classic"] .app { grid-template-columns: var(--c-railw) minmax(0, 1fr); transition: grid-template-columns .32s cubic-bezier(.22,1,.36,1); }
+html[data-ui="classic"] .rail { position: sticky; top: 14px; align-self: start; height: calc(100vh - 28px); height: calc(100dvh - 28px); box-sizing: border-box; margin: 14px 0 14px 14px;
+  overflow: visible; display: flex; flex-direction: column; gap: 4px; padding: 18px 14px 14px; border: 0; border-radius: 24px;
+  background: linear-gradient(180deg, var(--c-panel) 0%, var(--c-panel-2) 100%); color: #e9d9cc; z-index: 20;
+  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 18px 40px -12px rgba(31,14,10,.55); }
+html[data-ui="classic"] .rail > * { flex: none; }
+/* the brand: small, above you */
+html[data-ui="classic"] .rail .brand { order: -3; margin: 0 4px 14px; padding: 0; gap: 10px; background: none; border: 0; box-shadow: none; transform: none; animation: none; }
 html[data-ui="classic"] .rail .brand::before, html[data-ui="classic"] .rail .brand::after { display: none; }
-html[data-ui="classic"] .rail .brand img { width: 46px; height: 46px; filter: none; }
-html[data-ui="classic"] .rail .brand b { font: 600 21px/1 var(--c-head); letter-spacing: .02em; color: #fff; text-shadow: none; }
-html[data-ui="classic"] .rail .brand span { margin-top: 4px; padding: 0; background: none; border: 0; transform: none; font: 400 12px/1.2 var(--c-body); color: #e5c9b2; }
-html[data-ui="classic"] #practiceChip { margin: 0 16px 14px 6px !important; border-radius: 999px; border: 0 !important; background: rgba(255,255,255,.12) !important; color: #ffe2b8 !important;
-  font: 600 11px/1 var(--c-body) !important; letter-spacing: .08em; padding: 7px 10px !important; }
-html[data-ui="classic"] .nav { gap: 4px; }
-html[data-ui="classic"] .nav a { position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 0; border-radius: 14px 0 0 14px; background: none; box-shadow: none;
-  color: #f1dccb; text-decoration: none; transform: none !important; transition: background .2s, color .2s; }
-html[data-ui="classic"] .nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
-html[data-ui="classic"] .nav a .plate { all: unset; flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 500 14.5px/1.2 var(--c-head); letter-spacing: 0; }
-html[data-ui="classic"] .nav a .plate i { font: 600 11.5px/1 var(--c-body); font-style: normal; min-width: 22px; padding: 4px 7px; box-sizing: border-box; text-align: center; border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; margin-right: 14px; }
-html[data-ui="classic"] .nav a .ic, html[data-ui="classic"] .nav a > i:not(.c-ic) { display: none; }
-html[data-ui="classic"] .nav a::after { content: none; border: 0; border-radius: 0; box-shadow: none; }
-html[data-ui="classic"] main { background: none; }
-html[data-ui="classic"] .nav a .c-ic { width: 20px; height: 20px; flex: none; opacity: .9; }
-/* the page you are on: a white tab that joins the work area, with curved corners above and below */
-html[data-ui="classic"] .nav a[aria-current="page"] { background: var(--c-bg); color: var(--c-brand); }
-html[data-ui="classic"] .nav a[aria-current="page"] .plate i { background: var(--c-brand); }
-html[data-ui="classic"] .nav a[aria-current="page"]::before, html[data-ui="classic"] .nav a[aria-current="page"]::after { content: ""; border: 0; border-radius: 0; position: absolute; right: 0; width: 20px; height: 20px; pointer-events: none; }
-html[data-ui="classic"] .nav a[aria-current="page"]::before { top: -20px; background: radial-gradient(circle at 0 0, transparent 19.5px, var(--c-bg) 20px); }
-html[data-ui="classic"] .nav a[aria-current="page"]::after { bottom: -20px; background: radial-gradient(circle at 0 100%, transparent 19.5px, var(--c-bg) 20px); }
-html[data-ui="classic"] .rail .who { margin: auto 16px 0 0; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 2px 12px; padding: 12px; border: 0; border-radius: 14px; background: rgba(255,255,255,.1); box-shadow: none; color: #fff; }
+html[data-ui="classic"] .rail .brand img { width: 30px; height: 30px; filter: none; }
+html[data-ui="classic"] .rail .brand b { font: 600 15px/1 var(--c-head); letter-spacing: .04em; color: #fff; text-shadow: none; }
+html[data-ui="classic"] .rail .brand span { display: none; }
+/* you: avatar, your role in small capitals, your name; sign out is the little door on the right */
+html[data-ui="classic"] .rail .who { order: -2; margin: 0 0 18px !important; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 1px 12px;
+  padding: 10px; border: 0; border-radius: 16px; background: rgba(255,255,255,.05); box-shadow: 0 0 0 1px rgba(255,255,255,.05) inset; color: #fff; }
 html[data-ui="classic"] .rail .who > .ic { display: none; }
-html[data-ui="classic"] .rail .who .c-av { grid-row: 1 / span 2; }
-html[data-ui="classic"] .rail .who b { font: 600 14.5px/1.2 var(--c-head); color: #fff; text-shadow: none; }
-html[data-ui="classic"] .rail .who b a { color: inherit; border: 0; }
-html[data-ui="classic"] .rail .who > span { font: 400 12.5px/1.3 var(--c-body); color: #e5c9b2; }
-html[data-ui="classic"] .rail .who .out { margin-top: 10px; min-height: 38px; border: 0; border-radius: 10px; background: rgba(0,0,0,.22); box-shadow: none; color: #fff; font: 500 13.5px/1 var(--c-body); letter-spacing: 0; }
-html[data-ui="classic"] .rail .who .out:hover { background: rgba(0,0,0,.35); }
+html[data-ui="classic"] .rail .who .c-av { grid-row: 1 / span 2; grid-column: 1; width: 42px; height: 42px; box-shadow: 0 0 0 2px rgba(255,255,255,.12); }
+html[data-ui="classic"] .rail .who > span:not(.c-av) { grid-row: 1; grid-column: 2; align-self: end; font: 600 9.5px/1.2 var(--c-body); letter-spacing: .08em; text-transform: uppercase; color: #a8907f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[data-ui="classic"] .rail .who b { grid-row: 2; grid-column: 2; align-self: start; font: 600 14px/1.25 var(--c-head); color: #fff; text-shadow: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[data-ui="classic"] .rail .who b a { color: inherit; border: 0; text-decoration: none; }
+html[data-ui="classic"] .rail .who .out { grid-row: 1 / span 2; grid-column: 3; margin: 0; width: 34px; height: 34px; min-height: 0; padding: 0; display: grid; place-items: center; border: 0; border-radius: 10px;
+  background: transparent; box-shadow: none; color: #a8907f; font-size: 0; letter-spacing: 0; transition: background .2s, color .2s; }
+html[data-ui="classic"] .rail .who .out::before { content: ""; width: 18px; height: 18px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M9 16l-4-4 4-4M5 12h11'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M9 16l-4-4 4-4M5 12h11'/%3E%3C/svg%3E") center / contain no-repeat; }
+html[data-ui="classic"] .rail .who .out:hover { background: rgba(255,255,255,.08); color: #fff; }
 html[data-ui="classic"] .rail .who .out .ic { display: none; }
+/* the section label */
+html[data-ui="classic"] .c-sec { order: -1; margin: 0 10px 6px; font: 600 10px/1 var(--c-body); letter-spacing: .14em; text-transform: uppercase; color: #8c7364; }
+/* the drawers */
+html[data-ui="classic"] .nav { gap: 2px; }
+html[data-ui="classic"] .nav a { position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 0; border-radius: 12px; background: none; box-shadow: none;
+  color: #d9c4b4; text-decoration: none; transform: none !important; transition: background .2s, color .2s; }
+html[data-ui="classic"] .nav a:hover { background: rgba(255,255,255,.06); color: #fff; }
+html[data-ui="classic"] .nav a .plate { all: unset; flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 500 14px/1.2 var(--c-head); letter-spacing: 0; white-space: nowrap; }
+html[data-ui="classic"] .nav a .plate i { font: 600 11px/1 var(--c-body); font-style: normal; min-width: 22px; padding: 4px 7px; box-sizing: border-box; text-align: center; border-radius: 999px; background: rgba(255,255,255,.1); color: #fff; }
+html[data-ui="classic"] .nav a .ic, html[data-ui="classic"] .nav a > i:not(.c-ic) { display: none; }
+html[data-ui="classic"] .nav a::before, html[data-ui="classic"] .nav a::after { content: none; border: 0; border-radius: 0; box-shadow: none; }
+html[data-ui="classic"] .nav a .c-ic { width: 20px; height: 20px; flex: none; opacity: .85; }
+html[data-ui="classic"] .nav a[aria-current="page"] { background: rgba(255,255,255,.09); color: #fff; box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset; }
+html[data-ui="classic"] .nav a[aria-current="page"] .c-ic { opacity: 1; color: var(--c-orange); }
+html[data-ui="classic"] .nav a[aria-current="page"] .plate i { background: var(--c-orange); }
+/* the practice chip, and the card at the foot */
+html[data-ui="classic"] #practiceChip { order: 40; margin: auto 4px 10px !important; align-self: flex-start; border-radius: 999px; border: 0 !important; background: rgba(232,137,42,.14) !important; color: #f3b675 !important;
+  font: 600 10px/1 var(--c-body) !important; letter-spacing: .1em; padding: 6px 10px !important; }
+html[data-ui="classic"] .c-card-cta { order: 50; margin-top: auto; padding: 18px 14px 14px; border-radius: 18px; text-align: center; background: rgba(255,255,255,.04); box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset; }
+html[data-ui="classic"] #practiceChip ~ .c-card-cta { margin-top: 0; }
+html[data-ui="classic"] .c-card-cta b { display: block; font: 600 15px/1.3 var(--c-head); color: #fff; }
+html[data-ui="classic"] .c-card-cta p { margin: 6px 0 14px; font: 400 12.5px/1.45 var(--c-body); color: #b39d8d; }
+html[data-ui="classic"] .c-cta { display: flex; align-items: center; justify-content: center; gap: 8px; height: 42px; border-radius: 12px; text-decoration: none; color: #fff; font: 600 13.5px/1 var(--c-body);
+  background: linear-gradient(180deg, var(--c-orange), var(--c-orange-2)); box-shadow: 0 8px 18px -6px rgba(232,137,42,.6), 0 1px 0 rgba(255,255,255,.25) inset; transition: transform .15s, filter .15s; }
+html[data-ui="classic"] .c-cta:hover { filter: brightness(1.06); } html[data-ui="classic"] .c-cta:active { transform: translateY(1px); }
+html[data-ui="classic"] .c-cta svg { width: 18px; height: 18px; flex: none; }
+/* the chevron on the edge that folds the panel */
+html[data-ui="classic"] .c-fold { position: absolute; top: 74px; right: -13px; z-index: 3; width: 26px; height: 26px; padding: 0; display: grid; place-items: center; border-radius: 50%; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.1); background: #3a1d15; color: #d9c4b4; box-shadow: 0 4px 10px rgba(31,14,10,.35); transition: background .2s, color .2s, transform .32s cubic-bezier(.22,1,.36,1); }
+html[data-ui="classic"] .c-fold:hover { background: #4a261b; color: #fff; }
+html[data-ui="classic"] .c-fold svg { width: 14px; height: 14px; }
+html[data-ui="classic"].c-mini .c-fold { transform: rotate(180deg); }
+/* folded: icons only; names appear beside them on hover, as a dark flyout */
+html[data-ui="classic"].c-mini .rail { padding-left: 12px; padding-right: 12px; }
+html[data-ui="classic"].c-mini .rail .brand { justify-content: center; margin-left: 0; margin-right: 0; } html[data-ui="classic"].c-mini .rail .brand > div { display: none; }
+html[data-ui="classic"].c-mini .rail .who { grid-template-columns: 42px; justify-content: center; padding: 8px 0; background: none; box-shadow: none; }
+html[data-ui="classic"].c-mini .rail .who > span:not(.c-av), html[data-ui="classic"].c-mini .rail .who b, html[data-ui="classic"].c-mini .rail .who .out { display: none; }
+html[data-ui="classic"].c-mini .c-sec { margin-left: 0; margin-right: 0; text-align: center; font-size: 9px; }
+html[data-ui="classic"].c-mini .nav a { justify-content: center; padding: 12px 0; }
+html[data-ui="classic"].c-mini .nav a .plate { position: absolute; left: calc(100% + 14px); top: 50%; flex: none; padding: 9px 12px; border-radius: 10px; background: #2a1410; color: #fff;
+  box-shadow: 0 10px 24px rgba(31,14,10,.35), 0 0 0 1px rgba(255,255,255,.06) inset; opacity: 0; visibility: hidden; transform: translate(-6px, -50%); transition: opacity .15s, transform .15s, visibility .15s; pointer-events: none; z-index: 30; }
+html[data-ui="classic"].c-mini .nav a:hover .plate, html[data-ui="classic"].c-mini .nav a:focus-visible .plate { opacity: 1; visibility: visible; transform: translate(0, -50%); }
+html[data-ui="classic"].c-mini .nav a .plate i { margin-left: 8px; }
+html[data-ui="classic"].c-mini .nav a:has(.plate i)::after { content: ""; position: absolute; top: 8px; right: 14px; width: 8px; height: 8px; border-radius: 50%; background: var(--c-orange); box-shadow: 0 0 0 2px var(--c-panel); }
+html[data-ui="classic"].c-mini #practiceChip { align-self: center; margin-left: 0 !important; margin-right: 0 !important; font-size: 0 !important; width: 10px; height: 10px; padding: 0 !important; background: var(--c-orange) !important; }
+html[data-ui="classic"].c-mini .c-card-cta { padding: 0; background: none; box-shadow: none; }
+html[data-ui="classic"].c-mini .c-card-cta b, html[data-ui="classic"].c-mini .c-card-cta p, html[data-ui="classic"].c-mini .c-cta span { display: none; }
+html[data-ui="classic"].c-mini .c-cta { width: 44px; height: 44px; margin: 0 auto; border-radius: 14px; }
+@media (prefers-reduced-motion: reduce) { html[data-ui="classic"] .app, html[data-ui="classic"] .c-fold, html[data-ui="classic"].c-mini .nav a .plate { transition: none; } }
 .c-av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font: 600 14px/1 var(--c-head, sans-serif); color: #fff; background: linear-gradient(140deg, #c9821b, #9a2f24); flex: none; }
 
 /* ---- the work area ---- */
@@ -137,7 +183,16 @@ html[data-ui="classic"].arriving main, html[data-ui="classic"].arriving .nav li 
 @media (max-width: 1180px) { .c-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 820px) {
   html[data-ui="classic"] .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }   /* the bar keeps its own height while the page waits for data */
-  html[data-ui="classic"] .rail { position: sticky; height: auto; padding: 10px 16px; flex-direction: row; align-items: center; background: linear-gradient(100deg, var(--c-side-1), var(--c-side-2)); }
+  html[data-ui="classic"] .app, html[data-ui="classic"].c-mini .app { grid-template-columns: minmax(0, 1fr); }
+  html[data-ui="classic"] .rail, html[data-ui="classic"].c-mini .rail { position: sticky; top: 0; height: auto; margin: 0; border-radius: 0; padding: 10px 16px; flex-direction: row; align-items: center; background: linear-gradient(100deg, var(--c-panel), #4a1f15); box-shadow: 0 4px 16px rgba(31,14,10,.25); }
+  html[data-ui="classic"] .c-sec, html[data-ui="classic"] .c-card-cta, html[data-ui="classic"] .c-fold { display: none !important; }
+  html[data-ui="classic"] .rail .brand > div { display: block !important; }
+  html[data-ui="classic"] .rail .who { order: 60; margin: 0 0 0 auto !important; padding: 6px 8px; background: none; box-shadow: none; }
+  html[data-ui="classic"] .rail > .nav { flex: 1 1 auto; }
+  html[data-ui="classic"] .nav { flex-direction: row; flex-wrap: nowrap; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; margin: 0 8px; }
+  html[data-ui="classic"] .nav a { padding: 8px 10px; gap: 8px; } html[data-ui="classic"] .nav a .plate { font-size: 13px; }
+  html[data-ui="classic"] .rail .who .c-av { width: 36px; height: 36px; } html[data-ui="classic"] .rail .who { grid-template-columns: 36px auto auto; }
+  html[data-ui="classic"] #practiceChip { order: 55; margin: 0 0 0 auto !important; }
   html[data-ui="classic"] .rail .brand { margin: 0; } html[data-ui="classic"] .rail .brand img { width: 34px; height: 34px; }
   html[data-ui="classic"] #practiceChip { margin: 0 0 0 auto !important; }
   html[data-ui="classic"] main { padding: 18px 16px 30px; }
