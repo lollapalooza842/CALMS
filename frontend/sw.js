@@ -9,15 +9,18 @@
    - On install, every screen and its files are fetched once (the list comes from the server, /sw-files.json), so a
      screen opens offline even if it was never visited on this computer.
    Change VERSION to throw away every old copy. */
-var VERSION = "calms-shell-v2";
-var SHELL = ["./", "index.html", "assets/css/index.css", "assets/css/fonts.css", "assets/css/entrance.css", "assets/css/icons.css", "assets/js/api.js", "assets/js/app.js", "assets/js/index.js", "assets/js/entrance.js", "assets/js/links.js", "assets/fonts/badhorse.otf", "assets/img/logo-large.webp", "assets/img/kuwa.png", "assets/img/app/icon-192.png"];
+var VERSION = "calms-shell-v3";
+var SHELL = ["./", "index.html", "assets/css/fonts.css", "assets/css/theme-ui.css", "assets/css/index.css", "assets/css/entrance.css", "assets/css/classic-fonts.css", "assets/css/classic.css", "assets/css/icons.css",
+  "assets/js/entrance.js", "assets/js/api.js", "assets/js/offline.js", "assets/js/app.js", "assets/js/index.js", "assets/js/links.js", "assets/fonts/badhorse.otf", "assets/img/logo-large.webp", "assets/img/kuwa.png", "assets/img/app/icon-192.png"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) {
-    var one = function (f) { return c.add(f).catch(function () {}); };
-    return Promise.all(SHELL.map(one)).then(function () {
+    /* a few at a time, so a small server (Render's free tier) is not hit with two hundred requests at once */
+    var one = function (f) { return c.add(new Request(f, { cache: "reload" })).catch(function () {}); };
+    var batches = function (files) { var i = 0; return (function next() { var part = files.slice(i, i += 6); return part.length ? Promise.all(part.map(one)).then(next) : null; })(); };
+    return batches(SHELL).then(function () {
       return fetch("sw-files.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
-        .then(function (files) { return Promise.all(files.map(one)); });
+        .then(function (files) { return batches(files.filter(function (f) { return SHELL.indexOf(f) < 0; })); });
     });
   }).then(function () { return self.skipWaiting(); }));
 });

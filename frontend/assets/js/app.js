@@ -11,6 +11,19 @@
   if (atRoot) try { sessionStorage.removeItem("calms-rail:western"); sessionStorage.removeItem("calms-rail:classic"); sessionStorage.removeItem("calms-seed"); sessionStorage.removeItem("calms-role"); } catch (e) {}   /* the sign-in screen: the next person gets their own rail (look.js) */
   window.CALMS = window.CALMS || {}; window.CALMS.app = installed ? (desktop ? "desktop" : "installed") : "browser";
 
+  if (/^https?:$/.test(location.protocol)) {
+  /* Safety net: if the page came up without its styles while the server is reachable (a broken copy kept by the service
+     worker), drop the kept copies and the service worker, and load the page once more, fresh. */
+  window.addEventListener("load", function () {
+    var styled = [].some.call(document.styleSheets, function (s) { try { return s.href && /\/assets\/css\/(index|base)\.css/.test(s.href) && s.cssRules.length > 0; } catch (e) { return false; } });
+    var once = false; try { once = sessionStorage.getItem("calms-healed") === "1"; } catch (e) {}
+    if (styled || once || !navigator.onLine) return;
+    fetch(base + "assets/css/" + (atRoot ? "index" : "base") + ".css", { cache: "no-store" }).then(function (r) { if (!r.ok) return;
+      try { sessionStorage.setItem("calms-healed", "1"); } catch (e) {}
+      Promise.all([navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }) : null,
+        window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : null]).then(function () { location.reload(); }, function () { location.reload(); }); }, function () {});
+  });
+  }
   if (!/^https?:$/.test(location.protocol) || !("serviceWorker" in navigator)) return;
   /* the desktop app too: with it, every screen opens when the connection drops (offline.js keeps the data) */
   window.addEventListener("load", function () { navigator.serviceWorker.register(base + "sw.js").catch(function () {}); });
