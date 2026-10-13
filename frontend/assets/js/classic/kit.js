@@ -77,8 +77,17 @@
   CK.check = function (label, on, opt) { var i = h("input", { type: "checkbox" }); i.checked = !!on; if (opt && opt.disabled) i.disabled = true; return h("label.ck-check", i, h("span", label)); };
   CK.seg = function (opts, value, onChange) { var g = h("div.ck-seg", { role: "group" }); opts.forEach(function (o) { var v = Array.isArray(o) ? o[0] : o, t = Array.isArray(o) ? o[1] : o, n = Array.isArray(o) ? o[2] : null;
       var b = h("button", { type: "button", "aria-pressed": String(v === value), on: { click: function () { [].forEach.call(g.children, function (x) { x.setAttribute("aria-pressed", "false"); }); b.setAttribute("aria-pressed", "true"); onChange(v); } } }, t, n != null ? h("em", String(n)) : null); g.appendChild(b); });
-    return g; };
-  CK.tabs = function (opts, value, onChange) { var t = CK.seg(opts, value, onChange); t.className = "ck-tabs"; t.setAttribute("role", "tablist"); return t; };
+    thumb(g); return g; };
+  /* a white thumb that glides to the chosen button (classic-ui.css .ck-thumb); follows clicks, size changes and re-draws */
+  function thumb(g) {
+    if (!window.ResizeObserver) return; var t = h("i.ck-thumb", { "aria-hidden": "true" }); g.classList.add("has-thumb"); g.appendChild(t);   /* last, so pages that count the buttons by position still line up */
+    function place(jump) { var b = g.querySelector('button[aria-pressed="true"]'); if (!b || !g.isConnected) { t.style.opacity = 0; return; } t.style.opacity = 1;
+      if (jump) t.style.transition = "none"; t.style.width = b.offsetWidth + "px"; t.style.height = b.offsetHeight + "px"; t.style.transform = "translate(" + b.offsetLeft + "px," + b.offsetTop + "px)";
+      if (jump) { t.offsetWidth; t.style.transition = ""; } }
+    var first = true; new ResizeObserver(function () { place(first); first = false; }).observe(g);
+    g.addEventListener("click", function () { place(false); });
+    if (window.MutationObserver) new MutationObserver(function () { place(false); }).observe(g, { attributes: true, subtree: true, attributeFilter: ["aria-pressed"] }); }
+  CK.tabs = function (opts, value, onChange) { var t = CK.seg(opts, value, onChange); t.className = "ck-tabs has-thumb"; t.setAttribute("role", "tablist"); return t; };
   CK.search = function (ph, onInput) { var i = h("input.ck-input", { type: "search", placeholder: ph || "Search" }); i.addEventListener("input", function () { onInput(i.value.trim().toLowerCase()); }); return h("div.ck-search", CK.ic("search"), i); };
 
   /* ---- layout ---- */
@@ -88,8 +97,17 @@
       h("div.ck-headrow", h("div", h("h1", o.title, o.status || null), o.sub ? h("p.ck-sub", o.sub) : null), o.actions ? h("div.ck-actions", o.actions) : null)); };
   CK.card = function (title, body, opt) { opt = opt || {}; return h("section.ck-card.ck-in" + (opt.cls ? "." + opt.cls : ""), title || opt.tools ? h("div.ck-cardhead", title ? h("h2", opt.icon ? CK.ic(opt.icon) : null, title) : h("span"), opt.tools || null) : null, h("div.ck-cardbody" + (opt.flush ? ".flush" : ""), body)); };
   CK.grid = function (cols, kids, cls) { return h("div.ck-grid" + (cls ? "." + cls : ""), { style: { "--cols": cols } }, kids); };
-  CK.stat = function (label, value, opt) { opt = opt || {}; return h("div.ck-stat.ck-in" + (opt.tone ? ".t-" + opt.tone : "") + (opt.on ? ".is-click" : ""), { on: opt.on ? { click: opt.on } : null, role: opt.on ? "button" : null, tabindex: opt.on ? 0 : null },
-      h("span.ck-tile", CK.ic(opt.icon || "chart")), h("div", h("span.lbl", label), h("b", value), opt.sub ? h("small", opt.sub) : null)); };
+  /* figures count up from zero as their card rises in (keeps the formatting: peso sign, commas, %, decimals, "days") */
+  var REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  CK.countUp = function (el, delay) {
+    var txt = el.textContent, m = /^([^\d-]*)(-?[\d,]*\.?\d+)(.*)$/.exec(txt); if (REDUCE || !m || /\d/.test(m[3]) || /\d/.test(m[1])) return;   /* one figure only (not a date) */
+    var raw = m[2].replace(/,/g, ""), to = parseFloat(raw), dec = (raw.split(".")[1] || "").length, comma = m[2].indexOf(",") >= 0; if (!isFinite(to) || to === 0) return;
+    var fmt = function (v) { var s2 = v.toFixed(dec); if (comma) { var p = s2.split("."); p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ","); s2 = p.join("."); } return m[1] + s2 + m[3]; };
+    el.textContent = fmt(0); var t0 = null, D = 900;
+    setTimeout(function () { requestAnimationFrame(function step(t) { if (t0 === null) t0 = t; var k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 4); el.textContent = k < 1 ? fmt(to * e) : txt; if (k < 1) requestAnimationFrame(step); }); }, delay || 0); };
+  CK.stat = function (label, value, opt) { opt = opt || {}; return statFig(h("div.ck-stat.ck-in" + (opt.tone ? ".t-" + opt.tone : "") + (opt.on ? ".is-click" : ""), { on: opt.on ? { click: opt.on } : null, role: opt.on ? "button" : null, tabindex: opt.on ? 0 : null },
+      h("span.ck-tile", CK.ic(opt.icon || "chart")), h("div", h("span.lbl", label), h("b", value), opt.sub ? h("small", opt.sub) : null))); };
+  function statFig(card) { var b = card.querySelector("b"); if (b && typeof b.firstChild === "object" && b.childNodes.length === 1 && b.firstChild.nodeType === 3) setTimeout(function () { var i = +(card.style.getPropertyValue("--i") || 0); CK.countUp(b, i * 55 + 120); }, 0); return card; }
   CK.dl = function (rows, cls) { return h("dl.ck-dl" + (cls ? "." + cls : ""), rows.filter(Boolean).map(function (r) { return h("div", h("dt", r[0]), h("dd", r[1] == null || r[1] === "" ? "–" : r[1])); })); };
   CK.empty = function (title, text, icon) { return h("div.ck-empty", h("span.ck-emptyic", CK.ic(icon || "check")), h("b", title), text ? h("p", text) : null); };
   CK.note = function (text, tone, icon) { return h("div.ck-note.t-" + (tone || "blue"), CK.ic(icon || (tone === "red" ? "alert" : "info")), h("div", text)); };

@@ -274,3 +274,44 @@ html[data-ui="classic"] #calmsDown a { border: 0; border-radius: 10px; padding: 
 html[data-ui="classic"] #calmsDown a + a { background: #f3ece4; color: #2a1d15; }
 @keyframes ck-fadein { from { opacity: 0; } }
 @keyframes ck-modalin { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+
+/* ---- motion, refined (after current web-animation guidance: transform and opacity only, ease-out for things that
+   enter, under ~300ms for anything you trigger, a light press on buttons, hover only where there is a real mouse, and
+   none at all for people who ask for less motion) ---- */
+:root { --ck-out: cubic-bezier(.23, 1, .32, 1); --ck-io: cubic-bezier(.77, 0, .175, 1); }
+@keyframes ck-rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+.ck-in { animation-timing-function: var(--ck-out); animation-duration: .55s; }
+.ck-rowin { animation-timing-function: var(--ck-out); }
+/* a press you can feel */
+.ck-btn:active:not(:disabled), .c-cta:active, .ck-seg button:active, .ck-tabs button:active { transform: scale(.97); transition: transform .1s var(--ck-out); }
+html[data-ui="classic"] .nav a:active { transform: scale(.98) !important; transition: transform .1s var(--ck-out); }
+/* hover, only with a mouse */
+@media (hover: hover) and (pointer: fine) {
+  .ck-card { transition: box-shadow .25s ease, transform .25s var(--ck-out); }
+  .ck-stat.is-click:hover .ck-tile, .ck-stat:hover .ck-tile { transform: scale(1.06) rotate(-3deg); }
+  .ck-table tr.is-click:hover td:first-child { box-shadow: inset 3px 0 0 var(--c-brand); }
+  .ck-btn:hover .ck-ic { transform: translateX(1px); }
+  html[data-ui="classic"] .nav a:hover .c-ic { transform: translateX(2px); }
+}
+.ck-stat .ck-tile, .ck-btn .ck-ic, html[data-ui="classic"] .nav a .c-ic { transition: transform .25s var(--ck-out); }
+.ck-table tr.is-click td:first-child { transition: box-shadow .2s ease; }
+/* the segmented controls: a white thumb that glides to the choice (kit.js adds it) */
+.ck-seg.has-thumb, .ck-tabs.has-thumb { position: relative; isolation: isolate; }
+.ck-seg.has-thumb button[aria-pressed="true"], .ck-tabs.has-thumb button[aria-pressed="true"] { background: transparent; box-shadow: none; }
+.ck-thumb { position: absolute; z-index: -1; left: 0; top: 0; border-radius: 9px; background: #fff; box-shadow: 0 1px 3px rgba(31,23,18,.12), 0 4px 10px rgba(31,23,18,.06);
+  transition: transform .32s var(--ck-out), width .32s var(--ck-out), height .32s var(--ck-out); pointer-events: none; }
+/* long lists: rows further down rise in as they scroll into view (browsers that can; the rest just show them) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ck-table tbody tr:nth-child(n+13) { animation: ck-rise linear both; animation-delay: 0s; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  }
+}
+/* toasts and dialogs: a touch of scale */
+@keyframes ck-toast { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+.ck-toast { animation-timing-function: var(--ck-out) !important; }
+@keyframes ck-pop { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) {
+  .ck-btn:active, .c-cta:active, .ck-seg button:active, .ck-tabs button:active, html[data-ui="classic"] .nav a:active { transform: none !important; }
+  .ck-thumb, .ck-card, .ck-stat .ck-tile, .ck-btn .ck-ic, html[data-ui="classic"] .nav a .c-ic { transition: none; }
+  .ck-table tbody tr { animation: none !important; }
+}
