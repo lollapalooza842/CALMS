@@ -46,7 +46,7 @@ async function escalate() {
 const ROLE_KEY = { loan_processor: "processor", underwriter: "underwriter", lead_underwriter: "underwriter", disbursement_officer: "disbursement",
   loan_account_officer: "account", sales_agent: "agent", compliance_auditor: "auditor", system_administrator: "admin", operations_manager: "manager" };
 const KINDS = {
-  processor: { back: "Returned to you", docs: "Documents outstanding", draft: "Drafts to finish", verify: "Yours to verify", agree: "Agreements to finish" },
+  processor: { back: "Returned to you", docs: "Documents outstanding", draft: "Drafts to finish", verify: "Yours to verify", offer: "Walk-in counter-offers", agree: "Agreements to finish" },
   underwriter: { above: "Escalated to you", review: "Manual review", counter: "Counter-offer declined" },
   disbursement: { release: "Ready to release", wait: "Not ready yet" },
   account: { late: "Past due", due: "Due this week", paid: "Fully paid" },
@@ -100,8 +100,12 @@ async function queue(u) {
     const A = await apps(), sub = A.filter((a) => a.status === "submitted"), miss = await missingPapers(sub);
     const lastV = await latest("verifications", sub.filter((a) => a.check_state === "returned").map((a) => a.id));
     const agr = await latest("agreements", A.filter((a) => ["approved", "accepted"].includes(a.status)).map((a) => a.id));
+    const walk = await latest("counter_offers", A.filter((a) => a.status === "awaiting" && !a.agent_id).map((a) => a.id));
     for (const a of A) {
       const mine = a.encoded_by === u.id;
+      // BR-011: a walk-in has no sales agent, so the loan processor tells her the offer and records her answer
+      if (a.status === "awaiting" && !a.agent_id) { const o = walk[a.id];
+        items.push(item(a, "offer", "Awaiting borrower", "red", "Record the response", (o ? `Offer ${o.n}: ${peso(o.amount)} for ${o.term_months} months. ` : "") + "A walk-in, so you tell her the offer and record her answer, with proof.", "record-answer", { term: "Asked for " + peso(a.amount) })); continue; }
       if (a.status === "draft" && mine) items.push(item(a, "draft", "Draft", "brown", "Resume draft", "Not yet submitted. Finish the papers and submit it.", "documents"));
       else if (a.status === "submitted" && mine && a.check_state === "returned") {
         const v = lastV[a.id], f = v ? Object.values(v.flags || {}).map((x) => x.reason || x).filter(Boolean) : [];
@@ -170,7 +174,7 @@ async function queue(u) {
       const A = await apps();
       for (const a of A.filter((x) => ESCALATES.includes(x.status) && (x.escalated || hoursSince(x.status_since) >= limitH)))
         items.push(item(a, "esc", "Waiting at " + STATUS[a.status], "red", "Open the application", "Nobody has moved it on for " + Math.floor(hoursSince(a.status_since)) + " hours." + (a.assignee ? " It is with " + a.assignee + "." : ""), "application-detail"));
-      extra = ["Applications in progress", A.filter((a) => !["funded", "rejected", "declined"].includes(a.status)).length];
+      extra = ["Applications in progress", A.filter((a) => !["funded", "rejected"].includes(a.status)).length];
     }
   } else if (role === "agent") {
     const A = (await apps()).filter((a) => a.agent_id === u.id), off = await latest("counter_offers", A.filter((a) => a.status === "awaiting").map((a) => a.id));
@@ -179,11 +183,13 @@ async function queue(u) {
       const o = off[a.id];
       if (a.status === "awaiting") items.push(item(a, "offer", "Awaiting borrower", "red", "Record the response", o ? `Offer ${o.n}: ${peso(o.amount)} for ${o.term_months} months. Proof of the borrower's answer is required.` : "Tell the borrower the offer and record the answer.", "record-answer", { term: "Asked for " + peso(a.amount) }));
       else if (a.status === "submitted" && miss[a.id].length) items.push(item(a, "relay", miss[a.id].length + " document" + (miss[a.id].length > 1 ? "s" : "") + " missing", "brown", "See what is needed", "Ask the borrower for: " + miss[a.id].join(", ") + ".", "application-detail"));
+      else if (a.status === "declined" && hoursSince(a.status_since) < 72)
+        items.push(item(a, "relay", "Declined by borrower", "brown", "See the offers", "Her answer is recorded. Underwriting will lay down a new offer or reject the application; you will see a new offer here if there is one.", "counter-offers"));
       else if (["approved", "rejected", "funded", "accepted"].includes(a.status) && hoursSince(a.status_since) < 72)
         items.push(item(a, "relay", STATUS[a.status], a.status === "rejected" ? "red" : "green", "See the application",
-          { approved: "Approved. The agreement is being drawn up; the borrower will be asked to come in and sign.", accepted: "Accepted. Waiting for the signed agreement and the release.", funded: "Released. Tell the borrower the money is on its way and when the first payment is due.", rejected: "Declined. Tell the borrower in person; the reason is on the application." }[a.status], "application-detail"));
+          { approved: "Approved. The agreement is being drawn up; the borrower will be asked to come in and sign.", accepted: "Accepted. Waiting for the signed agreement and the release.", funded: "Released. Tell the borrower the money is on its way and when the first payment is due.", rejected: "Rejected. Tell the borrower in person; the reason is on the application." }[a.status], "application-detail"));
     }
-    extra = ["Borrowers in progress", A.filter((a) => !["funded", "rejected", "declined"].includes(a.status)).length];
+    extra = ["Borrowers in progress", A.filter((a) => !["funded", "rejected"].includes(a.status)).length];
   } else if (role === "auditor") {
     const ov = (await db.query(`select d.*, a.reference, a.term_months, p.name product, u.short_name from decisions d join applications a on a.id = d.application_id join loan_products p on p.id = a.product_id
         join users u on u.id = d.decided_by where d.is_override and d.decided_at > now() - interval '30 days' order by d.decided_at`)).rows;

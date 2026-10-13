@@ -2,10 +2,11 @@
    an even 24px rhythm, white cards on a warm grey, Lexend for headings and figures, Inter for the rest,
    and motion that is quick and soft (things rise 12px and fade in, one after another). */
 
-::view-transition-old(root) { animation: ck-vt-out .18s cubic-bezier(.4,0,1,1) both; }
-::view-transition-new(root) { animation: ck-vt-in .32s cubic-bezier(.22,1,.36,1) both; }
-@keyframes ck-vt-out { to { opacity: 0; transform: translateY(-6px); } }
-@keyframes ck-vt-in { from { opacity: 0; transform: translateY(10px); } }
+/* page to page: the old page stays fully drawn underneath while the new one fades in over it. (Fading both at once let
+   whatever is behind the page show through halfway, which on some screens is black: the black flicker.) */
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) { animation: ck-appear .22s ease-out both; }
+@keyframes ck-appear { from { opacity: 0; } }
 html.c-own main > :not(.c-top):not(.c-view):not(#note):not(.note) { display: none !important; }
 html.c-own main #note, html.c-own main .note { display: none !important; }
 html.c-own main { gap: 0 !important; }
@@ -16,7 +17,9 @@ html.c-leaving .c-view, html.c-leaving .c-dash { opacity: 0; transform: translat
 html.c-arrive .ck-in { animation-delay: calc(var(--i, 0) * 70ms + 380ms); }
 @keyframes ck-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .ck-rowin { animation: ck-rise .4s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--i, 0) * 28ms + 160ms); }
-@media (prefers-reduced-motion: reduce) { .ck-in, .ck-rowin { animation: none !important; } ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
+/* "show fewer animations" (Windows: Settings > Accessibility > Visual effects > Animation effects off): nothing moves,
+   things still fade in, one after another */
+@media (prefers-reduced-motion: reduce) { .ck-in, .ck-rowin { animation-name: ck-appear !important; } }
 
 :where(.ck-stat, .ck-meter) { --a: var(--c-brand); } :where(.ck-pill, .ck-pipestep) { --a: #7a6b5e; } :where(.ck-note) { --a: #2c5e8a; } :where(.ck-toast) { --a: #2f7a4f; }
 /* ---- heads ---- */

@@ -189,7 +189,7 @@ html.c-page .c-slide { animation: c-up .4s cubic-bezier(.22,1,.36,1) both; anima
 html.c-page .c-row { animation: c-up .35s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(.15s + var(--i, 0) * .03s); }
 html[data-ui="classic"].arriving body::before { content: none; }
 html[data-ui="classic"].arriving main, html[data-ui="classic"].arriving .nav li { animation: none; }
-@media (prefers-reduced-motion: reduce) { html.c-arrive *, html.c-page * { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { html.c-arrive :is(.rail, .nav li, .c-top, .c-slide, .c-row, .c-fab), html.c-page :is(.c-slide, .c-row) { animation-name: ck-appear !important; } }
 
 /* ---- narrower screens ---- */
 @media (max-width: 1180px) { .c-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
