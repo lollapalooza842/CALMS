@@ -13,7 +13,7 @@
   function start(A, ME) {
     var CAN = (ME.role === "loan_processor" || ME.role === "sales_agent") && (A.status === "draft" || A.status === "submitted");
     var slots = A.checklist.map(function (c) { return { id: c.slot, label: c.label, desc: DESC[c.slot] || "", v: A.documents.filter(function (d) { return d.slot === c.slot; }).sort(function (x, y) { return x.version - y.version; }) }; });
-    var drawn = false, open = null, openV = 0, errs = {}, busy = {}, fresh = null, looked = [];
+    var drawn = false, open = null, openV = 0, errs = {}, busy = {}, fresh = null, looked = [], kept = {};
     var list = h("ul.ck-slots"), tally = h("div"), viewer = h("div.ck-stack"), goBtn = null;
     function slot(id) { return slots.filter(function (s) { return s.id === id; })[0]; }
     function missing() { return slots.filter(function (s) { return !s.v.length; }); }
@@ -27,8 +27,11 @@
       var rd = new FileReader();
       rd.onerror = function () { delete busy[s.id]; errs[s.id] = "Not filed. The file could not be read."; drawList(); };
       rd.onload = function () {
-        CK.api("POST", "/api/applications/" + A.reference + "/documents", { slot: s.id, file: { name: f.name, data: String(rd.result).split(",")[1] || "" } }).then(function (r) {
-          delete busy[s.id]; s.v.push(r.document); fresh = s.id;
+        CK.api("POST", "/api/applications/" + A.reference + "/documents", { slot: s.id, file: { name: f.name, data: String(rd.result).split(",")[1] || "" } },
+          { offline: { kind: "doc", label: s.label + " · " + A.borrower.name, sub: A.reference + " · " + f.name } }).then(function (r) {
+          delete busy[s.id];
+          if (r.queued) { kept[s.id] = f.name; CK.toast(s.label + ": saved on this computer. It is filed when the connection is back.", "amber"); drawList(); return; }   /* offline (offline.js) */
+          delete kept[s.id]; s.v.push(r.document); fresh = s.id;
           CK.toast(s.label + (had ? ": version " + s.v.length + " filed. Version " + had + " is kept as superseded." : ": filed and linked to " + A.reference + "."));
           drawAll(); view(s.id, s.v.length - 1);
         }, function (e) { delete busy[s.id]; if (e && e.status === 401) return; errs[s.id] = "Not filed. " + e.message; drawList(); });
@@ -50,7 +53,7 @@
         var li = h("li.ck-slot" + (drawn ? "" : ".ck-rowin") + (cur ? ".is-click" : ".is-miss") + (open === s.id ? ".is-sel" : "") + (busy[s.id] ? ".is-busy" : "") + (fresh === s.id ? ".is-new" : ""), { style: { "--i": i } },
           h("span.ck-filetile" + (cur ? ".ok" : ".miss"), CK.ic(cur ? "doc" : busy[s.id] ? "upload" : "alert")),
           h("div.grow", h("b", s.label, cur ? h("span.ck-vtag", "v" + s.v.length) : null), h("small", meta)), tools, inp,
-          errs[s.id] ? h("p.ck-err", { role: "alert" }, errs[s.id]) : null);
+          errs[s.id] ? h("p.ck-err", { role: "alert" }, errs[s.id]) : kept[s.id] ? h("p.ck-hint", "Saved on this computer: " + kept[s.id] + ". Filed when the connection is back.") : null);
         if (cur) li.addEventListener("click", function (e) { if (e.target.closest("button, a, input")) return; view(s.id, s.v.length - 1); if (phone()) viewer.scrollIntoView({ behavior: "smooth", block: "start" }); });
         if (CAN) { li.addEventListener("dragover", function (e) { e.preventDefault(); li.classList.add("is-over"); }); li.addEventListener("dragleave", function () { li.classList.remove("is-over"); });
           li.addEventListener("drop", function (e) { e.preventDefault(); li.classList.remove("is-over"); var f = e.dataTransfer.files[0]; if (f) file(s, f); }); }

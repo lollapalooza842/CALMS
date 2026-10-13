@@ -31,6 +31,9 @@ async function write(entry, client) {
   await client.query("select pg_advisory_xact_lock(4091)");
   const last = await client.query("select seal from audit_log order by id desc limit 1");
   const prev = last.rows[0] ? last.rows[0].seal : FIRST_SEAL;
+  // saved on a computer while it was offline and sent later: the entry says when it was really done
+  const off = require("./idempotency").savedOfflineAt();
+  if (off && entry.after && typeof entry.after === "object" && !Array.isArray(entry.after)) entry = { ...entry, after: { ...entry.after, savedOfflineAt: off } };
   const actor = entry.actor || (entry.user ? entry.user.full_name : "CALMS");
   const row = { ...entry, actor };
   await client.query(

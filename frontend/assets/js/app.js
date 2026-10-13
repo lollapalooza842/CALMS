@@ -11,8 +11,10 @@
   if (atRoot) try { sessionStorage.removeItem("calms-rail:western"); sessionStorage.removeItem("calms-rail:classic"); sessionStorage.removeItem("calms-seed"); sessionStorage.removeItem("calms-role"); } catch (e) {}   /* the sign-in screen: the next person gets their own rail (look.js) */
   window.CALMS = window.CALMS || {}; window.CALMS.app = installed ? (desktop ? "desktop" : "installed") : "browser";
 
-  if (desktop || !/^https?:$/.test(location.protocol) || !("serviceWorker" in navigator)) return;
+  if (!/^https?:$/.test(location.protocol) || !("serviceWorker" in navigator)) return;
+  /* the desktop app too: with it, every screen opens when the connection drops (offline.js keeps the data) */
   window.addEventListener("load", function () { navigator.serviceWorker.register(base + "sw.js").catch(function () {}); });
+  if (desktop) return;
 
   /* the browser decides when CALMS may be installed, and tells us with this event */
   var offer = null;

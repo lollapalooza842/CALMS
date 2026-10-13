@@ -232,8 +232,9 @@
       new Promise(function (ok, no) { var rd = new FileReader(); rd.onload = function () { ok(String(rd.result).split(",")[1] || ""); }; rd.onerror = function () { no(new Error("The consent file could not be read.")); }; rd.readAsDataURL(consent.file); }).then(function (data) {
         return CK.api("POST", "/api/applications", { product: p.name, amount: S.amount, termMonths: Number(String(S.term).replace(/[^0-9]/g, "")), agent: S.agent, purpose: S.purpose,
           borrower: { name: S.name, dob: S.dob, idType: S.idtype, idNo: S.idno, mobile: S.mobile, email: S.email, address: S.address }, details: details,
-          consentConfirmed: !!S.agree, consent: { name: consent.name, data: data } });
-      }).then(function (d) { sending = false; CK.busy(sendBtn, false); finish(d.reference); }, function (e) {
+          consentConfirmed: !!S.agree, consent: { name: consent.name, data: data } },
+          { offline: { kind: "app", label: "New application · " + S.name, sub: p.name + " · ₱ " + S.amount + " for " + S.term + " months" } });   /* offline: kept on this computer, sent later (offline.js) */
+      }).then(function (d) { sending = false; CK.busy(sendBtn, false); if (d.queued) saved(d); else finish(d.reference); }, function (e) {
         sending = false; CK.busy(sendBtn, false); if (e && e.status === 401) return;
         var Fe = e.fields || {}, ks = Object.keys(Fe), n;
         if (e.status === 409) { sumBox.textContent = ""; var m = /APP-\d{4}-\d{4}/.exec(e.message || "");
@@ -242,6 +243,21 @@
         else { sumBox.textContent = ""; n = h("div.ck-note.t-red.ck-panelin", CK.ic("alert"), h("div", h("b", "Not submitted. "), e.message || "The server could not be reached. Try again.")); sumBox.appendChild(n); }
         n.dataset.srv = "1"; n.scrollIntoView({ block: "nearest", behavior: "smooth" }); CK.toast("Not submitted. " + (e.status === 409 ? "That borrower already has one of these open." : "Fix what is marked."), "red");
       });
+    }
+    /* offline: the application waits on this computer and gets its APP number when it is sent */
+    function saved(d) {
+      var p = P[S.product]; try { localStorage.removeItem(KEY); } catch (er) {}
+      CK.toast("Saved on this computer. It is sent when the connection is back.", "amber");
+      CK.render([CK.head({ crumbs: [["Applications", "applications.html"], ["New application"]], title: "Saved on this computer", sub: "You're offline. The application and its consent form are kept here and sent, once, as soon as the connection is back. It gets its APP number then." }),
+        h("div.ck-grid.side2",
+          h("section.ck-card.ck-in.ck-donecard", h("div.ck-cardbody", h("div.ck-doneic", CK.ic("clock")), h("small.ck-sm", "Reference number"), h("div.ck-doneref", "Not numbered yet"),
+            CK.dl([["Borrower", S.name], ["Product", p.name], ["Amount", "₱ " + S.amount], ["Term", S.term + " months"], ["Saved", stamp()], ["Encoded by", MEN[1]]], "ck-donedl"),
+            h("div.ck-actions", CK.btn("See saved items", { kind: "primary", icon: "list", on: function () { if (window.CALMS_NET) CALMS_NET.open(); } }), CK.btn("Start another application", { kind: "ghost", icon: "plus", on: function () { location.reload(); } })))),
+          CK.card("When the connection is back", h("div.ck-tasks",
+            h("div.ck-task", h("span.n", "1"), h("div.grow", h("b", "It is sent by itself"), h("small", "In the order it was saved. You can keep working meanwhile.")), CK.ic("send")),
+            h("div.ck-task", h("span.n", "2"), h("div.grow", h("b", "It gets its APP number"), h("small", "If the borrower already has an active application by then, it waits under \"Needs your look\" instead.")), CK.ic("check")),
+            h("div.ck-task.lock", h("span.n", "3"), h("div.grow", h("b", "File the other papers"), h("small", "Once it has its number.")), CK.ic("lock"))), { icon: "list" }))]);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     function finish(ref) {
       var at = stamp(), p = P[S.product], b = S.name; try { localStorage.removeItem(KEY); } catch (er) {}

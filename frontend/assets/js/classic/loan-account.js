@@ -7,7 +7,7 @@
     var today = a.today, paid = 0;
     var rows = a.schedule.map(function (s) { var due = s.principal + s.interest, got = s.paidPrincipal + s.paidInterest, st = got >= due - .005 ? "paid" : s.dueOn < today ? "over" : got > 0 ? "part" : "next"; if (st === "paid") paid++; return Object.assign({ due: due, got: got, st: st }, s); });
     var payIt = a.canPost && !a.closed ? CK.btn("Post a payment", { kind: "primary", icon: "peso", on: function () {
-      var m = CK.modal({ title: "Post a payment · " + a.number, wide: true, body: CK.paymentForm(a, a.channels, function (r) { m.close(); CK.toast("Payment posted. Receipt " + (r.receipt || r.payment && r.payment.receipt || "") + "."); load(); }) }); } }) : null;
+      var m = CK.modal({ title: "Post a payment · " + a.number, wide: true, body: CK.paymentForm(a, a.channels, function (r) { m.close(); if (!r.queued) CK.toast("Payment posted. Receipt " + (r.receipt || r.payment && r.payment.receipt || "") + "."); load(); }) }); } }) : null;
     var stand = a.closed ? CK.pill("Fully paid", "grey") : a.daysPastDue ? CK.pill(a.daysPastDue + " days past due", a.daysPastDue > 30 ? "red" : "amber") : CK.pill("Current", "green");
     var schedT = CK.table([
       { k: "n", label: "No.", w: "60px", render: function (s) { return h("span.ck-strong", String(s.n)); } },

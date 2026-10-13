@@ -1,17 +1,25 @@
-/* CALMS service worker: what lets the browser install CALMS as an app, and lets the app's
-   screens open when the network drops.
+/* CALMS service worker: what lets the browser (and the desktop app) install CALMS, and lets every screen open when
+   the network drops.
 
    Rules, kept deliberately simple:
-   - Anything under /api is never touched. Loan data always comes live from the server, and is
-     never stored on the computer.
-   - Pages, styles, scripts, pictures and fonts: ask the network first, so a new version shows up
-     at once; keep a copy; if the network is down, use the copy.
+   - Anything under /api is never touched here. Copies of what the server said are kept by offline.js instead, for
+     the person signed in only, and wiped when they sign out.
+   - Pages, styles, scripts, pictures and fonts: ask the network first, so a new version shows up at once; keep a
+     copy; if the network is down, use the copy.
+   - On install, every screen and its files are fetched once (the list comes from the server, /sw-files.json), so a
+     screen opens offline even if it was never visited on this computer.
    Change VERSION to throw away every old copy. */
-var VERSION = "calms-shell-v1";
+var VERSION = "calms-shell-v2";
 var SHELL = ["./", "index.html", "assets/css/index.css", "assets/css/fonts.css", "assets/css/entrance.css", "assets/css/icons.css", "assets/js/api.js", "assets/js/app.js", "assets/js/index.js", "assets/js/entrance.js", "assets/js/links.js", "assets/fonts/badhorse.otf", "assets/img/logo-large.webp", "assets/img/kuwa.png", "assets/img/app/icon-192.png"];
 
 self.addEventListener("install", function (e) {
-  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(SHELL).catch(function () {}); }).then(function () { return self.skipWaiting(); }));
+  e.waitUntil(caches.open(VERSION).then(function (c) {
+    var one = function (f) { return c.add(f).catch(function () {}); };
+    return Promise.all(SHELL.map(one)).then(function () {
+      return fetch("sw-files.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+        .then(function (files) { return Promise.all(files.map(one)); });
+    });
+  }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener("activate", function (e) {
   e.waitUntil(caches.keys().then(function (keys) { return Promise.all(keys.filter(function (k) { return k !== VERSION; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); }));

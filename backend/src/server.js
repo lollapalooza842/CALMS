@@ -51,6 +51,8 @@ app.use("/api", (req, res, next) => { if (req.method !== "GET") res.on("finish",
 app.use("/api/auth", require("./routes/auth"));
 // Everything below needs a signed-in user (checked once per request).
 app.use("/api", (req, res, next) => Promise.resolve(auth.requireUser(req, res, next)).catch(next));
+// Work saved on a computer while offline is sent with a key, so a retry never does it twice (lib/idempotency.js).
+app.use("/api", require("./lib/idempotency").middleware);
 // Mock-up portraits (lib/faces.js): /api/face?n=Liza%20Mendoza. Staff (a name on Users and roles) get office clothes.
 let staffNames = { at: 0, set: new Set() };
 app.get("/api/face", async (req, res, next) => {
@@ -79,6 +81,21 @@ app.get("/api/audit/verify", auth.allow("compliance_auditor", "system_administra
 app.use("/api", (req, res) => res.status(404).json({ error: "No such address." }));
 
 // ---- the front end ----
+// The files every screen needs, for the service worker (frontend/sw.js) to keep on install, so any screen opens offline.
+// Sounds are left out (large, and the classic look has none); pictures, fonts, styles, scripts and pages are in.
+let swFiles = null;
+app.get("/sw-files.json", (req, res) => {
+  if (!swFiles) {
+    const fs = require("fs"), rootDir = path.join(__dirname, "..", "..", "frontend"), out = [];
+    const walk = (rel) => { for (const e of fs.readdirSync(path.join(rootDir, rel), { withFileTypes: true })) {
+      const r = rel ? rel + "/" + e.name : e.name;
+      if (e.isDirectory()) { if (!/^(mockups|assets\/audio|node_modules)$/.test(r)) walk(r); }
+      else if (/^(pages\/[^/]+\.html|assets\/.+\.(css|js|woff2|otf|png|jpe?g|webp|svg|ico))$/.test(r)) out.push(r);
+    } };
+    walk(""); swFiles = out.sort();
+  }
+  res.set("Cache-Control", "no-cache").json(swFiles);
+});
 // Pictures, sounds and fonts hardly ever change: the browser keeps them for a day instead of asking again on every page.
 // Pages, styles and scripts are checked each time (a quick "not changed" when they have not), so an update shows at once.
 app.use(express.static(path.join(__dirname, "..", "..", "frontend"), { extensions: ["html"], setHeaders: (res, file) => {
@@ -89,6 +106,10 @@ app.use(express.static(path.join(__dirname, "..", "..", "frontend"), { extension
 // ---- errors ----
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   if (err.status && err.status < 500) return res.status(err.status).json({ error: err.message });
+  // the database cannot be reached (the network is down, or Supabase is): say so plainly, as "offline", so the
+  // computer keeps saved work and tries again later instead of treating it as a real refusal
+  if (/^(ECONNREFUSED|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|ECONNRESET|EHOSTUNREACH|ENETUNREACH|57P0[123])$/.test(String(err.code || "")) || /Connection terminated|timeout exceeded when trying to connect/i.test(err.message || ""))
+    return res.status(503).json({ error: "CALMS cannot reach its database right now. Nothing was changed.", offline: true });
   console.error(err);
   res.status(500).json({ error: "Something went wrong on the server. Try again." });
 });

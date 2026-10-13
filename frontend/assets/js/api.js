@@ -7,23 +7,37 @@
 (function () {
   var online = /^https?:$/.test(location.protocol);
   var atRoot = !/\/pages\/[^/]*$/.test(location.pathname);
+  /* what CALMS does when the connection drops (offline.js); it runs right after this file, before the page's own script */
+  if (online && !window.CALMS_NET && document.readyState === "loading") document.write('<script src="' + (atRoot ? "" : "../") + 'assets/js/offline.js"><\/script>');
   var signIn = (atRoot ? "" : "../") + "index.html#signin";
 
   /* The same read asked for twice on one page (the classic look's screen and the page underneath it, the rail and the
      top bar) goes to the server once: both get their own copy of the one answer. Kept for 4 seconds; any change
      (a POST, PUT, PATCH or DELETE) forgets every kept answer, so nothing stale is shown after an action. */
   var shared = {};
-  function api(method, path, body) {
+  /* Offline (offline.js, window.CALMS_NET): reads come from the copies kept on this computer; a change is refused with
+     the reason, unless the page says it may wait (opt.offline: { kind, label, sub }), and then it goes to the outbox.
+     Such a change carries its key from the first try, so if the connection dropped after the server had already done
+     it, sending it again later is recognised and not done twice. */
+  function api(method, path, body, opt) {
+    var N = window.CALMS_NET, wait = opt && opt.offline && N ? opt.offline : null, key = wait ? N.newId() : "";
     if (method !== "GET") shared = {};
     else { var hit = shared[path]; if (hit && Date.now() - hit.t < 4000) return hit.p.then(copy); }
-    var p = fetch(path, { method: method, credentials: "same-origin", headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined })
+    if (N && N.isDown()) return method === "GET" ? N.fromCache(path) : later();
+    var head = body ? { "Content-Type": "application/json" } : {}; if (key) head["Idempotency-Key"] = key;
+    var p = fetch(path, { method: method, credentials: "same-origin", headers: head, body: body ? JSON.stringify(body) : undefined })
       .then(function (res) { return res.json().catch(function () { return {}; }).then(function (data) {
+        if (N && (res.status === 503 && data.offline || res.status === 502 || res.status === 504)) throw lost();   /* the server is up but cannot reach its database, or a gateway in between is down */
         var badCode = res.status === 401 && data.field === "mfa";                 /* a wrong authenticator code is a typo, not a lost session */
         if (res.status === 401 && !badCode && !atRoot) { location.href = signIn; }  /* session ended: back to sign-in */
         if (!res.ok) { var e = new Error(data.error || "Something went wrong."); e.status = badCode ? 400 : res.status; e.fields = data.fields; e.field = data.field; throw e; }
-        return data; }); });
-    if (method === "GET") { shared[path] = { t: Date.now(), p: p }; p.catch(function () { delete shared[path]; }); return p.then(copy); }
-    return p;
+        return data; }); }, function () { throw lost(); });
+    function lost() { var e = new Error("CALMS cannot be reached."); e.lost = true; e.status = 0; return e; }
+    function later() { return wait ? N.queue(method, path, body, wait, key) : Promise.reject(N.err(N.why(method, path))); }
+    if (method === "GET") {
+      p = p.then(function (data) { if (N) N.keep(path, data); return data; }, function (e) { if (e.lost && N) { N.down(); return N.fromCache(path); } throw e; });
+      shared[path] = { t: Date.now(), p: p }; p.catch(function () { delete shared[path]; }); return p.then(copy); }
+    return p.catch(function (e) { if (e.lost && N) { N.down(); return later(); } throw e; });
   }
   function copy(d) { return d && typeof d === "object" ? JSON.parse(JSON.stringify(d)) : d; }
 
@@ -52,6 +66,7 @@
   }
   function unreachable(err) {
     if (!online) return false;
+    if (err && err.offline) { notice("You're offline", err.message, [["Try again"], ["Go to My Queue", up + "my-queue.html"]]); return true; }
     var known = err && err.status >= 400 && err.status < 500;
     notice(known ? "This cannot be opened" : "CALMS cannot be reached",
       known ? (err.message || "The server refused.") : "The server did not answer. If nobody has used CALMS for a while it may be waking up, which can take up to a minute. Nothing was changed.",
@@ -121,10 +136,13 @@
   if (!online || atRoot) return;
 
   /* On every inner page: who is signed in? Show their name in the rail, and sign out for real. */
-  api("GET", "/api/auth/me").then(function (data) { window.CALMS.user = data.user;
+  function whoAmI() { api("GET", "/api/auth/me").then(function (data) { window.CALMS.user = data.user;
     function paint() { var who = document.querySelector(".rail .who"); if (!who) return; var b = who.querySelector("b a") || who.querySelector("b"), s = who.querySelector("span"); if (b) b.textContent = data.user.name; if (s) s.textContent = data.user.roleName; }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", paint); else paint(); window.addEventListener("load", paint);
-  }, function () {});
+  }, function () {}); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", whoAmI); else whoAmI();   /* after offline.js has loaded, so the answer is kept */
   document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest(".rail .who a"); if (!a || !/Sign out/.test(a.textContent)) return; e.preventDefault(); e.stopPropagation();
-    api("POST", "/api/auth/logout").then(go, go); function go() { if (window.CALMS_LEAVE) window.CALMS_LEAVE(signIn); else location.href = signIn; } }, true);
+    /* signing out wipes the copies kept on this computer (offline.js); saved work not yet sent stays until its owner signs in again */
+    api("POST", "/api/auth/logout").then(go, go); function go() { var w = window.CALMS_NET ? window.CALMS_NET.wipe() : Promise.resolve(); w.then(leave, leave); }
+    function leave() { if (window.CALMS_LEAVE) window.CALMS_LEAVE(signIn); else location.href = signIn; } }, true);
 })();

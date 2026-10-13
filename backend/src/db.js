@@ -15,7 +15,11 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: local ? false : { rejectUnauthorized: false }, // Supabase requires TLS
   max: 5,
+  connectionTimeoutMillis: 8000,   // the network is down: give up after 8 seconds (the computer then works offline) instead of waiting forever
 });
+// A connection that drops while idle (the internet goes down, Supabase restarts) is reported here. Without this the
+// whole back end would stop; with it, the pool simply opens a fresh connection on the next request.
+pool.on("error", (e) => console.error("database connection lost:", e.message));
 
 module.exports = {
   query: (text, params) => pool.query(text, params),

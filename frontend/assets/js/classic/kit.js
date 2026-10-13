@@ -18,7 +18,7 @@
     return el;
   }
   CK.h = h;
-  CK.api = function (m, p, b) { return window.CALMS ? CALMS.api(m, p, b) : Promise.reject(new Error("Offline")); };
+  CK.api = function (m, p, b, o) { return window.CALMS ? CALMS.api(m, p, b, o) : Promise.reject(new Error("Offline")); };
   CK.q = function (k) { return new URLSearchParams(location.search).get(k) || ""; };
   CK.go = function (href) { CK.leave(href); };
 
@@ -167,7 +167,10 @@
   CK.render = function (kids) { var v = CK.view(); v.textContent = ""; (Array.isArray(kids) ? kids : [kids]).forEach(function (k) { if (k) v.appendChild(k); }); CK.stagger(v); };
   CK.stagger = function (root) { var i = 0; [].forEach.call(root.querySelectorAll(".ck-in"), function (e) { if (e.dataset.in) return; e.dataset.in = 1; e.style.setProperty("--i", i++); }); };
   CK.loading = function () { CK.render([h("div.ck-head.ck-in", h("div.ck-skel.big", h("i", { style: { width: "34%" } }), h("i", { style: { width: "52%" } }))), CK.grid(3, [0, 1, 2].map(function () { return h("div.ck-card.ck-in", CK.skel(3)); })), h("div.ck-card.ck-in", CK.skel(6))]); };
-  CK.error = function (err, back) { if (err && err.status === 401) return; CK.render([CK.head({ title: "This could not be opened" }), CK.card(null, [CK.note((err && err.message) || "CALMS could not be reached.", "red"), h("div.ck-actions", CK.btn("Try again", { kind: "primary", icon: "refresh", on: function () { location.reload(); } }), back ? CK.btn("Back", { href: back, kind: "ghost" }) : null)])]); };
+  CK.error = function (err, back) { if (err && err.status === 401) return;
+    if (err && err.offline) { CK.render([CK.head({ title: "You're offline" }), CK.card(null, [CK.note(err.message, "amber"), h("div.ck-actions", CK.btn("Try again", { kind: "ghost", icon: "refresh", on: function () { location.reload(); } }), back ? CK.btn("Back", { href: back, kind: "ghost" }) : null)])]);
+      CK.view().setAttribute("data-offline-error", "1"); return; }   /* offline.js reloads the page by itself when the connection is back */
+    CK.render([CK.head({ title: "This could not be opened" }), CK.card(null, [CK.note((err && err.message) || "CALMS could not be reached.", "red"), h("div.ck-actions", CK.btn("Try again", { kind: "primary", icon: "refresh", on: function () { location.reload(); } }), back ? CK.btn("Back", { href: back, kind: "ghost" }) : null)])]); };
   /* the page leaves smoothly: the view fades down before the next page loads */
   CK.leave = function (href) { document.documentElement.classList.add("c-leaving"); setTimeout(function () { location.href = href; }, 170); };
   document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a[href]"); if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || a.target === "_blank" || a.hasAttribute("download")) return;
@@ -192,12 +195,16 @@
         where.appendChild(CK.bar([[tot.penalty, "#b3261a", "Penalty"], [tot.interest, "#c9821b", "Interest"], [tot.principal, "#2f7a4f", "Principal"]]));
         where.appendChild(h("div.ck-legend", [["Penalty", "#b3261a", tot.penalty], ["Interest", "#c9821b", tot.interest], ["Principal", "#2f7a4f", tot.principal]].map(function (x) { return h("span", h("i", { style: { background: x[1] } }), x[0] + " " + CK.peso(x[2], true)); })));
         where.appendChild(h("div.ck-sm", "Covers payment" + (d.allocation.length > 1 ? "s " : " ") + d.allocation.map(function (x) { return "no. " + x.n; }).join(", ") + "."));
-        fA.setError(""); }, function (e) { fA.setError(e.message); }); }, 300); }
+        fA.setError(""); }, function (e) { if (e.offline) { where.textContent = ""; where.appendChild(h("div.ck-sm", "Offline: where the money goes (penalties, interest, principal) is worked out by the office's server when the payment is sent.")); return; } fA.setError(e.message); }); }, 300); }
     amt.addEventListener("input", preview); date.addEventListener("change", preview); preview();
     btn.addEventListener("click", function () { [fA, fD, fC, fR].forEach(function (f) { f.setError(""); });
       if (!(+amt.value.replace(/[^\d.]/g, "") > 0)) { fA.setError("Enter the amount received."); amt.focus(); return; } if (!chan.value) { fC.setError("Choose how the money came in."); return; }
       if (chan.value !== "Cash at the branch" && !ref.value.trim()) { fR.setError("Enter the deposit, GCash or cheque reference."); ref.focus(); return; }
-      CK.busy(btn, true); CK.api("POST", "/api/loan-accounts/" + acct.number + "/payments", { amount: amt.value.replace(/[^\d.]/g, ""), paidOn: date.value, channel: chan.value, reference: ref.value.trim() }).then(function (r) { CK.busy(btn, false); done(r); },
+      var money = amt.value.replace(/[^\d.]/g, "");
+      CK.busy(btn, true); CK.api("POST", "/api/loan-accounts/" + acct.number + "/payments", { amount: money, paidOn: date.value, channel: chan.value, reference: ref.value.trim() },
+        { offline: { kind: "pay", label: "Payment · " + acct.borrower, sub: acct.number + " · " + CK.peso(+money, true) + " · " + chan.value + (ref.value.trim() ? " " + ref.value.trim() : "") } }).then(function (r) { CK.busy(btn, false);
+          if (r.queued) { r.receipt = r.temp + " (temporary)"; CK.toast("Saved on this computer. Temporary receipt " + r.temp + "; the official receipt number comes when it is sent.", "amber"); }   /* offline (offline.js) */
+          done(r); },
         function (e) { CK.busy(btn, false); var m = { amt: fA, date: fD, chan: fC, ref: fR }[e.field || e.fields] || fA; m.setError(e.message); }); });
     return h("div.ck-stack.ck-payform", h("div.ck-form", fA, fD, fC, fR), where, h("div.ck-actions", btn));
   };

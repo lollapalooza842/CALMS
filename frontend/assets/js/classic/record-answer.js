@@ -144,20 +144,22 @@
         actions: [["Go back", "ghost"], ["Seal it", "primary", function (close, b, err) { CK.busy(b, true);
           var rd = new FileReader(); rd.onerror = function () { CK.busy(b, false); err("The file could not be read. Choose it again."); };
           rd.onload = function () { var note = (words.value.trim() ? words.value.trim() + " " : "") + "(Proof: " + ptype.value.toLowerCase() + ".)";
-            CK.api("POST", "/api/applications/" + L.reference + "/offers/" + N + "/answer", { answer: yes ? "accepted" : "declined", channel: chanV, toldAt: new Date(when.value).toISOString(), note: note, proof: { name: file.name, data: String(rd.result).split(",")[1] || "" } })
-              .then(function () { close(); CK.toast("Her answer is sealed. Offer " + N + " can no longer be changed by anyone."); done(yes); },
+            CK.api("POST", "/api/applications/" + L.reference + "/offers/" + N + "/answer", { answer: yes ? "accepted" : "declined", channel: chanV, toldAt: new Date(when.value).toISOString(), note: note, proof: { name: file.name, data: String(rd.result).split(",")[1] || "" } },
+              { offline: { kind: "answer", label: "Her answer · " + L.borrower, sub: L.reference + " · offer " + N + " · " + (yes ? "she accepts" : "she declines") } })   /* offline: kept here, sealed when sent */
+              .then(function (r) { close(); if (r && r.queued) { CK.toast("Saved on this computer. Her answer is sealed when the connection is back.", "amber"); done(yes, true); return; } CK.toast("Her answer is sealed. Offer " + N + " can no longer be changed by anyone."); done(yes); },
                 function (e) { CK.busy(b, false); if (e.status === 401) return; err(e.message + " Nothing was sealed."); var f = route(e.message); if (f) f.setError(e.message); else formErr.textContent = e.message; }); };
           rd.readAsDataURL(file); }]] });
     });
 
-    function done(yes) { var told = new Date(when.value);
+    function done(yes, queued) { var told = new Date(when.value);
       var then = yes ? ["Status becomes Accepted by Borrower.", "The loan agreement and disclosure statement can now be generated for her to sign.", "It enters the disbursement queue once the signed agreement is uploaded.", "She is sent the outcome by SMS. You will be told when the agreement is ready to bring to her."]
         : ["Status becomes Declined by Borrower.", "It returns to underwriting (" + LO.by + ") with her reason.", "Underwriting will either issue a new offer or reject the application.", "If a new offer is issued, it comes to you to carry, like this one."];
-      CK.render([CK.head({ crumbs: crumbs, title: "Her answer is sealed", status: CK.status(yes ? "accepted" : "declined"), sub: L.borrower + " · " + L.product + " · offer " + N + " can no longer be changed by anyone.",
+      if (queued) then = ["You're offline, so her answer is kept on this computer.", "It is sent and sealed, once, as soon as the connection is back.", "If underwriting changed the offer meanwhile, it waits under \"Needs your look\" instead."].concat(then.slice(0, 1));
+      CK.render([CK.head({ crumbs: crumbs, title: queued ? "Saved on this computer" : "Her answer is sealed", status: queued ? null : CK.status(yes ? "accepted" : "declined"), sub: L.borrower + " · " + L.product + (queued ? " · offer " + N + " · sealed when the connection is back." : " · offer " + N + " can no longer be changed by anyone."),
           actions: [CK.btn("Open the application", { kind: "primary", icon: "next", href: "application-detail.html?ref=" + L.reference })] }),
         h("div.ck-grid.side2",
-          CK.card("Sealed", [h("div.ck-outcome", { style: { "--a": yes ? "#2f7a4f" : "#b3261a" } }, h("span.ck-tile", CK.ic(yes ? "check" : "x")), h("div", h("b", (yes ? "ACCEPTED" : "DECLINED") + " offer " + N), h("p", "Recorded " + CK.dt(new Date())))),
-            CK.dl([["She answered", CK.dt(told)], ["Told", chanV.toLowerCase()], ["Proof", ptype.value + ": " + file.name], ["Her words", words.value.trim() || "none recorded"], ["Recorded by", ME ? ME.name + ", " + ME.roleName : "–"], ["Offer", P(OFF.amt) + " over " + OFF.term + " months, now sealed"]])], { icon: "lock" }),
+          CK.card(queued ? "Saved, not yet sealed" : "Sealed", [h("div.ck-outcome", { style: { "--a": yes ? "#2f7a4f" : "#b3261a" } }, h("span.ck-tile", CK.ic(yes ? "check" : "x")), h("div", h("b", (yes ? "ACCEPTED" : "DECLINED") + " offer " + N), h("p", (queued ? "Saved " : "Recorded ") + CK.dt(new Date())))),
+            CK.dl([["She answered", CK.dt(told)], ["Told", chanV.toLowerCase()], ["Proof", ptype.value + ": " + file.name], ["Her words", words.value.trim() || "none recorded"], ["Recorded by", ME ? ME.name + ", " + ME.roleName : "–"], ["Offer", P(OFF.amt) + " over " + OFF.term + " months" + (queued ? "" : ", now sealed")]])], { icon: "lock" }),
           CK.card("What happens now", h("ol.ck-steps-ol", then.map(function (t) { return h("li", t); })), { icon: "list" }))]); }
 
     var form = CK.card("Her answer", [h("div.ck-form", fAns, fChan, fWhen, fPtype, fProof, fWords), h("div.ck-stack", { style: { gap: "6px" } }, swear, swearErr), h("div.ck-divider"),
