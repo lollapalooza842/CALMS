@@ -315,3 +315,8 @@ html[data-ui="classic"] .nav a:active { transform: scale(.98) !important; transi
   .ck-thumb, .ck-card, .ck-stat .ck-tile, .ck-btn .ck-ic, html[data-ui="classic"] .nav a .c-ic { transition: none; }
   .ck-table tbody tr { animation: none !important; }
 }
+/* mock-up portraits over the initials (classic-app.js CALMS_FACE): fade in once loaded */
+.ck-av, .c-av { position: relative; overflow: hidden; isolation: isolate; }
+img.c-face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity .3s ease; }
+img.c-face.ok { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { img.c-face { transition: none; } }

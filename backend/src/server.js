@@ -51,6 +51,15 @@ app.use("/api", (req, res, next) => { if (req.method !== "GET") res.on("finish",
 app.use("/api/auth", require("./routes/auth"));
 // Everything below needs a signed-in user (checked once per request).
 app.use("/api", (req, res, next) => Promise.resolve(auth.requireUser(req, res, next)).catch(next));
+// Mock-up portraits (lib/faces.js): /api/face?n=Liza%20Mendoza. Staff (a name on Users and roles) get office clothes.
+let staffNames = { at: 0, set: new Set() };
+app.get("/api/face", async (req, res, next) => {
+  try {
+    const n = String(req.query.n || "").replace(/\s+/g, " ").trim().slice(0, 80); if (!n) return res.status(400).end();
+    if (Date.now() - staffNames.at > 60000) staffNames = { at: Date.now(), set: new Set((await db.query("select full_name from users")).rows.map((r) => r.full_name.toLowerCase())) };
+    res.set("Cache-Control", "private, max-age=604800").type("image/svg+xml").send(require("./lib/faces").face(n, staffNames.set.has(n.toLowerCase()) ? "staff" : "person"));
+  } catch (e) { next(e); }
+});
 app.use("/api/applications/:ref", require("./routes/verification"));
 app.use("/api/applications/:ref", require("./routes/underwriting"));
 app.use("/api/applications/:ref", require("./routes/servicing"));

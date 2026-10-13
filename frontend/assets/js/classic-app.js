@@ -29,6 +29,22 @@
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
   function initials(n) { return String(n || "").split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w.charAt(0).toUpperCase(); }).join("") || "·"; }
 
+  /* a mock-up portrait over the initials (the server draws it from the name: /api/face); the initials stay underneath
+     while it loads, and if it cannot load */
+  /* a photo for each person: the same name always gets the same face, women and men from their own sets */
+  var WOMEN = " liza mila corazon regina maricar katrina lourdes rosalinda imelda teresita carmela josefina marivic norma herminia felisa emily maria ana grace joy rose luz carmen nenita lorna cristina elena jocelyn marites susan michelle angelica kristine princess divina ligaya remedios consuelo precious glenda irene evelyn marilyn rowena jennifer ",
+      MEN = " antonio aurelio benjie jun rodel paolo benigno vicente crisanto nestor ramon glenn juan jose luca joshua noel andrea ",
+      SHE = ["p01", "p05", "p09", "p11"], HE = ["p02", "p03", "p04", "p06", "p07", "p08", "p10", "p12"];
+  function isWoman(first) { if (WOMEN.indexOf(" " + first + " ") >= 0) return true; if (MEN.indexOf(" " + first + " ") >= 0) return false; return /(a|ita|ine|elle|ette|ie)$/.test(first) && !/o$/.test(first); }
+  window.CALMS_PHOTO = function (name) {
+    var n = String(name || "").replace(/^(ladder|atty\.?|dr\.?|engr\.?)\s+/i, "").trim(), first = n.split(/\s+/)[0].toLowerCase().replace(/[^a-z\u00f1]/g, "");
+    var set = isWoman(first) ? SHE : HE, h = 0; for (var i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) >>> 0;
+    return "/assets/img/people/" + set[h % set.length] + ".jpg"; };
+  window.CALMS_FACE = function (span, name) {
+    if (!span || !name) return span; var old = span.querySelector("img.c-face"); if (old && old.dataset.n === name) return span; if (old) old.remove();
+    var img = document.createElement("img"); img.className = "c-face"; img.alt = ""; img.decoding = "async"; img.dataset.n = name;
+    img.addEventListener("load", function () { img.classList.add("ok"); }); img.addEventListener("error", function () { img.remove(); });
+    img.src = window.CALMS_PHOTO(name); if (img.complete && img.naturalWidth) img.classList.add("ok"); span.appendChild(img); return span; };
   function ready(fn) { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn); else fn(); }
   ready(function () {
     /* ---- the sidebar: icons and the order they slide in ---- */
@@ -39,7 +55,7 @@
     dress(); if (nav && window.MutationObserver) new MutationObserver(dress).observe(nav, { childList: true, subtree: true });   /* at once, before the next paint: the icons never blink out */
     if (window.MutationObserver) new MutationObserver(function () { setTimeout(dress, 0); }).observe(document.body, { childList: true });
     var who = document.querySelector(".rail .who");
-    function badge() { if (!who) return; var n = (who.querySelector("b") || {}).textContent || ""; var av = who.querySelector(".c-av"); if (!av) { av = el("span", "c-av"); av.setAttribute("aria-hidden", "true"); who.insertBefore(av, who.firstChild); } av.textContent = initials(n); }
+    function badge() { if (!who) return; var n = (who.querySelector("b") || {}).textContent || ""; var av = who.querySelector(".c-av"); if (!av) { av = el("span", "c-av"); av.setAttribute("aria-hidden", "true"); who.insertBefore(av, who.firstChild); } if (av.dataset.n !== n) { av.textContent = initials(n); av.dataset.n = n; } window.CALMS_FACE(av, n); }
     badge(); if (who && window.MutationObserver) new MutationObserver(function () { var av = who.querySelector(".c-av"), n = (who.querySelector("b") || {}).textContent || ""; if (!av || av.textContent !== initials(n)) badge(); }).observe(who, { childList: true, subtree: true, characterData: true });
 
     /* ---- the top bar ---- */
@@ -132,7 +148,7 @@
         var tb = el("table", "c-table"), th = el("thead"), tr = el("tr"); ["Borrower", "Loan", "What is needed", "Waiting", ""].forEach(function (h) { tr.appendChild(el("th", "", h)); }); th.appendChild(tr); tb.appendChild(th);
         var body = el("tbody");
         show.forEach(function (x, i) { var r = el("tr", "c-row"); r.style.setProperty("--i", i);
-          var c1 = el("td", "c-td-who"), w = el("div", "c-who"), av = el("span", "c-av", initials(x.who)); av.style.setProperty("--g", GRAD[(x.who || "").length % GRAD.length]); w.appendChild(av);
+          var c1 = el("td", "c-td-who"), w = el("div", "c-who"), av = el("span", "c-av", initials(x.who)); av.style.setProperty("--g", GRAD[(x.who || "").length % GRAD.length]); window.CALMS_FACE(av, x.who); w.appendChild(av);
           var wn = el("div"); wn.appendChild(el("b", "", x.who)); wn.appendChild(el("small", "", x.ref)); w.appendChild(wn); c1.appendChild(w); r.appendChild(c1);
           var c2 = el("td", "c-loan c-td-loan"); c2.appendChild(el("b", "", peso(x.amt))); c2.appendChild(el("small", "", x.prod + (x.term ? " · " + x.term : ""))); r.appendChild(c2);
           var c3 = el("td", "c-need"), pill = el("span", "c-pill", x.stamp); pill.style.setProperty("--t", TONE[x.tone] || TONE.ink); c3.appendChild(pill); if (x.why) c3.appendChild(el("small", "", x.why)); r.appendChild(c3);

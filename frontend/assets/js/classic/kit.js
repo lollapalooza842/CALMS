@@ -34,7 +34,8 @@
   CK.since = function (x) { return CK.span((Date.now() - D(x)) / 36e5); };
   CK.initials = function (n) { return String(n || "").replace(/^Ladder\s+/, "").split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w.charAt(0).toUpperCase(); }).join("") || "·"; };
   var GR = ["#c9821b,#9a2f24", "#2c5e8a,#1f3f5e", "#2f7a4f,#1f5537", "#8a5a9a,#5a3a6b", "#b26a10,#7a4808", "#3d6b73,#24464c"];
-  CK.av = function (name, size) { var s = String(name || ""), k = 0; for (var i = 0; i < s.length; i++) k += s.charCodeAt(i); return h("span.ck-av", { style: { background: "linear-gradient(140deg," + GR[k % GR.length] + ")", width: size ? size + "px" : null, height: size ? size + "px" : null } }, CK.initials(s)); };
+  CK.av = function (name, size) { return window.CALMS_FACE ? CALMS_FACE(av0(name, size), String(name || "").replace(/^Ladder\s+/, "")) : av0(name, size); };
+  function av0(name, size) { var s = String(name || ""), k = 0; for (var i = 0; i < s.length; i++) k += s.charCodeAt(i); return h("span.ck-av", { style: { background: "linear-gradient(140deg," + GR[k % GR.length] + ")", width: size ? size + "px" : null, height: size ? size + "px" : null } }, CK.initials(s)); }
 
   /* the stages an application passes through */
   CK.ST = { draft: ["Draft", "grey"], submitted: ["Submitted", "blue"], review: ["Under review", "amber"], approved: ["Approved", "green"], awaiting: ["Awaiting borrower", "violet"],
