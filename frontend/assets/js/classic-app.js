@@ -55,8 +55,19 @@
     dress(); if (nav && window.MutationObserver) new MutationObserver(dress).observe(nav, { childList: true, subtree: true });   /* at once, before the next paint: the icons never blink out */
     if (window.MutationObserver) new MutationObserver(function () { setTimeout(dress, 0); }).observe(document.body, { childList: true });
     var who = document.querySelector(".rail .who");
-    function badge() { if (!who) return; var n = (who.querySelector("b") || {}).textContent || ""; var av = who.querySelector(".c-av"); if (!av) { av = el("span", "c-av"); av.setAttribute("aria-hidden", "true"); who.insertBefore(av, who.firstChild); } if (av.dataset.n !== n) { av.textContent = initials(n); av.dataset.n = n; } window.CALMS_FACE(av, n); }
-    badge(); if (who && window.MutationObserver) new MutationObserver(function () { var av = who.querySelector(".c-av"), n = (who.querySelector("b") || {}).textContent || ""; if (!av || av.textContent !== initials(n)) badge(); }).observe(who, { childList: true, subtree: true, characterData: true });
+    /* the photo is an <i>, not a <span>: the pages fill "the first span" of the nameplate with the role, which used to
+       land in the photo and show "Loan Proces..." for a moment on every page */
+    function badge() { if (!who) return; var n = (who.querySelector("b") || {}).textContent || ""; var av = who.querySelector(".c-av");
+      if (av && av.tagName !== "I") { av.remove(); av = null; }
+      if (!av) { av = el("i", "c-av"); av.setAttribute("aria-hidden", "true"); who.insertBefore(av, who.firstChild); }
+      if (av.dataset.n !== n || av.firstChild && av.firstChild.nodeType === 3 && av.firstChild.nodeValue !== initials(n)) { var img = av.querySelector("img.c-face"); av.textContent = initials(n); av.dataset.n = n; if (img && img.dataset.n === n) av.appendChild(img); }
+      window.CALMS_FACE(av, n); inline(av.querySelector("img.c-face")); }
+    /* the nameplate photo is kept inside the page itself (a small copy written into the image), so the next page draws it
+       in its very first frame from the kept sidebar, instead of the initials showing until the photo file arrives */
+    function inline(img) { if (!img || /^data:/.test(img.src)) return; img.decoding = "sync";
+      function go() { try { var c = document.createElement("canvas"); c.width = c.height = 96; c.getContext("2d").drawImage(img, 0, 0, 96, 96); img.src = c.toDataURL("image/jpeg", 0.85); } catch (e) {} }
+      if (img.complete && img.naturalWidth) go(); else img.addEventListener("load", go, { once: true }); }
+    badge(); if (who && window.MutationObserver) new MutationObserver(function () { var av = who.querySelector(".c-av"), n = (who.querySelector("b") || {}).textContent || ""; if (!av || av.tagName !== "I" || av.textContent !== initials(n) || !av.querySelector("img.c-face")) badge(); }).observe(who, { childList: true, subtree: true, characterData: true });
 
     /* ---- the top bar ---- */
     var main = document.querySelector("main"); if (!main) return;

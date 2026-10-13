@@ -319,3 +319,7 @@ html[data-ui="classic"]:not(.c-own) main .hole .in { background: #f6f1ea !import
 html[data-ui="classic"]:not(.c-own) main .hole .pl, html[data-ui="classic"]:not(.c-own) main .hole .ft { background: none !important; border: 0 !important; }
 html[data-ui="classic"]:not(.c-own) main .hole .ft b { color: var(--c-ink) !important; } html[data-ui="classic"]:not(.c-own) main .hole .ft small { color: var(--c-ink-3) !important; }
 html[data-ui="classic"]:not(.c-own) main .sbar span, html[data-ui="classic"]:not(.c-own) main .pour span { border: 0 !important; border-radius: 4px; }
+/* page to page: the sidebar is not lifted out as its own layer (rail.css does that for the western look). Here the
+   new page fades in over the old one, which stays fully drawn underneath, and the sidebar is the same on both, so it
+   simply stays put. As its own layer, its see-through panel was drawn twice for a moment: it darkened, then came back. */
+html[data-ui="classic"] .rail, html[data-ui="classic"] #tabbar { view-transition-name: none; }

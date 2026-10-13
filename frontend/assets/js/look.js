@@ -5,6 +5,10 @@
    counts, the nameplate, the practice chip and the phone's tab bar) for the rest of the visit, and the next page draws
    that copy the moment its rail arrives, before the first paint, instead of an empty rail that fills in when the server
    answers. The server's answer then updates it in place. Kept per look, per tab; signing out or in clears it. */
+/* The browser may draw a page's first frame before the rest of it has arrived. On a page change that first frame is the
+   one that fades in, so a frame without the side rail made the rail blink pale. Hold the first frame until the page's
+   main area has begun, by which time the whole rail (and its kept copy) is in. */
+if (/\/pages\//.test(location.pathname) && document.readyState === "loading" && !document.getElementById("calmsMain")) document.write('<link rel="expect" href="#calmsMain" blocking="render">');
 (function () {
   var ui = ""; try { ui = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1] || localStorage.getItem("calms-ui") || "western"; } catch (e) {}
   var KEY = "calms-rail:" + ui, saved = null; try { saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (e) {}
@@ -59,6 +63,7 @@
   try { var q = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1]; if (q) localStorage.setItem("calms-ui", q); ui = q || localStorage.getItem("calms-ui") || ""; } catch (e) {}
   if (ui !== "classic") return;
   r.setAttribute("data-ui", "classic"); r.setAttribute("data-theme", "light"); window.CK_LOOK = true;
+  r.style.backgroundColor = "#f5f2ee"; r.style.colorScheme = "light";   /* the page's very first frame is warm white, never the dark of a dark-mode screen */
   var page = (location.pathname.split("/").pop() || "").replace(/\.html$/, ""), web = /^https?:$/.test(location.protocol);
   var OWN = window.CK_PAGES = ["applications", "application-detail", "notifications", "loan-accounts", "loan-account", "audit-log", "reports",
     "users-roles", "system", "products-rules", "my-profile", "review-queue", "disbursement-queue", "counter-offers", "record-answer", "documents", "encode-verify", "credit-assessment", "decision",
@@ -68,7 +73,12 @@
   if (own) [].forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), function (l) { if (l.href.split("/").pop() === page + ".css") l.media = "not all"; });
   /* written into <head> while it is still being read, so the browser waits for them before drawing anything */
   var css = (document.querySelector('link[href$="/base.css"]') ? [] : ["base.css"]).concat(["classic-fonts.css", "classic-app.css", "classic-ui.css", "classic-pages.css"]);
-  document.write(css.map(function (f) { return '<link rel="stylesheet" href="../assets/css/' + f + '">'; }).join(""));
+  /* the type, fetched at once: the fonts wait up to a moment for these (font-display: optional in classic-fonts.css), so
+     every page's first frame is drawn in Lexend and Inter, never in a stand-in font that then swaps (the sidebar's words
+     shifting a hair on every page change) */
+  var FONTS = ["lexend-latin-500", "lexend-latin-600", "inter-latin-400", "inter-latin-500", "inter-latin-600"];
+  document.write(FONTS.map(function (f) { return '<link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/' + f + '-normal.woff2">'; }).join("") +
+    css.map(function (f) { return '<link rel="stylesheet" href="../assets/css/' + f + '">'; }).join(""));
   var arrived = false; try { arrived = sessionStorage.getItem("calms-entered") === "1"; } catch (e) {}
   r.classList.add(arrived ? "c-arrive" : "c-page");
   /* the sidebar's extras (classic-app.css): folded to icons or not (remembered per device), the "Main" label, the chevron

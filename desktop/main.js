@@ -121,6 +121,11 @@ function createWindow() {
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false, autoplayPolicy: "no-user-gesture-required" },   // the intro's music may start by itself in the app
   });
   win.once("ready-to-show", () => { win.maximize(); win.show(); });
+  // between two pages the window shows its own background for a moment: match it to the look in use (the classic look's
+  // warm white, the western look's dusk), or classic pages blink near-black on every page change
+  const tint = () => win && win.webContents.executeJavaScript('(function(){try{return localStorage.getItem("calms-ui")||""}catch(e){return ""}})()')
+    .then((ui) => { if (win) win.setBackgroundColor(ui === "classic" ? "#f5f2ee" : "#1a0f08"); }).catch(() => {});
+  win.webContents.on("did-finish-load", tint); win.webContents.on("did-navigate-in-page", tint);
   win.on("page-title-updated", (e, title) => { e.preventDefault(); win.setTitle(mode === "demo" ? title + " (sample data)" : title); });
   // links to anywhere else open in the normal browser, never inside the app
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:/.test(url) && !inApp(url)) shell.openExternal(url); return { action: "deny" }; });
