@@ -151,7 +151,7 @@
     }
     function drawPanel(dir) {
       var s = sec(cur), L = secs(), i = L.indexOf(s); reg = {}; panel.textContent = "";
-      var body = [h("div.ck-whead", h("span.ck-wic", CK.ic(s.icon)), h("div", h("small", "Step " + (i + 1) + " of " + L.length), h("h2", s.title), h("p.ck-hint", s.hint)))];
+      var body = [h("div.ck-whead", h("span.ck-wic", CK.ic(s.icon)), h("div", h("small", "Step " + (i + 1) + " of " + L.length), h("h2", s.title)))];   /* no guide line under the step */
       if (s.id === "request") body.push(productPicker());
       if (s.fields.length) body.push(h("div.ck-form", s.fields.map(fieldFor)));
       if (s.id === "borrower") body.push(warnBox);

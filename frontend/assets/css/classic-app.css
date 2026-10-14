@@ -86,7 +86,7 @@ html[data-ui="classic"] #practiceChip { order: 40; margin: auto 4px 10px !import
   font: 600 10px/1 var(--c-body) !important; letter-spacing: .1em; padding: 6px 10px !important; }
 html[data-ui="classic"] .c-card-cta { order: 50; margin-top: auto; padding: 18px 14px 14px; border-radius: 18px; text-align: center; background: rgba(255,255,255,.04); box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset; }
 html[data-ui="classic"] #practiceChip ~ .c-card-cta { margin-top: 0; }
-html[data-ui="classic"] .c-card-cta b { display: block; font: 600 15px/1.3 var(--c-head); color: #fff; }
+html[data-ui="classic"] .c-card-cta b { display: block; margin-bottom: 12px; font: 600 15px/1.3 var(--c-head); color: #fff; }
 html[data-ui="classic"] .c-card-cta p { margin: 6px 0 14px; font: 400 12.5px/1.45 var(--c-body); color: #b39d8d; }
 html[data-ui="classic"] .c-cta { display: flex; align-items: center; justify-content: center; gap: 8px; height: 42px; border-radius: 12px; text-decoration: none; color: #fff; font: 600 13.5px/1 var(--c-body);
   background: linear-gradient(180deg, var(--c-orange), var(--c-orange-2)); box-shadow: 0 8px 18px -6px rgba(232,137,42,.6), 0 1px 0 rgba(255,255,255,.25) inset; transition: transform .15s, filter .15s; }

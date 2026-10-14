@@ -20,7 +20,7 @@
       var stg = R.stages.map(function (s, i) { return [s, p.wait[i], i === p.wait.indexOf(Math.max.apply(null, p.wait)) ? "#b3261a" : "#d2bfac"]; });
       var dec2 = [["Approved as asked", p.ok, "#2f7a4f"], ["Approved higher up", p.up, "#2c5e8a"], ["Counter-offered", p.co, "#c9821b"], ["Declined", p.no, "#b3261a"]];
       wrap.appendChild(h("div.ck-grid.stretch", { style: { "--cols": 2 } },
-        CK.card("Where applications wait", [h("p.ck-sm", "Average hours at each step before someone moved it on. The red bar is where to look first."), bars(stg, function (v) { return CK.num(v) + " h"; }), h("div.ck-sm", "Waiting now: " + R.stages.map(function (s, i) { return s + " " + p.q[i]; }).join(" · "))],
+        CK.card("Where applications wait", [null, bars(stg, function (v) { return CK.num(v) + " h"; }), h("div.ck-sm", "Waiting now: " + R.stages.map(function (s, i) { return s + " " + p.q[i]; }).join(" · "))],
           { icon: "clock", tools: tools("Where applications wait", [["Step", "Average hours", "Waiting now"]].concat(R.stages.map(function (s, i) { return [s, p.wait[i], p.q[i]]; }))) }),
         CK.card("Decisions", [CK.bar(dec2.map(function (x) { return [x[1], x[2], x[0]]; })), h("div.ck-legend", dec2.map(function (x) { return h("span", h("i", { style: { background: x[2] } }), x[0] + " · " + x[1]); })), bars(p.vol.map(function (x) { return [x[0], x[1]]; }), null, "#2c5e8a")],
           { icon: "stamp", tools: tools("Decisions and volume", [["Week", "Applications"]].concat(p.vol)) })));

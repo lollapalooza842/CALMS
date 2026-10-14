@@ -24,7 +24,7 @@
     ], A, { sort: "daysPastDue", dir: -1, onRow: function (a) { CK.go("loan-account.html?no=" + a.number); }, empty: "No account matches." });
     function apply() { tbl.filter(function (a) { if (bucket && bk(a) !== bucket) return false; if (day && !(a.next && !a.closed && a.next.dueOn === day)) return false; return !q || (a.number + " " + a.borrower + " " + a.reference).toLowerCase().indexOf(q) >= 0; }); }
     CK.render([
-      CK.head({ title: "Loan accounts", sub: open.length + " open accounts · " + (A.length - open.length) + " fully paid. Click a band or a day to see only those accounts.", actions: [CK.btn("Post a payment", { kind: "primary", icon: "peso", href: "post-payment.html" })] }),
+      CK.head({ title: "Loan accounts", sub: open.length + " open accounts · " + (A.length - open.length) + " fully paid", actions: [CK.btn("Post a payment", { kind: "primary", icon: "peso", href: "post-payment.html" })] }),
       h("div.ck-stats.ck-in", { style: { "--cols": 4 } }, CK.stat("Principal still out", CK.peso(out), { icon: "wallet", tone: "brand", sub: "across " + open.length + " accounts" }),
         CK.stat("Past due", String(pastDue.length), { icon: "alert", tone: "amber", sub: CK.peso(pastDue.reduce(function (s, a) { return s + a.overdue; }, 0)) + " overdue" }),
         CK.stat("Falling due this week", String(dueWeek.length), { icon: "cal", tone: "blue", sub: CK.peso(dueWeek.reduce(function (s, a) { return s + a.next.amount; }, 0)) + " expected" }),

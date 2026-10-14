@@ -5,8 +5,8 @@
     CK.card(null, [CK.empty("Open an application first", "A decision belongs to one application. Pick one from the review queue.", "search"), h("div.ck-actions", CK.btn("Review queue", { kind: "primary", icon: "next", href: "review-queue.html" }))])]); return; }
   function pesoC(n) { return CK.peso(n, true); }
   function pct(n) { return n == null ? "–" : n.toFixed(1) + "%"; }
-  var KIND = { asis: ["Approve as asked", "green", "Approved", "check", "Grant exactly what she asked for."], other: ["Approve other terms", "amber", "Approved, changed terms", "swap", "Grant a different amount or term. This raises a counter-offer."],
-    no: ["Decline", "red", "Declined", "x", "Reject the application, with a reason she can be told."], up: ["Endorse upward", "blue", "Endorsed upward", "up", "Over your limit: pass it up with the credit memo."] };
+  var KIND = { asis: ["Approve as asked", "green", "Approved", "check", ""], other: ["Approve other terms", "amber", "Approved, changed terms", "swap", "Raises a counter-offer."],
+    no: ["Decline", "red", "Declined", "x", ""], up: ["Endorse upward", "blue", "Endorsed upward", "up", "Over your limit."] };
   var REASONS = ["Capacity: cash flow does not support the installment", "Credit history: bureau record", "Documents: figures not supported", "Policy: outside product rules"];
   function load(justSigned) { CK.api("GET", "/api/applications/" + encodeURIComponent(ref) + "/decision").then(function (d) { draw(d, justSigned); }, function (e) { CK.error(e, "review-queue.html"); }); }
   CK.loading(); load();
@@ -42,7 +42,7 @@
 
     /* ---- the decision form ---- */
     var choiceBox = h("div.ck-choices", { role: "group", "aria-label": "Decision" }), choiceBtns = {};
-    Object.keys(KIND).forEach(function (k) { var K = KIND[k], b = h("button.ck-choice.t-" + K[1], { type: "button", "aria-pressed": "false" }, h("span.ck-tile", CK.ic(K[3])), h("div", h("b", K[0]), h("small", k === "up" ? "Over your limit: pass it to " + UP + " with the credit memo." : K[4])));
+    Object.keys(KIND).forEach(function (k) { var K = KIND[k], b = h("button.ck-choice.t-" + K[1], { type: "button", "aria-pressed": "false" }, h("span.ck-tile", CK.ic(K[3])), h("div", h("b", K[0]), k === "up" ? h("small", "To " + UP + ".") : K[4] ? h("small", K[4]) : null));
       b.addEventListener("click", function () { var off = offWhy(k); if (off) { CK.toast(off, "blue"); return; } S.kind = S.kind === k ? "" : k; tried = false; paint(); }); choiceBtns[k] = b; choiceBox.appendChild(b); });
     function offWhy(k) { if (k === "up") return !ME.upstairs ? "There is no one above you to endorse it to. Approve it, grant other terms, or decline." : !(ASK.amt > ME.limit || over()) ? "Endorsing upward is for amounts over your own limit. This one is inside it." : "";
       if (k === "asis" && ASK.amt > ME.limit) return "The requested " + pesoC(ASK.amt) + " is over your limit. Endorse it upward, or grant a smaller amount."; return ""; }
@@ -97,7 +97,7 @@
         CK.dl([["Decision", KIND[S.kind][2] + (ov ? " (override)" : "")], ["Terms", S.kind === "no" ? "none granted" : pesoC(t.amt) + " over " + t.term + " months"], ["Each month", S.kind === "no" ? "–" : pesoC(b.m)], ["Signed by", ME.name + ", " + ME.roleName]].concat(S.kind === "no" ? [["Reason", why.value]] : [])),
         rm.value.trim() ? CK.note(rm.value.trim(), "blue", "edit") : null,
         S.kind === "other" ? CK.note("Counter-offer 1 goes to " + AGENT + " to convey. The loan agreement stays locked until her answer is recorded.", "violet", "swap") : null,
-        code, h("p.ck-hint", "Signing locks the decision under your name. It goes into the audit log and cannot be changed.")],
+        code, null],
         actions: [["Cancel", "ghost"], ["Sign the decision", S.kind === "no" ? "danger" : "primary", function (close, btn, err) {
           if (!/^\d{6}$/.test(ci.value)) { code.setError("Enter all six digits."); ci.focus(); return; }
           CK.busy(btn, true);
@@ -121,7 +121,7 @@
     /* ---- the page ---- */
     var A = L.assessment, recCard = CK.card("The rules recommend", A ? [h("div.ck-verdict", h("div.ck-seal2.t-" + ({ Low: "green", Moderate: "amber", High: "red" }[A.tier] || "grey"), A.tier.charAt(0)), h("div", h("b.ck-tiername", A.tier + " risk"), h("small.ck-sm", "Rule set version " + (A.version || L.ruleVersion)))),
         h("div.ck-rec", h("b", A.outcome.replace(/^Manual review: /, "").replace(/^./, function (c) { return c.toUpperCase(); })), h("p", A.why), FIT && FIT < ASK.amt ? h("p", "Up to " + pesoC(FIT) + " over " + ASK.term + " months, debt-to-income stays at or under " + POL.dtiSoft + "%.") : null,
-          h("p.ck-sm", "This is a recommendation; the decision is yours, within your limit."))]
+          null)]
       : [CK.note("No credit assessment yet. Ask FinScore on the Credit assessment screen first.", "amber"), h("div.ck-actions", CK.btn("Credit assessment", { kind: "primary", icon: "next", href: "credit-assessment.html?ref=" + encodeURIComponent(L.reference) }))],
       { icon: "shield", tools: CK.btn("Assessment", { kind: "ghost", icon: "chart", href: "credit-assessment.html?ref=" + encodeURIComponent(L.reference) }) });
     var termsCard = CK.card("Terms", [h("div.ck-tablewrap", cmp), editWrap, banners], { icon: "peso" });
@@ -143,7 +143,7 @@
         h("div.ck-field", h("label", h("span.ck-stepno", "2"), " Say why"), ovPill, whyWrap, fRm),
         L.assessment ? null : CK.note("No credit assessment yet. Ask FinScore on the Credit assessment screen first.", "amber"),
         h("div.ck-actions", signBtn), signErr,
-        h("p.ck-hint", "You sign with your authenticator code in the next step. The server checks your limit, the override rules and the code again before it signs.")], { icon: "stamp" }));
+        null], { icon: "stamp" }));
     }
     CK.render([
       CK.head({ crumbs: [["Review queue", "review-queue.html"], [L.reference, "application-detail.html?ref=" + encodeURIComponent(L.reference)], ["Credit assessment", "credit-assessment.html?ref=" + encodeURIComponent(L.reference)], ["Decision"]],

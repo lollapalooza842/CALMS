@@ -17,7 +17,7 @@
     var SV = H.services; sel = (SV.filter(function (s) { return s.st === "down" || s.st === "slow"; })[0] || SV[0]).id;
     function mailOn() { var m = SV.filter(function (s) { return s.id === "email"; })[0]; return !!(m && m.st !== "off"); }
     var pane = h("div.ck-stack"), SUB = { health: "Whether the outside services CALMS depends on are answering, and whether the jobs that run by themselves ran.", msg: "The wording of the messages CALMS sends to borrowers and staff. Pick one to edit it.", company: "The company details printed at the top of every statement, clearance, credit memo and report for the regulator." };
-    var sub = h("p.ck-sub", SUB[tab]);
+    var sub = h("p.ck-sub", "");   /* no guide text */
     var chk = CK.btn("Check all again", { kind: "ghost", icon: "refresh", on: function () { ring(null, chk); } });
 
     /* ---- health ---- */
@@ -112,7 +112,7 @@
         CK.card("On every paper", [h("p.ck-ap", "This prints at the top of statements, clearances, credit memos and regulatory reports."), prevBox], { icon: "file" }))]; }
 
     /* ---- tabs ---- */
-    function draw() { pane.textContent = ""; sub.textContent = SUB[tab];
+    function draw() { pane.textContent = ""; sub.textContent = "";
       (tab === "health" ? health() : tab === "msg" ? messages() : company()).forEach(function (k) { pane.appendChild(k); });
       CK.stagger(pane); }
     var tabs = CK.tabs([["health", "Health"], ["msg", "Messages"], ["company", "Company"]], tab, function (v) { tab = v; try { sessionStorage.setItem("ck-system-tab", v); } catch (e) {} pane.classList.remove("ck-afade"); void pane.offsetWidth; pane.classList.add("ck-afade"); draw(); });

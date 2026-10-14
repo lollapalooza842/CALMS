@@ -34,11 +34,11 @@
     var deal = lead ? CK.btn("Deal them out", { kind: "primary", icon: "users", on: dealOut }) : null;
     CK.render([
       CK.head({ crumbs: [["My Queue", "my-queue.html"], ["Review queue"]], title: "Review queue",
-        sub: viewer ? "Everything the rules could not decide alone, on every desk. You can read it; only the Lead Underwriter moves folders." : lead ? "Everything the rules could not decide alone. As Lead you see every desk and may move folders between them." : "Your own tray. Only the Lead Underwriter sees the other desks or moves folders.",
+        sub: viewer ? "Only the Lead Underwriter moves folders." : lead ? "Everything the rules could not decide alone. As Lead you see every desk and may move folders between them." : "Your own tray. Only the Lead Underwriter sees the other desks or moves folders.",
         actions: [deal] }),
       boxes.stats,
       h("div.ck-split.ck-rq",
-        h("div.ck-stack", CK.card(all() ? "In manual review" : "My tray", [boxes.filters, tbl], { icon: "list" }), all() ? CK.card("Desks", boxes.desks, { icon: "users", tools: h("span.ck-sm", "Click a desk to see only its folders") }) : null),
+        h("div.ck-stack", CK.card(all() ? "In manual review" : "My tray", [boxes.filters, tbl], { icon: "list" }), all() ? CK.card("Desks", boxes.desks, { icon: "users", tools: h("span.ck-sm", "") }) : null),
         boxes.side),
       h("div.ck-grid.ck-rq", { style: { "--cols": 2 } }, CK.card("Reassignment log", boxes.log, { icon: "swap" }), CK.card("Latest on these files", boxes.tape, { icon: "clock" }))
     ]);

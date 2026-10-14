@@ -1,0 +1,114 @@
+/* The classic look, neumorphic: everything outside the sidebar is one soft warm surface, and the cards, buttons and
+   tiles are pressed out of it (raised: a light shadow up-left, a warm one down-right) or into it (inset: fields, tracks,
+   wells). Colour is kept for meaning only: the brand red for the main action, amber for the CALMS mark and attention,
+   the status tones on pills. Loaded last on every classic page (look.js); the sidebar keeps its own dark panel. */
+html[data-ui="classic"] {
+  --neo: #ece6e0; --neo-2: #f2ede8; --neo-ink-line: rgba(120, 96, 76, .14);
+  --neo-hi: rgba(255, 255, 255, .92); --neo-lo: rgba(158, 134, 112, .42); --neo-lo-2: rgba(158, 134, 112, .26);
+  --neo-up: 8px 8px 18px var(--neo-lo), -8px -8px 18px var(--neo-hi);
+  --neo-up-sm: 4px 4px 10px var(--neo-lo), -4px -4px 10px var(--neo-hi);
+  --neo-up-xs: 2px 2px 5px var(--neo-lo-2), -2px -2px 5px var(--neo-hi);
+  --neo-in: inset 4px 4px 9px var(--neo-lo), inset -4px -4px 9px var(--neo-hi);
+  --neo-in-sm: inset 2px 2px 5px var(--neo-lo), inset -2px -2px 5px var(--neo-hi);
+  --neo-amber: #e8892a;
+  --c-bg: var(--neo); --c-card: var(--neo); --c-line: var(--neo-ink-line);
+}
+/* one even surface (the warm glow stays only behind the sidebar) */
+html[data-ui="classic"] body { background:
+  radial-gradient(420px 380px at 0% 14%, rgba(232,137,42,.30), transparent 70%),
+  radial-gradient(380px 460px at 4% 80%, rgba(154,47,36,.24), transparent 70%), var(--neo) fixed; background-attachment: fixed; }
+
+/* ---- the icons: a soft body and the amber CALMS mark ---- */
+html[data-ui="classic"] svg .ic-f { fill: currentColor; fill-opacity: .16; stroke: none; }
+html[data-ui="classic"] svg .ic-a { fill: var(--neo-amber); stroke: none; }
+html[data-ui="classic"] .ck-btn.ck-primary svg .ic-a, html[data-ui="classic"] .c-cta svg .ic-a, html[data-ui="classic"] .c-fab svg .ic-a { fill: #ffd29a; }
+
+/* ---- raised surfaces ---- */
+html[data-ui="classic"] :is(.ck-card, .ck-stat, .c-stat, .c-panel, .ck-modal, .ck-task, .ck-pipestep, .ck-prod, .ck-choice, .ck-offer, .ck-slot, .ck-entry) {
+  background: var(--neo); border-color: transparent; box-shadow: var(--neo-up); }
+html[data-ui="classic"] :is(.ck-card, .ck-stat, .c-stat, .c-panel, .ck-modal) { border-radius: 22px; }
+html[data-ui="classic"] .ck-card .ck-card, html[data-ui="classic"] .ck-card :is(.ck-task, .ck-choice, .ck-offer, .ck-slot, .ck-entry, .ck-prod, .ck-pipestep) { box-shadow: var(--neo-up-sm); border-radius: 16px; }
+html[data-ui="classic"] .ck-cardhead { border-bottom-color: transparent; }
+/* a card's inner rows sit in a soft well instead of between hard lines */
+html[data-ui="classic"] .ck-table th, html[data-ui="classic"] .ck-table td { border-bottom-color: var(--neo-ink-line); }
+html[data-ui="classic"] .ck-table tbody tr:hover, html[data-ui="classic"] .c-table tbody tr:hover { background: rgba(255,255,255,.35); }
+html[data-ui="classic"] .ck-table tr.is-sel { background: rgba(255,255,255,.45); box-shadow: inset 3px 0 0 var(--c-brand); }
+
+/* stats: the stripe goes; the icon sits in a raised round tile, the figure carries the weight */
+html[data-ui="classic"] :is(.ck-stat, .c-stat)::before { display: none; }
+html[data-ui="classic"] :is(.ck-stat .ck-tile, .c-stat .c-tile) { border-radius: 50%; background: var(--neo); box-shadow: var(--neo-up-sm); color: var(--a); }
+html[data-ui="classic"] .ck-stat.is-click:hover { transform: none; box-shadow: var(--neo-up-sm); }
+html[data-ui="classic"] .ck-stat.is-on { box-shadow: var(--neo-in); }
+html[data-ui="classic"] .ck-stat.is-on .ck-tile { box-shadow: var(--neo-in-sm); }
+
+/* ---- fields: pressed in ---- */
+html[data-ui="classic"] :is(.ck-input, .ck-view select, .c-view select, .c-view textarea, main input[type=text], main input[type=search], main input[type=email], main input[type=tel], main input[type=number], main input[type=date], main input[type=password], main select, main textarea) {
+  background: var(--neo); border: 0; border-radius: 14px; box-shadow: var(--neo-in); }
+html[data-ui="classic"] :is(.ck-input, main input, main select, main textarea):hover { box-shadow: var(--neo-in); }
+html[data-ui="classic"] :is(.ck-input, main input, main select, main textarea):focus { background: var(--neo-2); box-shadow: var(--neo-in), 0 0 0 3px rgba(126,34,28,.18); outline: 0; }
+html[data-ui="classic"] .ck-input[aria-invalid="true"] { box-shadow: var(--neo-in), 0 0 0 2px rgba(179,38,26,.45); background: var(--neo); }
+html[data-ui="classic"] main input[type=checkbox], html[data-ui="classic"] main input[type=radio] { box-shadow: none; }
+
+/* ---- buttons: raised, and pressed in while pressed ---- */
+html[data-ui="classic"] .ck-btn { background: var(--neo); border-color: transparent; box-shadow: var(--neo-up-sm); border-radius: 14px; transition: box-shadow .18s, color .18s, transform .12s; }
+html[data-ui="classic"] .ck-btn:hover { background: var(--neo); border-color: transparent; color: var(--c-brand); box-shadow: var(--neo-up); }
+html[data-ui="classic"] .ck-btn:active { transform: none; box-shadow: var(--neo-in-sm); }
+html[data-ui="classic"] .ck-btn.ck-primary { background: linear-gradient(145deg, #93301f, #6f1f15); color: #fff; box-shadow: 6px 6px 14px rgba(111,31,21,.35), -5px -5px 12px var(--neo-hi), inset 0 1px 0 rgba(255,255,255,.18); }
+html[data-ui="classic"] .ck-btn.ck-primary:hover { color: #fff; background: linear-gradient(145deg, #a2391f, #7a2318); box-shadow: 8px 8px 18px rgba(111,31,21,.4), -6px -6px 14px var(--neo-hi), inset 0 1px 0 rgba(255,255,255,.2); }
+html[data-ui="classic"] .ck-btn.ck-primary:active { box-shadow: inset 3px 3px 8px rgba(40,10,6,.5), inset -2px -2px 6px rgba(255,255,255,.12); }
+html[data-ui="classic"] .ck-btn.ck-green { background: linear-gradient(145deg, #3a8a5c, #2a6c46); color: #fff; box-shadow: 6px 6px 14px rgba(42,108,70,.32), -5px -5px 12px var(--neo-hi); }
+html[data-ui="classic"] .ck-btn.ck-danger { color: #b3261a; } html[data-ui="classic"] .ck-btn.ck-danger:hover { color: #b3261a; background: var(--neo); }
+html[data-ui="classic"] .ck-btn.ck-soft { color: var(--c-brand); }
+html[data-ui="classic"] .ck-btn:is(.ck-ghost, .ck-icon) { box-shadow: none; background: transparent; }
+html[data-ui="classic"] .ck-btn:is(.ck-ghost, .ck-icon):hover { box-shadow: var(--neo-up-sm); background: var(--neo); }
+html[data-ui="classic"] .ck-btn:is(.ck-ghost, .ck-icon):active { box-shadow: var(--neo-in-sm); }
+html[data-ui="classic"] .ck-btn:disabled { box-shadow: var(--neo-up-xs); }
+
+/* ---- segmented controls and tabs: a pressed-in track, a raised thumb ---- */
+html[data-ui="classic"] :is(.ck-seg, .ck-tabs, .c-filters) { background: var(--neo); box-shadow: var(--neo-in); border-radius: 16px; padding: 5px; }
+html[data-ui="classic"] :is(.ck-seg, .ck-tabs) button[aria-pressed="true"], html[data-ui="classic"] .ck-thumb { background: var(--neo); box-shadow: var(--neo-up-sm); border-radius: 12px; }
+html[data-ui="classic"] .c-filters button { background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 12px !important; color: var(--c-ink-2) !important; }
+html[data-ui="classic"] .c-filters button[aria-pressed="true"] { background: var(--neo) !important; color: var(--c-brand) !important; box-shadow: var(--neo-up-sm) !important; }
+html[data-ui="classic"] .c-filters button * { color: inherit !important; }
+html[data-ui="classic"] :is(.ck-seg, .ck-tabs) em, html[data-ui="classic"] .c-filters button em { background: transparent; box-shadow: var(--neo-in-sm); padding: 2px 7px; border-radius: 999px; }
+
+/* ---- small things ---- */
+html[data-ui="classic"] .ck-pill { box-shadow: var(--neo-up-xs); }
+html[data-ui="classic"] .ck-note { background: var(--neo); border: 0; box-shadow: var(--neo-in-sm); border-radius: 16px; }
+html[data-ui="classic"] .ck-emptyic { background: var(--neo); box-shadow: var(--neo-up-sm); color: var(--c-brand); }
+html[data-ui="classic"] :is(.ck-pick, .ck-filetile) { background: var(--neo); }
+html[data-ui="classic"] .ck-pick { border: 0; border-radius: 16px; box-shadow: none; }
+html[data-ui="classic"] .ck-pick:hover { box-shadow: var(--neo-up-sm); background: var(--neo); }
+html[data-ui="classic"] .ck-pick.is-sel { box-shadow: var(--neo-in-sm); background: var(--neo); }
+html[data-ui="classic"] .ck-filetile { box-shadow: var(--neo-up-xs); border-radius: 12px; }
+html[data-ui="classic"] :is(.ck-agecol, .ck-daybox) { background: var(--neo); box-shadow: var(--neo-in-sm); border: 0; }
+html[data-ui="classic"] .ck-modalback { background: rgba(60,44,32,.28); }
+html[data-ui="classic"] .c-av, html[data-ui="classic"] .ck-av { box-shadow: var(--neo-up-xs); }
+
+/* ---- the top bar and the dashboard ---- */
+html[data-ui="classic"] .c-chip { background: var(--neo); border: 0; box-shadow: var(--neo-up-sm); border-radius: 14px; }
+html[data-ui="classic"] a.c-chip:hover, html[data-ui="classic"] button.c-chip:hover { box-shadow: var(--neo-up); }
+html[data-ui="classic"] a.c-chip:active, html[data-ui="classic"] button.c-chip:active { box-shadow: var(--neo-in-sm); }
+html[data-ui="classic"] .c-go { background: var(--neo); border: 0; box-shadow: var(--neo-up-sm); border-radius: 12px; color: var(--c-brand); }
+html[data-ui="classic"] .c-go:hover { box-shadow: var(--neo-up); background: var(--neo); color: var(--c-brand); }
+html[data-ui="classic"] .c-go:active { box-shadow: var(--neo-in-sm); }
+html[data-ui="classic"] .c-pill { box-shadow: var(--neo-up-xs); }
+html[data-ui="classic"] .c-fab { box-shadow: 8px 8px 18px rgba(111,31,21,.4), -6px -6px 14px var(--neo-hi); }
+html[data-ui="classic"] .c-table th, html[data-ui="classic"] .c-table td { border-bottom-color: var(--neo-ink-line); }
+
+/* ---- the phone's tab bar: part of the same surface ---- */
+@media (max-width: 600px) {
+  html[data-ui="classic"] #tabbar { background: var(--neo); border-top: 0; box-shadow: 0 -6px 16px var(--neo-lo-2), 0 -1px 0 var(--neo-hi); }
+  html[data-ui="classic"] #tabbar .tab[aria-current="page"] { box-shadow: var(--neo-in-sm); border-radius: 14px; }
+}
+@media (prefers-contrast: more) { html[data-ui="classic"] :is(.ck-card, .ck-stat, .c-stat, .c-panel, .ck-btn, .ck-input) { outline: 1px solid rgba(60,40,25,.35); } }
+
+/* ---- the pages' own pieces: tiles to pick are raised, places to drop a file are pressed in; papers stay white paper ---- */
+html[data-ui="classic"] :is(.ck-opts > label, .ck-dq-ch, .ck-rec, .ck-rq-desk, .ck-rules li, .ck-urkeys li, .ck-sumx, .ck-svline, .ck-detailbox, .ck-attach, .ck-savechip) {
+  background: var(--neo) !important; border-color: transparent !important; box-shadow: var(--neo-up-sm); border-radius: 16px; }
+html[data-ui="classic"] .ck-opts > label:has(input:checked), html[data-ui="classic"] .ck-opts > label.is-on { box-shadow: var(--neo-in-sm), 0 0 0 2px rgba(126,34,28,.35); }
+html[data-ui="classic"] .ck-opts > label.is-off { box-shadow: var(--neo-up-xs); opacity: .6; }
+html[data-ui="classic"] .ck-drop { background: var(--neo) !important; border: 0 !important; box-shadow: var(--neo-in); border-radius: 18px; }
+html[data-ui="classic"] .ck-vers button { background: var(--neo); border: 0; box-shadow: var(--neo-up-xs); }
+html[data-ui="classic"] :is(.ck-wfoot, .ck-tlfoot) { background: var(--neo); border-top-color: var(--neo-ink-line); }
+html[data-ui="classic"] .ck-detail td { background: transparent; }

@@ -17,7 +17,7 @@
     var account = CK.card(null, [
       h("div.ck-pf-badge", CK.av(U.name, 64), h("div", h("span.ck-pf-co", "GR8 Lending Company"), h("b", U.name), CK.pill(U.roleName, "brand"))),
       CK.dl([["Username", U.username], ["Branch", U.branch], ["Work email", U.email], ["Signed in", M.signedIn || "Just now"], ["Password last changed", M.passwordChanged || "–"]]),
-      h("p.ck-hint", "To change your name, role or branch, ask the System Administrator.")], { cls: "ck-pf-acct" });
+      null], { cls: "ck-pf-acct" });
 
     /* ---- how to reach you ---- */
     var mob = CK.input({ type: "tel", mode: "tel", value: mobile, ph: "Not set yet" }), fMob = CK.field("Mobile number for texts", mob, { hint: "Eleven digits starting with 09, for example 0917 555 0188." });
@@ -48,7 +48,7 @@
     var signing = CK.card("Signing in", [mfaBox, h("div.ck-divider"),
       h("div.ck-pf-row", h("span.ck-pf-tile", CK.ic("lock")), h("div.grow", h("b", "Password"), h("small", M.passwordChanged ? "Last changed " + M.passwordChanged + "." : "Your own password.")), pwBtn),
       h("div.ck-divider"), h("div", h("b.ck-pf-sub", "Where I am signed in"), sessBox),
-      h("p.ck-hint", "Changes to your sign-in settings are written to the audit log.")], { icon: "shield" });
+      null], { icon: "shield" });
     drawMfa(); drawSess();
 
     function mfaStart(ev) { var b = ev.currentTarget; CK.busy(b, true);

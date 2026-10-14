@@ -6,24 +6,8 @@
   if (document.documentElement.getAttribute("data-ui") !== "classic") return;
   var HERE = (location.pathname.split("/").pop() || "").replace(/\.html$/, "");
   var S = function (d) { return '<svg class="c-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>"; };
-  var IC = {
-    "my queue": '<path d="M4 13h4l2 3h4l2-3h4"/><path d="M5.5 6.5 4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5l-1.5-6.5A2 2 0 0 0 16.6 5H7.4a2 2 0 0 0-1.9 1.5z"/>',
-    applications: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
-    "new application": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/>',
-    "review queue": '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1M9 12l2 2 4-4"/>',
-    "counter-offers": '<path d="M7 7h11l-3-3M17 17H6l3 3"/>',
-    "disbursement queue": '<rect x="3" y="7" width="18" height="11" rx="2"/><circle cx="12" cy="12.5" r="2.5"/><path d="M6 10.5v.01M18 14.5v.01"/>',
-    "loan accounts": '<path d="M4 7a2 2 0 0 1 2-2h11v4"/><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M16 14.5h.01"/>',
-    payments: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/>',
-    notifications: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
-    reports: '<path d="M4 20h16M7 16v-4M12 16V8M17 16v-7"/>',
-    "audit log": '<path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6z"/><path d="M9 12l2 2 4-4"/>',
-    rules: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
-    system: '<rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01M8 16.5h.01"/>',
-    "users and roles": '<circle cx="9" cy="8" r="3.5"/><path d="M3 20c.7-3.4 3-5 6-5s5.3 1.6 6 5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 15c1.6.6 2.6 2.3 3 5"/>',
-    "my profile": '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
-    more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>'
-  };
+  var IC = window.CALMS_IC || {};   /* the CALMS icons (look.js) */
+
   var ALIAS = { queue: "my queue", "disbursement": "disbursement queue", release: "disbursement queue", accounts: "loan accounts", notices: "notifications", users: "users and roles", audit: "audit log", offers: "counter-offers", review: "review queue", new: "new application", "sign out": null };
   function icon(label) { var k = String(label || "").replace(/\s*\d+\s*$/, "").trim().toLowerCase(); k = ALIAS.hasOwnProperty(k) ? ALIAS[k] : k; return k && IC[k] ? S(IC[k]) : ""; }
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
@@ -72,7 +56,7 @@
     /* ---- the top bar ---- */
     var main = document.querySelector("main"); if (!main) return;
     var top = el("header", "c-top"), crumb = el("span", "c-crumb", "GR8 Lending Company · CALMS"), right = el("div", "c-right");
-    var date = el("span", "c-chip c-date"); date.innerHTML = S('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>');
+    var date = el("span", "c-chip c-date"); date.innerHTML = S(IC.cal);
     date.appendChild(document.createTextNode(new Date().toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" })));
     var bell = el("a", "c-chip c-bell"); bell.href = "notifications.html"; bell.setAttribute("aria-label", "Notifications"); bell.innerHTML = S(IC.notifications);
     right.appendChild(date); right.appendChild(bell); top.appendChild(crumb); top.appendChild(right); main.insertBefore(top, main.firstChild);
@@ -142,16 +126,16 @@
       hd.appendChild(el("p", "", (Q.title || "") + (ME && ME.user && ME.user.branch ? " · " + ME.user.branch + " branch" : "") + " · " + (items.length ? items.length + " thing" + (items.length > 1 ? "s" : "") + " waiting on you" : "nothing waiting on you")));
       hello.appendChild(hd); dash.appendChild(hello);
       var stats = el("ul", "c-stats");
-      stats.appendChild(stat("Waiting on you", String(items.length), "In your queue now", "#9a2f24", IC["my queue"], 1));
-      stats.appendChild(stat("Over " + Q.limitHours + " hours", String(late.length), late.length ? "The Operations Manager is told" : "Nothing overdue", "#c9821b", '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', 2));
-      stats.appendChild(stat("Oldest", items.length ? hrs(oldest) : "–", "At one step", "#2c5e8a", '<path d="M7 3h10M7 21h10M8 3c0 5 8 6 8 9s-8 4-8 9M16 3c0 5-8 6-8 9"/>', 3));
-      var ex = Q.extra || ["Unread notices", Q.unread]; stats.appendChild(stat(ex[0], String(ex[1] == null ? "–" : ex[1]), "Today", "#2f7a4f", '<path d="M5 12.5l4.5 4.5L19 7.5"/>', 4));
+      stats.appendChild(stat("Waiting on you", String(items.length), "", "#9a2f24", IC["my queue"], 1));
+      stats.appendChild(stat("Over " + Q.limitHours + " hours", String(late.length), "", "#c9821b", IC.clock, 2));
+      stats.appendChild(stat("Oldest", items.length ? hrs(oldest) : "–", "", "#2c5e8a", IC.hourglass, 3));
+      var ex = Q.extra || ["Unread notices", Q.unread]; stats.appendChild(stat(ex[0], String(ex[1] == null ? "–" : ex[1]), "", "#2f7a4f", IC.done, 4));
       dash.appendChild(stats);
       var panel = el("section", "c-panel c-slide"); panel.style.setProperty("--i", 5);
       var ph = el("div", "c-phead"); ph.appendChild(el("h2", "", "Waiting on you"));
       var fl = el("div", "c-filters"); fl.setAttribute("role", "group"); fl.setAttribute("aria-label", "Show");
       var kinds = [["all", "All", items.length]].concat(Object.keys(Q.kinds || {}).map(function (k) { return [k, Q.kinds[k], items.filter(function (x) { return x.kind === k; }).length]; }).filter(function (k) { return k[2]; }));
-      kinds.forEach(function (k) { var b = el("button", "", k[1]); b.type = "button"; b.setAttribute("aria-pressed", String(filter === k[0])); b.appendChild(el("em", "", String(k[2]))); b.addEventListener("click", function () { filter = k[0]; draw(false); }); fl.appendChild(b); });
+      kinds.forEach(function (k) { var b = el("button", "c-f", k[1]); b.type = "button"; b.setAttribute("aria-pressed", String(filter === k[0])); b.appendChild(el("em", "", String(k[2]))); b.addEventListener("click", function () { filter = k[0]; draw(false); }); fl.appendChild(b); });
       ph.appendChild(fl); panel.appendChild(ph);
       var show = items.filter(function (x) { return filter === "all" || x.kind === filter; }).sort(function (a, b) { return b.hours - a.hours; });
       if (!show.length) panel.appendChild(el("p", "c-empty", items.length ? "Nothing of this kind." : "All clear. Nothing is waiting on you right now."));

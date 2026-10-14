@@ -124,7 +124,7 @@
     var fitB = CK.btn("Largest amount inside " + POL.dtiSoft + "%", { kind: "soft", icon: "chart", on: function () { S.amt = fitAmt(S.term); paint(); CK.toast(CK.peso(S.amt) + " is the largest amount over " + S.term + " months that keeps debt-to-income at or under " + POL.dtiSoft + "%" + (COLL ? " and loan-to-value inside the ceiling." : "."), "blue"); } });
     var bench = CK.card("What-if bench", h("div.ck-bench",
       h("div.ck-stack.ck-benchctl", h("div.ck-field", h("label", "Amount ", amtOut), range, h("div.ck-rangeends", h("span", CK.peso(MIN)), h("span", CK.peso(MAX)))), CK.field("Term", term),
-        h("div.ck-actions", resetB, fitB), h("p.ck-hint", "Moving these changes nothing on record. The saved assessment is always at the terms the borrower asked for.")),
+        h("div.ck-actions", resetB, fitB), null),
       sumx), { icon: "edit", tools: h("span.ck-sm", "try terms before you decide") });
 
     /* ---- tradelines ---- */

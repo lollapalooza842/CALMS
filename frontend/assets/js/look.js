@@ -9,6 +9,69 @@
    one that fades in, so a frame without the side rail made the rail blink pale. Hold the first frame until the page's
    main area has begun, by which time the whole rail (and its kept copy) is in. */
 if (/\/pages\//.test(location.pathname) && document.readyState === "loading" && !document.getElementById("calmsMain")) document.write('<link rel="expect" href="#calmsMain" blocking="render">');
+/* The CALMS icons: drawn for this app, on a 24px grid. Each has a soft filled body (class ic-f, the ink at low
+   strength) under a crisp line, and most carry one small amber mark (class ic-a), the CALMS coin. Shared by the
+   classic look's pages (kit.js), its sidebar and top bar (classic-app.js). Simple controls (plus, chevrons) stay plain. */
+window.CALMS_IC = (function () {
+  var DOC = 'M14 3H7.5A1.5 1.5 0 0 0 6 4.5v15A1.5 1.5 0 0 0 7.5 21h10a1.5 1.5 0 0 0 1.5-1.5V8z',
+      TRI = 'M10.3 4.3a2 2 0 0 1 3.4 0l7.4 12.8a2 2 0 0 1-1.7 3H4.6a2 2 0 0 1-1.7-3z',
+      SHIELD = 'M12 3 5 5.8v5.7c0 4.3 2.9 7.5 7 9.5 4.1-2 7-5.2 7-9.5V5.8z',
+      BELL = 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z',
+      TRAY = 'M4 13.5l1.7-6.8A2 2 0 0 1 7.6 5h8.8a2 2 0 0 1 1.9 1.7L20 13.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z',
+      f = function (d) { return '<path class="ic-f" d="' + d + '"/><path d="' + d + '"/>'; },
+      a = function (x, y, r) { return '<circle class="ic-a" cx="' + x + '" cy="' + y + '" r="' + (r || 1.5) + '"/>'; };
+  var I = {
+    search: '<circle class="ic-f" cx="10.5" cy="10.5" r="6.5"/><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/>' + a(8.6, 8.6, 1.3),
+    plus: '<path d="M12 5v14M5 12h14"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', x: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>', down: '<path d="M6 9l6 6 6-6"/>', up: '<path d="M6 15l6-6 6 6"/>',
+    dots: '<circle cx="5.5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/>' + a(18.5, 12, 1.6),
+    doc: f(DOC) + '<path d="M14 3v4a1 1 0 0 0 1 1h4M13 14h3"/>' + a(10, 14),
+    file: f(DOC) + '<path d="M14 3v4a1 1 0 0 0 1 1h4M9.5 12.5h6M9.5 16h3.5"/>' + a(16, 16, 1.2),
+    upload: f('M4 14h16v4.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z') + '<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/>' + a(16.5, 17, 1),
+    download: f('M4 14h16v4.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z') + '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/>' + a(16.5, 17, 1),
+    eye: f('M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z') + '<circle cx="12" cy="12" r="3"/>' + a(12, 12, 1.2),
+    clock: '<circle class="ic-f" cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' + a(12, 12, 1.2),
+    hourglass: f('M7 3.5h10c0 4.5-3 6-5 8.5-2-2.5-5-4-5-8.5zM7 20.5h10c0-4.5-3-6-5-8.5-2 2.5-5 4-5 8.5z') + a(12, 17.6, 1.4),
+    alert: f(TRI) + '<path d="M12 9.5v4"/>' + a(12, 16.6, 1.2),
+    info: '<circle class="ic-f" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/>' + a(12, 7.8, 1.2),
+    user: '<circle class="ic-f" cx="12" cy="8" r="4"/><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.8 4.2-6 7.5-6s6.3 2.2 7.5 6"/>' + a(18.5, 15.5, 1.3),
+    users: '<circle class="ic-f" cx="9" cy="8" r="3.5"/><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.7-3.4 3-5 6-5s5.3 1.6 6 5M16 4.6a3.4 3.4 0 0 1 0 6.8M17.5 15c1.8.6 3 2.4 3.4 5"/>' + a(20, 7.5, 1.3),
+    peso: '<circle class="ic-f" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M10 16.8V7.6h2.4a2.3 2.3 0 0 1 0 4.6H10M8.4 9.4h7M8.4 10.8h7"/>' + a(16.6, 16.4, 1.2),
+    bank: f('M3.5 9.5 12 4l8.5 5.5z') + '<path d="M5.5 9.5v8M10 9.5v8M14 9.5v8M18.5 9.5v8M3.5 20h17"/>' + a(12, 7.4, 1.1),
+    shield: f(SHIELD) + '<path d="M9 12l2.2 2.2L15.5 10"/>',
+    lock: '<rect class="ic-f" x="4.5" y="10" width="15" height="10.5" rx="2.5"/><rect x="4.5" y="10" width="15" height="10.5" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/>' + a(12, 15.2),
+    edit: f('M15 5l4 4L9 19H5v-4z') + '<path d="M13 7l4 4"/>' + a(19, 19.5, 1.2),
+    send: f('M4 11.5 20 4l-7.5 16-2.3-6.2z') + '<path d="M10.2 13.8 20 4"/>',
+    chart: '<rect class="ic-f" x="4.5" y="11" width="4" height="8.5" rx="1.2"/><rect x="4.5" y="11" width="4" height="8.5" rx="1.2"/><rect class="ic-f" x="10" y="7" width="4" height="12.5" rx="1.2"/><rect x="10" y="7" width="4" height="12.5" rx="1.2"/><rect class="ic-a" x="15.5" y="3.5" width="4" height="16" rx="1.2"/>',
+    list: '<path d="M9.5 7H20M9.5 12H20M9.5 17H16"/>' + a(5, 7, 1.4) + '<circle cx="5" cy="12" r="1"/><circle cx="5" cy="17" r="1"/>',
+    refresh: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4.2h-4.2"/>' + a(12, 12, 1.4),
+    cal: '<rect class="ic-f" x="4" y="5.5" width="16" height="14.5" rx="2.5"/><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>' + a(15.5, 15),
+    bell: f(BELL) + '<path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>' + a(17.8, 5.6, 1.9),
+    wallet: '<rect class="ic-f" x="3.5" y="7" width="17" height="13" rx="2.5"/><rect x="3.5" y="7" width="17" height="13" rx="2.5"/><path d="M6.5 7l9-3.5 1.3 3.5M20.5 11.3h-3.7a2.2 2.2 0 0 0 0 4.4h3.7"/>' + a(16.8, 13.5, 1.1),
+    flag: f('M5.5 4h11l-2 4 2 4h-11z') + '<path d="M5.5 21V4"/>' + a(5.5, 21, 1.3),
+    swap: '<path d="M7 8h12l-3.5-3.5M17 16H5l3.5 3.5"/>' + a(5, 8, 1.4) + a(19, 16, 1.4),
+    gear: '<circle class="ic-f" cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="5"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>' + a(12, 12, 1.8),
+    server: '<rect class="ic-f" x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="4" width="16" height="7" rx="2"/><rect class="ic-f" x="4" y="13" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M11 7.5h5M11 16.5h5"/>' + a(7.5, 7.5, 1.1) + a(7.5, 16.5, 1.1),
+    mail: '<rect class="ic-f" x="3" y="5.5" width="18" height="13" rx="2.5"/><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3.5 7.5 12 13l8.5-5.5"/>' + a(12, 13, 1.4),
+    phone: '<rect class="ic-f" x="7" y="3" width="10" height="18" rx="2.5"/><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M10.5 6h3"/>' + a(12, 17.5, 1.2),
+    key: '<circle class="ic-f" cx="8" cy="15" r="4.5"/><circle cx="8" cy="15" r="4.5"/><path d="M11.3 11.7 19.5 3.5M16.5 6.5l2 2M14.3 8.7l1.8 1.8"/>' + a(8, 15, 1.4),
+    stamp: f('M5 15.5h14V19H5z') + '<path d="M9.5 15.5V12c0-1.2-1.5-2.2-1.5-4.5a4 4 0 0 1 8 0c0 2.3-1.5 3.3-1.5 4.5v3.5M6.5 21.5h11"/>' + a(12, 7.5, 1.3),
+    done: '<circle class="ic-f" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M7.8 12.3l2.8 2.8 5.6-5.6"/>',
+    tray: f(TRAY) + '<path d="M4 13.5h4.2l1.6 2.5h4.4l1.6-2.5H20"/>' + a(12, 9.5, 1.6),
+    docs: '<path class="ic-f" d="M9 3.5h6l4 4v10a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 8 17.5v-12.5A1.5 1.5 0 0 1 9 3.5z"/><path d="M15 3.5H9.5A1.5 1.5 0 0 0 8 5v12.5A1.5 1.5 0 0 0 9.5 19h8a1.5 1.5 0 0 0 1.5-1.5V7.5zM15 3.5v4h4M5 7.5v12A1.5 1.5 0 0 0 6.5 21H15"/>' + a(13.5, 13, 1.3),
+    newdoc: f(DOC) + '<path d="M14 3v4a1 1 0 0 0 1 1h4M12.5 11.5v6M9.5 14.5h6"/>',
+    clipboard: '<rect class="ic-f" x="5.5" y="4.5" width="13" height="16.5" rx="2"/><rect x="5.5" y="4.5" width="13" height="16.5" rx="2"/><path d="M9 4.5V3.2h6v1.3M9 13l2 2 4-4"/>' + a(15, 18, 1.1),
+    note: '<rect class="ic-f" x="2.5" y="6.5" width="19" height="11" rx="2"/><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/>' + a(5.7, 9.6, 1.1) + a(18.3, 14.4, 1.1),
+    card: '<rect class="ic-f" x="3" y="5.5" width="18" height="13" rx="2.5"/><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 14.5h4"/>' + a(17, 14.5, 1.3),
+    sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle class="ic-f" cx="15" cy="7" r="2.3"/><circle cx="15" cy="7" r="2.3"/>' + a(9, 17, 2.3),
+    ledger: f(SHIELD) + '<path d="M9 9.5h6M9 12.5h6M9 15.5h3.5"/>' + a(15, 15.5, 1.1)
+  };
+  /* the sidebar's names for them */
+  I["my queue"] = I.tray; I.applications = I.docs; I["new application"] = I.newdoc; I["review queue"] = I.clipboard; I["counter-offers"] = I.swap;
+  I["disbursement queue"] = I.note; I["loan accounts"] = I.wallet; I.payments = I.card; I.notifications = I.bell; I.reports = I.chart; I["audit log"] = I.ledger;
+  I.rules = I.sliders; I.system = I.server; I["users and roles"] = I.users; I["my profile"] = I.user; I.more = I.dots;
+  return I;
+})();
 (function () {
   var ui = ""; try { ui = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1] || localStorage.getItem("calms-ui") || "western"; } catch (e) {}
   var KEY = "calms-rail:" + ui, saved = null; try { saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (e) {}
@@ -72,7 +135,7 @@ if (/\/pages\//.test(location.pathname) && document.readyState === "loading" && 
   /* the western page's own sheet would fight the rebuilt page */
   if (own) [].forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), function (l) { if (l.href.split("/").pop() === page + ".css") l.media = "not all"; });
   /* written into <head> while it is still being read, so the browser waits for them before drawing anything */
-  var css = (document.querySelector('link[href$="/base.css"]') ? [] : ["base.css"]).concat(["classic-fonts.css", "classic-app.css", "classic-ui.css", "classic-pages.css"]);
+  var css = (document.querySelector('link[href$="/base.css"]') ? [] : ["base.css"]).concat(["classic-fonts.css", "classic-app.css", "classic-ui.css", "classic-pages.css", "classic-neo.css"]);
   /* the type, fetched at once: the fonts wait up to a moment for these (font-display: optional in classic-fonts.css), so
      every page's first frame is drawn in Lexend and Inter, never in a stand-in font that then swaps (the sidebar's words
      shifting a hair on every page change) */
@@ -97,7 +160,7 @@ if (/\/pages\//.test(location.pathname) && document.readyState === "loading" && 
   window.CK_CTA = function (role) {
     var rail = document.querySelector(".rail"), c = CTA[role]; if (!rail || !c) return; var card = rail.querySelector(".c-card-cta"); if (card && card.dataset.role === role) return;
     if (!card) { card = document.createElement("div"); card.className = "c-card-cta"; rail.appendChild(card); }
-    card.dataset.role = role; card.innerHTML = "<b>" + c[0] + "</b><p>" + c[1] + '</p><a class="c-cta" href="' + c[3] + '.html" title="' + c[2] + '">' + SVG(c[3] === "new-application" || c[3] === "users-roles" ? '<path d="M12 5v14M5 12h14"/>' : '<path d="M5 12h14M13 6l6 6-6 6"/>') + "<span>" + c[2] + "</span></a>";
+    card.dataset.role = role; card.innerHTML = "<b>" + c[0] + '</b><a class="c-cta" href="' + c[3] + '.html" title="' + c[2] + '">' + SVG(c[3] === "new-application" || c[3] === "users-roles" ? '<path d="M12 5v14M5 12h14"/>' : '<path d="M5 12h14M13 6l6 6-6 6"/>') + "<span>" + c[2] + "</span></a>";
     try { sessionStorage.setItem("calms-role", role); } catch (e) {} };
   function dress(rail) {
     if (rail.dataset.dressed) return; rail.dataset.dressed = "1";

@@ -70,7 +70,7 @@
         if (LIVE.catalog[i][0] === "id") c.title = "A government ID is always needed.";
         inp.addEventListener("change", function () { S.prod[prod].docs[i] = inp.checked ? 1 : 0; c.classList.toggle("ck-dirty", S.prod[prod].docs[i] !== B.prod[prod].docs[i]); live(); });
         c.classList.toggle("ck-dirty", S.prod[prod].docs[i] !== B.prod[prod].docs[i]); return c; }));
-      var box = h("div.ck-stack.ck-afade", form, h("div.ck-field", h("label", "Papers the borrower must hand in"), docs, h("p.ck-hint", "The signed consent form is always required, so it is not in this list.")));
+      var box = h("div.ck-stack.ck-afade", form, h("div.ck-field", h("label", "Papers the borrower must hand in"), docs, null));
       prodBody.appendChild(box); prodTabs(); mark(); }
 
     /* ---- the three tracks ---- */
@@ -110,7 +110,7 @@
       var keepFocus = whyI && document.activeElement === whyI, caret = keepFocus ? whyI.selectionStart : 0;
       if (c.length === lastN && c.length && !tried) { /* only the list of changes moves */ var ul = pubCard.querySelector(".ck-prchg"); if (ul) { ul.replaceWith(chgList(c)); return; } }
       lastN = c.length; pubCard.textContent = "";
-      if (RO) { pubCard.appendChild(CK.card("Read only", [h("p.ck-ap", "You can read the rules and try them on a sample applicant. Only the System Administrator can change them.")], { icon: "lock", cls: "ck-panelin" })); return; }
+      if (RO) { pubCard.appendChild(CK.card("Read only", [h("p.ck-ap", "Only the System Administrator can change these.")], { icon: "lock", cls: "ck-panelin" })); return; }
       if (!c.length) { pubCard.appendChild(CK.card("Nothing to publish", [h("p.ck-ap", "Change a term, a paper or a line. Your changes collect here, and nothing takes effect until you publish.")], { icon: "send", cls: "ck-panelin" })); return; }
       whyI = CK.textarea(reason, "What changed in the business, in a sentence"); var fWhy = CK.field("Why are you changing it? This goes in the audit log.", whyI, { req: true });
       if (tried && reason.trim().length < 10) fWhy.setError("Give a reason of at least 10 characters.");

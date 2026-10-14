@@ -158,12 +158,12 @@
       CK.head({ crumbs: [["Applications", "applications.html"], [REF, "application-detail.html?ref=" + encodeURIComponent(REF)], ["Counter-offers"]], title: "Counter-offers", status: CK.pill(ST[0], ST[1]),
         sub: L.borrower + " · " + L.product + " · asked for " + CK.peso(ASK.amt) + " over " + ASK.term + " months", actions: [CK.btn("Application", { kind: "ghost", icon: "doc", href: "application-detail.html?ref=" + encodeURIComponent(REF) })] }),
       stats,
-      CK.card("On the table", [h("p.ck-sm", "In the order they were made. Choose an offer to compare it with her request."), table], { icon: "swap" }),
+      CK.card("On the table", [null, table], { icon: "swap" }),
       h("div.ck-grid", { style: { "--cols": 2 } }, CK.card("She asked for", shA, { icon: "user", tools: h("span.ck-sm", "her request") }),
         h("section.ck-card.ck-in", h("div.ck-cardhead", h("h2", CK.ic("peso"), titleB), subB), h("div.ck-cardbody", shB))),
       CK.card("How each is paid down", [legend, chartBox, h("div.ck-actions", tglB), schedWrap], { icon: "chart", tools: h("span.ck-sm", "outstanding balance, month by month") }),
       h("div.ck-grid.side2", CK.card(showDraft ? "Your move: offer " + (O.length + 1) : "Next move", move, { icon: showDraft ? "edit" : "next" }), logCard),
-      O.length ? CK.card("Offer sheet for the borrower", [h("p.ck-sm", "Printed and carried by the sales agent. It shows the offer you choose on the table above."), h("div.ck-actions", prtB), sheetWrap], { icon: "file" }) : null,
+      O.length ? CK.card("Offer sheet for the borrower", [null, h("div.ck-actions", prtB), sheetWrap], { icon: "file" }) : null,
       h("p.ck-foot.ck-in", "An offer with an answer recorded against it is sealed. It cannot be changed; a revision goes out as a new offer.")
     ]);
     drawTable(); drawMove(); compare();

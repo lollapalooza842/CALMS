@@ -91,7 +91,7 @@
       var list = h("div.ck-picklist.ck-urroles", roleOpts.map(function (r) { var n = U.filter(function (u) { return u.role === r[0] && u.status !== "off"; }).length;
         var b = h("button.ck-pick" + (roleF === r[0] ? ".is-sel" : ""), { type: "button", on: { click: function () { roleF = roleF === r[0] ? "" : r[0]; roleSel.value = roleF; apply(); drawSide(); } } },
           h("span.ck-urrolenum", String(n)), h("div.grow", h("b", r[1]), h("small", KEYS[r[0]].join(" · "))), needMfa(r[0]) ? h("span.ck-urshield", { title: "Second factor required" }, CK.ic("shield")) : null); return b; }));
-      return CK.card("Roles and their keys", [h("p.ck-sm", "One role each. The role decides which keys a person holds. Pick a role to see only its people; pick a person to change their access."), list,
+      return CK.card("Roles and their keys", [null, list,
         h("div.ck-legend", h("span", CK.ic("shield"), "Second factor at sign-in is required"))], { icon: "key", cls: "ck-panelin" }); }
     function personCard(u) {
       var self = u.username === ME, off = u.status === "off", body = [];

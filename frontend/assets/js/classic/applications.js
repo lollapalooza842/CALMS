@@ -26,7 +26,7 @@
       return !q || (a.reference + " " + a.borrower).toLowerCase().indexOf(q) >= 0; }); }
     var prodSel = CK.select([["", "All products"]].concat(products.map(function (p) { return [p, p]; })), ""); prodSel.addEventListener("change", function () { prod = prodSel.value; apply(); });
     CK.render([
-      CK.head({ title: "Applications", sub: "Every application, where it stands and how long it has waited. Click a stage to see only those.", actions: maker ? [CK.btn("New application", { kind: "primary", icon: "plus", href: "new-application.html" })] : null }),
+      CK.head({ title: "Applications", sub: "", actions: maker ? [CK.btn("New application", { kind: "primary", icon: "plus", href: "new-application.html" })] : null }),
       pipe,
       CK.card("All applications", [h("div.ck-toolbar", CK.search("Search a name or APP number", function (v) { q = v; apply(); }), prodSel, segC), tbl], { icon: "list" })
     ]);

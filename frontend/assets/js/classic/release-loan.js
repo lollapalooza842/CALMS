@@ -47,7 +47,7 @@
     /* ---- the side: the money, the agreement, the borrower ---- */
     var netDd = h("dd.ck-big", P(NET));
     var money = CK.card("Net proceeds", [h("dl.ck-dl.rows", h("div", h("dt", "Approved amount"), h("dd", P(AMT))), h("div.neg", h("dt", "Less: processing charge, " + Math.round(FEE * 1000) / 10 + "%"), h("dd", "− " + P(fee))), h("div.tot", h("dt", "Net proceeds to release"), netDd)),
-      h("p.ck-sm", "Releasing money does not change the approved terms. Every release is written to the audit log with your name.")], { icon: "peso" });
+      null], { icon: "peso" });
     var sf = R.signedFile;
     var agree = CK.card("Signed agreement", [CK.dl([["Status", R.agreementLocked ? CK.pill("Locked", "green") : CK.pill("Not on file", "red")], ["Signed by her", R.signedOn ? CK.date(R.signedOn) : "–"], ["Locked by", R.lockedBy ? R.lockedBy + ", " + CK.dt(R.lockedAt) : "–"],
         ["Fingerprint", sf && sf.sha256 ? h("span.ck-seal", sf.sha256.slice(0, 24) + "…") : "–"]], "one"),

@@ -82,7 +82,7 @@
       log("viewed", s, d, vi);
       var vers = s.v.length > 1 ? h("div.ck-stack.ck-tight", h("b.ck-strong", "Versions"), h("ul.ck-vers", s.v.map(function (x, i) { var lastI = i === s.v.length - 1;
         return h("li", h("button", { type: "button", "aria-pressed": String(i === vi), on: { click: function () { view(id, i); } } }, h("span.ck-vtag", "v" + (i + 1)), h("span.grow", lastI ? x.name : h("s", x.name)), h("span.ck-sm", lastI ? "current" : CK.dt(x.at)))); })),
-        h("p.ck-hint", "Superseded versions stay on file and can still be read.")) : h("p.ck-hint", "One version on file.");
+        null) : h("p.ck-hint", "One version on file.");
       var openBtn; openBtn = CK.btn("Open", { kind: "ghost", icon: "eye", title: "Open in a new tab", on: function () { window.open(src, "_blank", "noopener"); log("opened", s, d, vi); } });
       viewer.textContent = "";
       viewer.appendChild(h("section.ck-card.ck-viewer.ck-panelin", h("div.ck-cardhead", h("h2", CK.ic("doc"), s.label), openBtn),
@@ -98,13 +98,13 @@
     goBtn = CAN ? CK.btn("Send to Encode and verify", { kind: "primary", icon: "next", on: function () { var m = missing();
       if (m.length) { CK.toast("Not yet. " + m.length + " required paper" + (m.length > 1 ? "s are" : " is") + " still missing: " + m.map(function (s) { return lc(s.label); }).join(", ") + ".", "red"); return; }
       CK.go("encode-verify.html?ref=" + A.reference); } }) : null;
-    var note = !CAN ? CK.note(ME.role === "loan_processor" || ME.role === "sales_agent" ? "Papers can only be filed before the application goes to review. You may still read them." : "You may read. Only the loan processor files papers.", "blue", "lock") : null;
+    var note = !CAN ? CK.note(ME.role === "loan_processor" || ME.role === "sales_agent" ? "Papers are filed only before review." : "Only the loan processor files papers.", "blue", "lock") : null;
     CK.render([
       CK.head({ crumbs: [["Applications", "applications.html"], [A.reference, "application-detail.html?ref=" + A.reference], ["Documents"]], title: "Documents and checklist", status: CK.status(A.status),
         sub: A.borrower.name + " · " + A.product + " · " + A.reference, actions: [goBtn] }),
       CK.card(null, tally, { cls: "ck-tallycard" }),
       note,
-      h("div.ck-split", CK.card("Required papers", [list, CAN ? h("p.ck-hint", "Accepted: PDF, JPG, PNG, up to 10 MB each. Replacing a paper keeps the old version; nothing is ever deleted.") : null], { icon: "list" }), h("div.ck-sticky", viewer))
+      h("div.ck-split", CK.card("Required papers", [list, CAN ? h("p.ck-hint", "PDF, JPG or PNG, up to 10 MB.") : null], { icon: "list" }), h("div.ck-sticky", viewer))
     ]);
     drawAll();
     var first = slots.filter(function (s) { return s.v.length; })[0]; if (first && !phone()) view(first.id, first.v.length - 1); else empty();
