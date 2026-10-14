@@ -7,7 +7,7 @@ html[data-ui="classic"] {
   --c-bg: #f5f2ee; --c-card: #fff; --c-ink: #1f1712; --c-ink-2: #6b5c50; --c-ink-3: #9a8b7e; --c-line: #ece5dc;
   --c-brand: #7e221c; --c-brand-2: #9a2f24; --c-side-1: #3f2414; --c-side-2: #7e221c;
   --c-amber: #c9821b; --c-green: #2f7a4f; --c-blue: #2c5e8a; --c-gap: 24px; --c-r: 16px;
-  --c-head: "Lexend", "Segoe UI", Roboto, Arial, sans-serif; --c-body: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --c-head: "CALMS Head", "Poppins", "Segoe UI", Roboto, Arial, sans-serif; --c-body: "CALMS Text", "Manjari", "Segoe UI", Roboto, Arial, sans-serif;
   --c-shadow: 0 1px 2px rgba(31,23,18,.05), 0 6px 20px rgba(31,23,18,.06);
   /* the western tokens, retuned, so every page's own sheet comes out plain and light */
   --plank: var(--c-bg); --plank-2: var(--c-bg); --plank-line: transparent; --text: var(--c-ink); --text-soft: var(--c-ink-2);

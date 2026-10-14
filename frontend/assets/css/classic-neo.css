@@ -112,3 +112,11 @@ html[data-ui="classic"] .ck-drop { background: var(--neo) !important; border: 0 
 html[data-ui="classic"] .ck-vers button { background: var(--neo); border: 0; box-shadow: var(--neo-up-xs); }
 html[data-ui="classic"] :is(.ck-wfoot, .ck-tlfoot) { background: var(--neo); border-top-color: var(--neo-ink-line); }
 html[data-ui="classic"] .ck-detail td { background: transparent; }
+
+/* type: Poppins Bold for headings, names, figures, buttons and the sidebar's drawers; Manjari Thin for the text */
+html[data-ui="classic"] .rail .nav a .plate, html[data-ui="classic"] .rail .nav a, html[data-ui="classic"] #tabbar .tab { font-family: var(--c-head); }
+html[data-ui="classic"] :is(.ck-btn, .c-go, .c-cta, .c-filters button, .ck-seg button, .ck-tabs button) { font-family: var(--c-head); }
+/* Poppins Bold for the figures that head a tile or a card, and for every button; thin text needs darker greys to read */
+html[data-ui="classic"] main :is(.ck-btn, .c-go, .c-cta, .c-filters button, .ck-seg button, .ck-tabs button, .ck-stat b, .c-stat b, .ck-doneref),
+html[data-ui="classic"]:not(.c-own) main :is(.c-go, .c-filters button, .c-stat b, .c-panel h2, .c-fab) { font-family: var(--c-head) !important; }
+html[data-ui="classic"] { --c-ink-2: #4e4137; --c-ink-3: #74665a; }

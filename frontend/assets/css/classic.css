@@ -8,7 +8,7 @@
 
 html[data-ui="classic"] {
   --c-brand: #7e221c; --c-brand-2: #9a2f24; --c-brown: #3f2414; --c-ink: #1f1712; --c-ink-2: #5b4a3d; --c-line: #e4d9cb; --c-field: #fbf8f3;
-  --c-head: "Lexend", "Segoe UI", Roboto, Arial, sans-serif; --c-body: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --c-head: "CALMS Head", "Poppins", "Segoe UI", Roboto, Arial, sans-serif; --c-body: "CALMS Text", "Manjari", "Segoe UI", Roboto, Arial, sans-serif;
   color-scheme: light;
 }
 html[data-ui="classic"] body { background: #3f2414; }

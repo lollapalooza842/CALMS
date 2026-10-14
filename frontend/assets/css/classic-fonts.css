@@ -1,35 +1,22 @@
-/* The classic look's type: Lexend for headings, numbers and navigation (made for easy reading; clean and friendly),
-   Inter for body text, tables and forms (clear at small sizes). Both kept in the app so they work offline.
-   Both are under the SIL Open Font License; files from the Fontsource project. */
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 400; font-display: optional; src: url(../fonts/lexend-latin-400-normal.woff2) format("woff2");
+/* The classic look's type: Poppins Bold for headings, names, figures, buttons and the sidebar; Manjari Thin for the
+   text you read and type. "CALMS Head" is Poppins Bold at every weight a sheet asks for. "CALMS Text" is Manjari, with
+   the weights moved down: normal text is drawn Thin, semibold text Regular, bold text Bold, so a label that the sheets
+   mark as bold still stands out from the thin text around it. Both fonts are kept in the app so they work offline; both
+   are under the SIL Open Font License (files from Fontsource). font-display: optional (look.js preloads them), so a
+   page's first frame is drawn in these fonts, never in a stand-in. */
+@font-face { font-family: "CALMS Head"; font-style: normal; font-weight: 100 900; font-display: optional; src: url(../fonts/poppins-latin-700-normal.woff2) format("woff2");
   unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 400; font-display: optional; src: url(../fonts/lexend-latin-ext-400-normal.woff2) format("woff2");
+@font-face { font-family: "CALMS Head"; font-style: normal; font-weight: 100 900; font-display: optional; src: url(../fonts/poppins-latin-ext-700-normal.woff2) format("woff2");
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 500; font-display: optional; src: url(../fonts/lexend-latin-500-normal.woff2) format("woff2");
+@font-face { font-family: "CALMS Text"; font-style: normal; font-weight: 100 449; font-display: optional; src: url(../fonts/manjari-latin-100-normal.woff2) format("woff2");
   unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 500; font-display: optional; src: url(../fonts/lexend-latin-ext-500-normal.woff2) format("woff2");
+@font-face { font-family: "CALMS Text"; font-style: normal; font-weight: 450 649; font-display: optional; src: url(../fonts/manjari-latin-400-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "CALMS Text"; font-style: normal; font-weight: 650 900; font-display: optional; src: url(../fonts/manjari-latin-700-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "CALMS Text"; font-style: normal; font-weight: 100 449; font-display: optional; src: url(../fonts/manjari-latin-ext-100-normal.woff2) format("woff2");
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 600; font-display: optional; src: url(../fonts/lexend-latin-600-normal.woff2) format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 600; font-display: optional; src: url(../fonts/lexend-latin-ext-600-normal.woff2) format("woff2");
+@font-face { font-family: "CALMS Text"; font-style: normal; font-weight: 450 649; font-display: optional; src: url(../fonts/manjari-latin-ext-400-normal.woff2) format("woff2");
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 700; font-display: optional; src: url(../fonts/lexend-latin-700-normal.woff2) format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Lexend"; font-style: normal; font-weight: 700; font-display: optional; src: url(../fonts/lexend-latin-ext-700-normal.woff2) format("woff2");
-  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: optional; src: url(../fonts/inter-latin-400-normal.woff2) format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: optional; src: url(../fonts/inter-latin-ext-400-normal.woff2) format("woff2");
-  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: optional; src: url(../fonts/inter-latin-500-normal.woff2) format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: optional; src: url(../fonts/inter-latin-ext-500-normal.woff2) format("woff2");
-  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: optional; src: url(../fonts/inter-latin-600-normal.woff2) format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: optional; src: url(../fonts/inter-latin-ext-600-normal.woff2) format("woff2");
-  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: optional; src: url(../fonts/inter-latin-700-normal.woff2) format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: optional; src: url(../fonts/inter-latin-ext-700-normal.woff2) format("woff2");
+@font-face { font-family: "CALMS Text"; font-style: normal; font-weight: 650 900; font-display: optional; src: url(../fonts/manjari-latin-ext-700-normal.woff2) format("woff2");
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }

@@ -1,5 +1,5 @@
 /* The classic look's components (CK in assets/js/classic/kit.js). Every rebuilt page is made of these:
-   an even 24px rhythm, white cards on a warm grey, Lexend for headings and figures, Inter for the rest,
+   an even 24px rhythm, white cards on a warm grey, Poppins Bold for headings, Manjari Thin for the rest,
    and motion that is quick and soft (things rise 12px and fade in, one after another). */
 
 /* page to page: the old page stays fully drawn underneath while the new one fades in over it. (Fading both at once let
@@ -271,9 +271,9 @@ html.c-own body.calms-down main { visibility: visible !important; }
 html[data-ui="classic"] #calmsDown { background: rgba(36, 19, 10, .38); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); animation: ck-fadein .25s ease both; }
 html[data-ui="classic"] #calmsDown > div { background: #fff; color: #2a1d15; border: 0; outline: 0; border-radius: 18px; padding: 26px 26px 20px; font: 15px/1.55 Inter, system-ui, sans-serif;
   box-shadow: 0 24px 60px rgba(36, 19, 10, .28); animation: ck-modalin .35s cubic-bezier(.22, 1, .36, 1) both; }
-html[data-ui="classic"] #calmsDown h2 { font: 600 20px/1.3 Lexend, Inter, sans-serif; margin: 0 0 8px; }
+html[data-ui="classic"] #calmsDown h2 { font: 700 21px/1.3 var(--c-head); margin: 0 0 8px; }
 html[data-ui="classic"] #calmsDown p { color: #6b5c50; margin: 0 0 18px; }
-html[data-ui="classic"] #calmsDown a { border: 0; border-radius: 10px; padding: 10px 16px; font: 600 14px/1 Inter, sans-serif; background: #7e221c; color: #fff; }
+html[data-ui="classic"] #calmsDown a { border: 0; border-radius: 10px; padding: 10px 16px; font: 600 14px/1 var(--c-body); background: #7e221c; color: #fff; }
 html[data-ui="classic"] #calmsDown a + a { background: #f3ece4; color: #2a1d15; }
 @keyframes ck-fadein { from { opacity: 0; } }
 @keyframes ck-modalin { from { opacity: 0; transform: translateY(14px) scale(.98); } }
