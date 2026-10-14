@@ -20,6 +20,12 @@
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k) || ""; if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return ""; } }
   if (atRoot && ls("calms-uid")) { ls("calms-uid-last", ls("calms-uid")); ls("calms-uid", null); }
   function uid() { return ls("calms-uid") || ls("calms-uid-last"); }
+  /* Once CALMS has found it is offline, every page (and every tab) knows at once, and skips the waiting: pages, files
+     and data come straight from the copies on this computer. Only the quiet check in the background asks the server,
+     and the moment it answers, everything goes back to live. Kept for 12 hours at most. */
+  var mark = Number(ls("calms-down") || 0), firstBeat = false;
+  if (mark && Date.now() - mark < 12 * 3600000) { down = true; firstBeat = true; } else if (mark) ls("calms-down", null);
+  function tellWorker(isDown) { try { var sw = navigator.serviceWorker; if (sw && sw.controller) sw.controller.postMessage({ calms: "net", down: isDown }); } catch (e) {} }
 
   /* ---- the store on this computer (IndexedDB): "cache" for copies of reads, "outbox" for saved work ---- */
   var dbp = null;
@@ -131,17 +137,23 @@
 
   /* ---- going down and coming back ---- */
   var flash = null;
-  function goDown() { if (!down) { down = true; flash = null; } paint(); heartbeat(); }
+  function goDown() { if (!down) { down = true; flash = null; } if (!ls("calms-down")) ls("calms-down", String(Date.now())); tellWorker(true); paint(); heartbeat(); }
   function heartbeat() { clearTimeout(beat); if (!down) return;
     beat = setTimeout(function () {
       var ctl = window.AbortController ? new AbortController() : null, t = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
       fetch("/api/health", { cache: "no-store", signal: ctl ? ctl.signal : undefined })
         .then(function (r) { clearTimeout(t); if (r.ok) comeBack(); else heartbeat(); }, function () { clearTimeout(t); heartbeat(); });
-    }, navigator.onLine ? 4000 : 8000); }
-  function comeBack() { if (!down) return; down = false; slow = 0; probing = 0; stale = 0; flash = { text: "Back online.", until: Date.now() + 4000 }; paint(); setTimeout(paint, 4100);
+    }, firstBeat ? (firstBeat = false, 300) : navigator.onLine ? 4000 : 8000); }   /* a page opened while offline checks once right away */
+  function comeBack(quiet) { if (!down) return; var wasStale = stale; down = false; slow = 0; probing = 0; stale = 0; ls("calms-down", null); tellWorker(false);
+    flash = { text: wasStale ? "Back online. This page still shows the copy from " + hhmm(wasStale) + "." : "Back online.", until: Date.now() + (wasStale ? 15000 : 4000), refresh: !!wasStale }; paint(); setTimeout(paint, wasStale ? 15100 : 4100);
+    if (quiet) return;
     if (failedLoad && document.querySelector("#calmsDown, [data-offline-error]")) { setTimeout(function () { location.reload(); }, 600); return; }   /* the page could not open offline: open it now */
     flush(); }
   window.addEventListener("offline", goDown);
+  /* another tab found out first */
+  window.addEventListener("storage", function (e) { if (e.key !== "calms-down") return; if (e.newValue && !down) goDown(); else if (!e.newValue && down) { comeBack(true); flush(); } });
+  if (navigator.serviceWorker) navigator.serviceWorker.addEventListener("controllerchange", function () { tellWorker(down); });
+  window.addEventListener("load", function () { tellWorker(down); });
   window.addEventListener("online", function () { clearTimeout(beat); beat = setTimeout(function () { down = true; heartbeat(); }, 0); });
   if (down) heartbeat();
 
@@ -187,12 +199,12 @@
     else if (slow) { text = "The server is slow to answer (it may be waking up). Showing copies from " + hhmm(stale) + " until it does."; tone = "busy"; }
     else if (sending) { text = "Back online. Sending " + n + " saved item" + (n === 1 ? "" : "s") + "…"; tone = "busy"; }
     else if (needSignIn && n) { text = "Sign in again to send " + n + " saved item" + (n === 1 ? "" : "s") + ". They stay on this computer until then."; act = "Sign in"; }
-    else if (flash && Date.now() < flash.until) { text = flash.text; tone = "ok"; }
+    else if (flash && Date.now() < flash.until) { text = flash.text; tone = "ok"; if (flash.refresh) act = "Refresh"; }
     else if (look) { text = look + " saved item" + (look === 1 ? " needs" : "s need") + " your look."; act = "See"; }
     else if (n) { text = n + " saved item" + (n === 1 ? " is" : "s are") + " waiting to send."; act = "See"; }
     bar.hidden = !text; bar.className = tone; bar.textContent = ""; if (!text) return;
     bar.appendChild(el("i", "dot")); bar.appendChild(el("span", "", text));
-    if (act) { var b = el("button", "", act); b.type = "button"; b.addEventListener("click", function () { if (act === "Sign in") location.href = base + "index.html#signin"; else openPanel(); }); bar.appendChild(b); }
+    if (act) { var b = el("button", "", act); b.type = "button"; b.addEventListener("click", function () { if (act === "Sign in") location.href = base + "index.html#signin"; else if (act === "Refresh") location.reload(); else openPanel(); }); bar.appendChild(b); }
     chip();
   }
   function chip() { var right = document.querySelector(".c-top .c-right"); if (!right) return; var c = right.querySelector(".c-outbox"), total = counts.waiting + counts.look;
