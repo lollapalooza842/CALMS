@@ -135,11 +135,12 @@
 
   /* ---- feedback ---- */
   var toasts = null;
-  CK.toast = function (text, tone) { if (!toasts) { toasts = h("div.ck-toasts", { role: "status", "aria-live": "polite" }); document.body.appendChild(toasts); }
+  CK.toast = function (text, tone) { if (window.CALMS_SFX) CALMS_SFX.alert(tone);   /* a soft chime to go with it (sfx.js) */
+    if (!toasts) { toasts = h("div.ck-toasts", { role: "status", "aria-live": "polite" }); document.body.appendChild(toasts); }
     var t = h("div.ck-toast.t-" + (tone || "green"), CK.ic(tone === "red" ? "alert" : tone === "blue" ? "info" : "check"), h("span", text)); toasts.appendChild(t);
     setTimeout(function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 300); }, tone === "red" ? 6500 : 3800); };
   /* modal({title, body, actions:[[label, kind, fn(close, btn)]], wide}) */
-  CK.modal = function (o) {
+  CK.modal = function (o) { if (window.CALMS_SFX) CALMS_SFX.play("pop");
     var last = document.activeElement, back = h("div.ck-modalback"), box = h("div.ck-modal" + (o.wide ? ".wide" : ""), { role: "dialog", "aria-modal": "true", "aria-label": o.title });
     function close() { back.classList.add("out"); document.removeEventListener("keydown", key); setTimeout(function () { back.remove(); if (last && last.focus) last.focus(); }, 220); }
     function key(e) { if (e.key === "Escape") close(); }

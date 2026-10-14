@@ -31,7 +31,7 @@
   if (!window.CK_LOOK) return;                                   /* look.js (in the head) sets the classic look up */
   var page = (location.pathname.split("/").pop() || "").replace(/\.html$/, ""), own = r.classList.contains("c-own");
   /* pages rebuilt for the classic look draw themselves (assets/js/classic/<page>.js); the western page stays loaded but hidden */
-  ["classic-app.js"].concat(own ? ["classic/kit.js", "classic/" + page + ".js"] : []).forEach(function (f) { var s = document.createElement("script"); s.src = "../assets/js/" + f; s.async = false; document.head.appendChild(s); }); })();
+  ["classic-app.js", "classic/sfx.js"].concat(own ? ["classic/kit.js", "classic/" + page + ".js"] : []).forEach(function (f) { var s = document.createElement("script"); s.src = "../assets/js/" + f; s.async = false; document.head.appendChild(s); }); })();
 /* Kuwa's hat, chosen on the sign-in card (index.js): set before anything is drawn, so he wears it on every page */
 (function () { try { var h = localStorage.getItem("calms-hat"); if (h && h !== "cowboy" && /^(sheriff|bowler|sombrero)$/.test(h)) document.documentElement.setAttribute("data-hat", h); } catch (e) {} })();
 (function () {

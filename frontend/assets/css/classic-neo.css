@@ -120,3 +120,6 @@ html[data-ui="classic"] :is(.ck-btn, .c-go, .c-cta, .c-filters button, .ck-seg b
 html[data-ui="classic"] main :is(.ck-btn, .c-go, .c-cta, .c-filters button, .ck-seg button, .ck-tabs button, .ck-stat b, .c-stat b, .ck-doneref),
 html[data-ui="classic"]:not(.c-own) main :is(.c-go, .c-filters button, .c-stat b, .c-panel h2, .c-fab) { font-family: var(--c-head) !important; }
 html[data-ui="classic"] { --c-ink-2: #4e4137; --c-ink-3: #74665a; }
+/* the sounds switch (sfx.js), a round chip like the bell */
+html[data-ui="classic"] .c-sfx { width: 40px; padding: 0; justify-content: center; border: 0; cursor: pointer; color: var(--c-brand); }
+html[data-ui="classic"] .c-sfx[aria-pressed="false"] svg { color: var(--c-ink-3); }
