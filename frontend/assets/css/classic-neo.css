@@ -113,7 +113,7 @@ html[data-ui="classic"] .ck-vers button { background: var(--neo); border: 0; box
 html[data-ui="classic"] :is(.ck-wfoot, .ck-tlfoot) { background: var(--neo); border-top-color: var(--neo-ink-line); }
 html[data-ui="classic"] .ck-detail td { background: transparent; }
 
-/* type: Poppins Bold for headings, names, figures, buttons and the sidebar's drawers; Manjari Thin for the text */
+/* type: Poppins Bold for headings, names, figures, buttons and the sidebar's drawers; Manjari for the text */
 html[data-ui="classic"] .rail .nav a .plate, html[data-ui="classic"] .rail .nav a, html[data-ui="classic"] #tabbar .tab { font-family: var(--c-head); }
 html[data-ui="classic"] :is(.ck-btn, .c-go, .c-cta, .c-filters button, .ck-seg button, .ck-tabs button) { font-family: var(--c-head); }
 /* Poppins Bold for the figures that head a tile or a card, and for every button; thin text needs darker greys to read */

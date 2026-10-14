@@ -139,7 +139,7 @@ window.CALMS_IC = (function () {
   /* the type, fetched at once: the fonts wait up to a moment for these (font-display: optional in classic-fonts.css), so
      every page's first frame is drawn in Poppins and Manjari, never in a stand-in font that then swaps (the sidebar's words
      shifting a hair on every page change) */
-  var FONTS = ["poppins-latin-700", "manjari-latin-100", "manjari-latin-400", "manjari-latin-700"];
+  var FONTS = ["poppins-latin-700", "manjari-latin-400", "manjari-latin-700"];
   document.write(FONTS.map(function (f) { return '<link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/' + f + '-normal.woff2">'; }).join("") +
     css.map(function (f) { return '<link rel="stylesheet" href="../assets/css/' + f + '">'; }).join(""));
   var arrived = false; try { arrived = sessionStorage.getItem("calms-entered") === "1"; } catch (e) {}

@@ -1,5 +1,5 @@
 /* The classic look's components (CK in assets/js/classic/kit.js). Every rebuilt page is made of these:
-   an even 24px rhythm, white cards on a warm grey, Poppins Bold for headings, Manjari Thin for the rest,
+   an even 24px rhythm, white cards on a warm grey, Poppins Bold for headings, Manjari for the rest,
    and motion that is quick and soft (things rise 12px and fade in, one after another). */
 
 /* page to page: the old page stays fully drawn underneath while the new one fades in over it. (Fading both at once let
