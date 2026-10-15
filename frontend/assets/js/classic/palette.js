@@ -183,7 +183,7 @@
   /* ---- ways in: the keys, and a chip in the top bar ---- */
   function typing(t) { return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
   document.addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === "k" || e.key === "K")) { e.preventDefault(); if (back && !back.hidden) close(); else open(); return; }
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === "k" || e.key === "K" || e.code === "KeyK")) { e.preventDefault(); if (back && !back.hidden) close(); else open(); return; }
     if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e.target) && !document.querySelector(".ck-modalback")) { e.preventDefault(); open(); }
   }, true);
   function chip() {
