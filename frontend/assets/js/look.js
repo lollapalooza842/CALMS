@@ -72,6 +72,19 @@ window.CALMS_IC = (function () {
   I.rules = I.sliders; I.system = I.server; I["users and roles"] = I.users; I["my profile"] = I.user; I.more = I.dots;
   return I;
 })();
+/* The western look's Find button (classic/palette.js opens the search box): a plank at the top of the rail, put in the
+   moment the drawers begin, so the rail is whole in its first frame and never shifts down when the script arrives. */
+window.CALMS_WFIND = function () { var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  return '<button type="button" class="w-find" aria-label="Find a borrower, loan or page (' + (mac ? "\u2318K" : "Ctrl+K") + ')" aria-keyshortcuts="' + (mac ? "Meta+K" : "Control+K") + '">' +
+    '<i class="ic ic-lg ic-search" aria-hidden="true"></i><span class="plate">Find</span><span class="w-findk"><kbd>' + (mac ? "\u2318" : "Ctrl") + "</kbd><kbd>K</kbd></span></button>"; };
+(function () {
+  if (!/\/pages\//.test(location.pathname) || !window.MutationObserver) return;
+  var ui = ""; try { ui = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1] || localStorage.getItem("calms-ui") || "western"; } catch (e) {}
+  if (ui === "classic") return;
+  var mo = new MutationObserver(function () { var nav = document.getElementById("nav"); if (!nav) return; mo.disconnect();
+    if (!document.querySelector(".rail .w-find")) nav.insertAdjacentHTML("beforebegin", window.CALMS_WFIND()); });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
 (function () {
   var ui = ""; try { ui = (/[?&]ui=(classic|western)\b/.exec(location.search) || [])[1] || localStorage.getItem("calms-ui") || "western"; } catch (e) {}
   var KEY = "calms-rail:" + ui, saved = null; try { saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (e) {}

@@ -27,6 +27,12 @@
   if (!/^https?:$/.test(location.protocol) || !("serviceWorker" in navigator)) return;
   /* the desktop app too: with it, every screen opens when the connection drops (offline.js keeps the data) */
   window.addEventListener("load", function () { navigator.serviceWorker.register(base + "sw.js").catch(function () {}); });
+  /* a new version of CALMS took over this page (sw.js activated with a new VERSION): reload once, so the screen runs the
+     new files instead of the ones it opened with. Not on the very first install (nothing was in charge before). */
+  var hadOne = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function () { if (!hadOne || reloaded) { hadOne = true; return; } reloaded = true;
+    var busy = document.querySelector("input:focus, textarea:focus, .ck-modalback");   /* never mid-typing: then it waits for the next page */
+    if (!busy) location.reload(); });
   if (desktop) return;
 
   /* the browser decides when CALMS may be installed, and tells us with this event */
@@ -39,3 +45,6 @@
     b.addEventListener("click", function () { if (!offer) return; offer.prompt(); offer.userChoice.then(function () { offer = null; b.remove(); }); });
     (menu || stage).appendChild(b); }
 })();
+/* Quick search (Ctrl+K) in the western look; the classic look loads it from entrance.js */
+(function () { if (!/\/pages\//.test(location.pathname) || document.documentElement.getAttribute("data-ui") === "classic") return;
+  var s = document.createElement("script"); s.src = "../assets/js/classic/palette.js"; s.async = true; document.head.appendChild(s); })();

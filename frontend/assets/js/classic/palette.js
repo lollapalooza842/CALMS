@@ -1,4 +1,4 @@
-/* Quick search for the classic look: Ctrl+K (⌘K on a Mac), or "/" when not typing, opens one box from anywhere.
+/* Quick search, in both looks: Ctrl+K (⌘K on a Mac), or "/" when not typing, opens one box from anywhere.
    Type a borrower's name, an application or loan number, a mobile number, a page, or an action, and Enter goes there.
    - Pages and actions come from this person's own sidebar, so nobody is shown a door they cannot open.
    - Borrowers, applications, loan accounts (and, for the administrator, people with an account) come from
@@ -6,7 +6,10 @@
    - With the box empty: the last few things opened from it, then every page.
    Keys: ↑ ↓ move, Enter opens, Ctrl+Enter opens in a new tab, Esc closes. */
 (function () {
-  if (document.documentElement.getAttribute("data-ui") !== "classic") return;
+  if (window.CALMS_FIND || !/\/pages\//.test(location.pathname)) return;
+  /* the classic look loads this from entrance.js, the western look from app.js; the western button in the rail is put
+     in by look.js while the rail is drawn, so the rail never shifts when this file arrives */
+  var WEST = document.documentElement.getAttribute("data-ui") !== "classic";
   var IC = window.CALMS_IC || {}, MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
   function S(d) { return '<svg class="c-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (d || "") + "</svg>"; }
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
@@ -22,15 +25,17 @@
       var p = a.querySelector(".plate"), label = (p ? ((p.firstChild && p.firstChild.nodeValue) || p.textContent) : (a.getAttribute("aria-label") || a.textContent)) || "";
       label = label.replace(/\s*\d+\s*$/, "").replace(/\s+/g, " ").trim(); var href = a.getAttribute("href");
       if (!label || !href || seen[label.toLowerCase()]) return; seen[label.toLowerCase()] = 1;
-      var ic = a.querySelector("svg.c-ic"), here = a.getAttribute("aria-current") === "page" || a.classList.contains("on") || a.classList.contains("here");
-      out.push({ kind: "page", title: label, sub: here ? "You are here" : "", href: href, svg: ic ? ic.outerHTML : S(IC.next), out: /sign out/i.test(label) });
+      var ic = a.querySelector(WEST ? "i.ic" : "svg.c-ic"), here = a.getAttribute("aria-current") === "page" || a.classList.contains("on") || a.classList.contains("here");
+      out.push({ kind: "page", title: label, sub: here ? "You are here" : "", href: href, svg: ic ? ic.outerHTML.replace(/ ic-lg/, "") : "", out: /sign out/i.test(label) });
     });
     return out;
   }
   function actions() {
     var out = [], chip = document.querySelector(".c-sfx");
     if (chip && window.CALMS_SFX) out.push({ kind: "action", title: CALMS_SFX.isOn() ? "Turn sounds off" : "Turn sounds on", sub: "Clicks, hovers and alert chimes", words: "sound sfx mute audio", svg: chip.querySelector("svg").outerHTML, run: function () { chip.click(); } });
-    out.push({ kind: "action", title: "Reload this page", sub: "Fetch everything fresh", words: "refresh", svg: S(IC.refresh), run: function () { location.reload(); } });
+    out.push({ kind: "action", title: WEST ? "Switch to the classic look" : "Switch to the western look", sub: WEST ? "Clean and modern, same work" : "Planks, drawers and Kuwa, same work", words: "look theme style ui design appearance", wic: "system", svg: S(IC.swap),
+      run: function () { var u = new URL(location.href); u.searchParams.set("ui", WEST ? "classic" : "western"); location.href = u.href; } });
+    out.push({ kind: "action", title: "Reload this page", sub: "Fetch everything fresh", words: "refresh", wic: "system", svg: S(IC.refresh), run: function () { location.reload(); } });
     return out;
   }
   /* page and action names: whole words first, then letters in order ("nap" finds "New application") */
@@ -46,7 +51,7 @@
   function rkey() { var u = ""; try { u = localStorage.getItem("calms-uid") || ""; } catch (e) {} return "calms-recent|" + u; }
   function recent() { try { return JSON.parse(localStorage.getItem(rkey()) || "[]").slice(0, 5); } catch (e) { return []; } }
   function remember(x) { if (!x.href || x.kind === "action" || x.out) return;
-    var keep = { kind: x.kind, title: x.title, sub: x.sub, href: x.href, svg: x.kind === "page" ? x.svg : "", face: x.face || "", pill: x.pill || null };
+    var keep = { kind: x.kind, title: x.title, sub: x.kind === "page" ? "" : x.sub, href: x.href, svg: x.kind === "page" ? x.svg : "", face: x.face || "", pill: x.pill || null };
     try { var list = recent().filter(function (r) { return r.href !== keep.href; }); list.unshift(keep); localStorage.setItem(rkey(), JSON.stringify(list.slice(0, 5))); } catch (e) {} }
 
   /* ---- records: the server, or the copies on this computer when offline ---- */
@@ -71,9 +76,9 @@
   }
   function records(d) {
     var out = [];
-    (d.applications || []).forEach(function (a) { out.push({ kind: "application", group: "Applications", title: a.name, sub: a.ref + " · " + a.product + " · " + peso(a.amount), face: a.name, href: "application-detail.html?ref=" + encodeURIComponent(a.ref), pill: a.statusName ? [a.statusName, a.tone] : null }); });
-    (d.accounts || []).forEach(function (a) { out.push({ kind: "account", group: "Loan accounts", title: a.name, sub: a.no + " · " + a.product + " · " + peso(a.principal), face: a.name, href: "loan-account.html?no=" + encodeURIComponent(a.no), pill: a.closed ? ["Closed", "grey"] : null }); });
-    (d.people || []).forEach(function (u) { out.push({ kind: "person", group: "People with an account", title: u.name, sub: u.username + " · " + u.roleName, face: u.name, href: "users-roles.html?u=" + encodeURIComponent(u.username), pill: u.off ? ["Deactivated", "grey"] : null }); });
+    (d.applications || []).forEach(function (a) { out.push({ kind: "application", group: "Applications", title: a.name, sub: a.ref + " · " + a.product + " · " + peso(a.amount), face: a.name, wic: "application-detail", href: "application-detail.html?ref=" + encodeURIComponent(a.ref), pill: a.statusName ? [a.statusName, a.tone] : null }); });
+    (d.accounts || []).forEach(function (a) { out.push({ kind: "account", group: "Loan accounts", title: a.name, sub: a.no + " · " + a.product + " · " + peso(a.principal), face: a.name, wic: "loan-account", href: "loan-account.html?no=" + encodeURIComponent(a.no), pill: a.closed ? ["Closed", "grey"] : null }); });
+    (d.people || []).forEach(function (u) { out.push({ kind: "person", group: "People with an account", title: u.name, sub: u.username + " · " + u.roleName, face: u.name, wic: "users-roles", href: "users-roles.html?u=" + encodeURIComponent(u.username), pill: u.off ? ["Deactivated", "grey"] : null }); });
     return out;
   }
 
@@ -82,13 +87,14 @@
   function build() {
     back = el("div", "ck-palback"); back.hidden = true;
     var box = el("div", "ck-pal"); box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true"); box.setAttribute("aria-label", "Quick search");
-    var row = el("label", "ck-palin"); row.insertAdjacentHTML("afterbegin", S(IC.search));
-    input = el("input"); input.type = "text"; input.placeholder = "Search borrowers, loan numbers, pages…"; input.autocomplete = "off"; input.spellcheck = false;
+    var row = el("label", "ck-palin"); row.insertAdjacentHTML("afterbegin", WEST ? '<i class="ic ic-lg ic-search" aria-hidden="true"></i>' : S(IC.search));
+    input = el("input"); input.type = "text"; input.placeholder = WEST ? "A borrower, a loan number, a page…" : "Search borrowers, loan numbers, pages…"; input.autocomplete = "off"; input.spellcheck = false;
     input.setAttribute("role", "combobox"); input.setAttribute("aria-expanded", "true"); input.setAttribute("aria-controls", "ckPalList"); input.setAttribute("aria-autocomplete", "list");
     var esc = el("kbd", "ck-palesc", "Esc"); esc.addEventListener("click", close);
     row.appendChild(input); row.appendChild(esc);
     list = el("div", "ck-pallist"); list.id = "ckPalList"; list.setAttribute("role", "listbox"); list.setAttribute("aria-label", "Results");
     foot = el("div", "ck-palfoot"); foot.innerHTML = "<span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>" + (MAC ? "⌘" : "Ctrl") + "</kbd><kbd>K</kbd> from anywhere</span>";
+    if (WEST) box.appendChild(el("div", "ck-paltitle", "Find anything"));   /* the western box wears a signboard */
     box.appendChild(row); box.appendChild(list); box.appendChild(foot); back.appendChild(box); document.body.appendChild(back);
     back.addEventListener("mousedown", function (e) { if (e.target === back) close(); });
     input.addEventListener("input", function () { clearTimeout(timer); var q = input.value; draw(q, null); if (norm(q.trim()).length >= 2) { list.setAttribute("aria-busy", "true"); timer = setTimeout(function () { ask(q); }, 140); } });
@@ -118,6 +124,13 @@
             function () { if (my !== seq) return; list.removeAttribute("aria-busy"); draw(q, { applications: [], accounts: [], people: [], failed: true }); });
   }
 
+  /* a page's icon in this look: the sidebar's own (kept with a recent item from either look, so it is looked up again) */
+  function icon(x) {
+    var name = String(x.href || "").split("?")[0].split("/").pop().replace(/\.html$/, "");
+    if (WEST) return '<i class="ic ic-lg ic-' + (x.wic || name || "search") + '" aria-hidden="true"></i>';
+    if (x.svg && x.svg.indexOf("<svg") === 0) return x.svg;
+    var a = name && document.querySelector('#nav a[href^="' + name + '"] svg.c-ic'); return a ? a.outerHTML : S(IC.next);
+  }
   function mark(text, q) {   /* the typed letters, highlighted where they appear in the name */
     var span = el("span"), t = String(text || ""), i = q ? norm(t).indexOf(q) : -1;
     if (i < 0) { span.textContent = t; return span; }
@@ -145,8 +158,8 @@
       g[1].forEach(function (x) { var idx = items.length; items.push(x);
         var a = el(x.href ? "a" : "button", "ck-palitem"); a.id = "ckPalI" + idx; a.setAttribute("role", "option"); a.tabIndex = -1; if (x.href) a.href = x.href; else a.type = "button";
         var lead;
-        if (x.face) { lead = el("span", "ck-palav", initials(x.face)); if (window.CALMS_FACE) CALMS_FACE(lead, x.face); }
-        else { lead = el("span", "ck-palic"); lead.innerHTML = x.svg || S(IC.next); }
+        if (x.face) { lead = el("span", "ck-palav", initials(x.face)); if (window.CALMS_FACE && !WEST) CALMS_FACE(lead, x.face); }
+        else { lead = el("span", "ck-palic"); lead.innerHTML = icon(x); }
         a.appendChild(lead);
         var mid = el("span", "ck-palmid"), b = el("b"); b.appendChild(mark(x.title, q)); mid.appendChild(b); if (x.sub) { var sm = mark(x.sub, q.length >= 3 ? q : ""); sm.className = "ck-palsub"; mid.appendChild(sm); }
         a.appendChild(mid);
@@ -190,9 +203,15 @@
     var right = document.querySelector(".c-top .c-right"); if (!right) return false; if (right.querySelector(".c-find")) return true;
     var b = el("button", "c-chip c-find"); b.type = "button"; b.setAttribute("aria-label", "Quick search (" + (MAC ? "⌘K" : "Ctrl+K") + ")"); b.setAttribute("aria-keyshortcuts", MAC ? "Meta+K" : "Control+K");
     b.innerHTML = S(IC.search) + '<span class="c-findtx">Search</span><span class="c-findk"><kbd>' + (MAC ? "⌘" : "Ctrl") + "</kbd><kbd>K</kbd></span>";
-    b.addEventListener("click", open); right.insertBefore(b, right.firstChild); return true;
+    right.insertBefore(b, right.firstChild); return true;
   }
+  /* the western rail's button (look.js puts it in) */
+  function plank() {
+    if (document.querySelector(".rail .w-find")) return true; var nav = document.getElementById("nav"); if (!nav) return false;
+    nav.insertAdjacentHTML("beforebegin", window.CALMS_WFIND ? CALMS_WFIND() : ""); return true;
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest(".c-find, .w-find"); if (b) { e.preventDefault(); open(); } });
   function ready(fn) { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn); else fn(); }
-  ready(function () { if (!chip() && window.MutationObserver) { var mo = new MutationObserver(function () { if (chip()) mo.disconnect(); }); mo.observe(document.body, { childList: true, subtree: true }); } });
+  ready(function () { if (WEST) { plank(); return; } if (!chip() && window.MutationObserver) { var mo = new MutationObserver(function () { if (chip()) mo.disconnect(); }); mo.observe(document.body, { childList: true, subtree: true }); } });
   window.CALMS_FIND = { open: open, close: close };
 })();
