@@ -68,6 +68,7 @@ app.use("/api/applications/:ref", require("./routes/servicing"));
 app.use("/api", require("./routes/accounts"));
 app.use("/api/applications", require("./routes/applications"));
 app.use("/api/me", require("./routes/me"));
+app.use("/api/search", require("./routes/search"));
 app.use("/api", require("./routes/admin"));
 app.use("/api", require("./routes/oversight"));
 app.use("/api", require("./routes/queues"));

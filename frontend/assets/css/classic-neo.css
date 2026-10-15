@@ -123,3 +123,61 @@ html[data-ui="classic"] { --c-ink-2: #4e4137; --c-ink-3: #74665a; }
 /* the sounds switch (sfx.js), a round chip like the bell */
 html[data-ui="classic"] .c-sfx { width: 40px; padding: 0; justify-content: center; border: 0; cursor: pointer; color: var(--c-brand); }
 html[data-ui="classic"] .c-sfx[aria-pressed="false"] svg { color: var(--c-ink-3); }
+
+/* ---- quick search (classic/palette.js): Ctrl+K from anywhere ---- */
+html[data-ui="classic"] .c-find { gap: 8px; border: 0; cursor: pointer; color: var(--c-ink-3); font: 500 13.5px/1 var(--c-body); }
+html[data-ui="classic"] .c-find:hover { color: var(--c-ink-2); }
+html[data-ui="classic"] .c-findk { display: inline-flex; gap: 3px; margin-left: 6px; }
+html[data-ui="classic"] :is(.c-findk, .ck-palfoot, .ck-palin) kbd { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 7px; background: var(--neo); box-shadow: var(--neo-up-xs); font: 600 11px/1 var(--c-head); color: var(--c-ink-2); }
+@media (max-width: 900px) { html[data-ui="classic"] .c-findtx, html[data-ui="classic"] .c-findk { display: none; } html[data-ui="classic"] .c-find { width: 40px; padding: 0; justify-content: center; } }
+
+html[data-ui="classic"] :is(.ck-palback, .ck-palback *) { box-sizing: border-box; }
+html[data-ui="classic"] .ck-palback { position: fixed; inset: 0; z-index: 300; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; background: rgba(60,44,32,.26); backdrop-filter: blur(5px); animation: ck-pal-bg .16s ease both; }
+html[data-ui="classic"] .ck-palback[hidden] { display: none; }
+html[data-ui="classic"] .ck-palback.out { animation: ck-pal-bgout .15s ease both; }
+html[data-ui="classic"] .ck-pal { width: min(640px, 100%); max-height: min(560px, 76vh); display: flex; flex-direction: column; border-radius: 24px; background: var(--neo); box-shadow: 18px 18px 40px rgba(90,66,48,.38), -10px -10px 30px rgba(255,255,255,.5); overflow: hidden; animation: ck-pal-in .2s cubic-bezier(.2,.9,.3,1.15) both; }
+html[data-ui="classic"] .ck-palback.out .ck-pal { animation: ck-pal-out .15s ease both; }
+html[data-ui="classic"] .ck-palin { display: flex; align-items: center; gap: 12px; margin: 16px 16px 8px; padding: 0 12px 0 16px; height: 54px; border-radius: 16px; background: var(--neo); box-shadow: var(--neo-in); cursor: text; }
+html[data-ui="classic"] .ck-palin > svg { width: 21px; height: 21px; flex: none; color: var(--c-brand); }
+html[data-ui="classic"] .ck-palin input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: 400 17px/1.3 var(--c-body); color: var(--c-ink); }
+html[data-ui="classic"] .ck-palin input::placeholder { color: var(--c-ink-3); }
+html[data-ui="classic"] .ck-palesc { cursor: pointer; }
+html[data-ui="classic"] .ck-pallist { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 14px 14px; scroll-padding: 34px 0 10px; }
+html[data-ui="classic"] .ck-palhead { position: sticky; top: 0; z-index: 1; padding: 12px 10px 6px; background: var(--neo); font: 700 11px/1 var(--c-head); letter-spacing: .08em; text-transform: uppercase; color: var(--c-ink-3); }
+html[data-ui="classic"] .ck-palitem { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 54px; padding: 8px 10px; border: 0; border-radius: 14px; background: transparent; text-align: left; text-decoration: none; color: inherit; cursor: pointer; position: relative; transition: background-color .12s, box-shadow .12s; }
+html[data-ui="classic"] .ck-palitem.on { background: var(--neo); box-shadow: var(--neo-up-sm); }
+html[data-ui="classic"] .ck-palitem.on::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: var(--c-brand); }
+html[data-ui="classic"] .ck-palic, html[data-ui="classic"] .ck-palav { width: 36px; height: 36px; flex: none; border-radius: 50%; display: inline-grid; place-items: center; background: var(--neo); box-shadow: var(--neo-up-xs); color: var(--c-brand); overflow: hidden; position: relative; font: 600 13px/1 var(--c-head); }
+html[data-ui="classic"] .ck-palav { background: linear-gradient(140deg, #c9821b, #9a2f24); color: #fff; }
+html[data-ui="classic"] .ck-palav img.c-face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .2s; }
+html[data-ui="classic"] .ck-palav img.c-face.ok { opacity: 1; }
+html[data-ui="classic"] .ck-palic svg { width: 19px; height: 19px; margin: 0; }
+html[data-ui="classic"] .ck-palmid { flex: 1; min-width: 0; }
+html[data-ui="classic"] .ck-palmid b { display: block; font: 700 14.5px/1.3 var(--c-head); color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[data-ui="classic"] .ck-palsub { display: block; margin-top: 2px; font: 400 13px/1.3 var(--c-body); color: var(--c-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[data-ui="classic"] .ck-pal mark { background: rgba(232,137,42,.24); color: inherit; border-radius: 4px; padding: 0 1px; }
+html[data-ui="classic"] .ck-palitem .ck-pill { flex: none; }
+html[data-ui="classic"] .ck-palret { width: 28px; height: 28px; flex: none; display: inline-grid; place-items: center; border-radius: 9px; color: var(--c-ink-3); opacity: 0; transition: opacity .12s; }
+html[data-ui="classic"] .ck-palret svg { width: 16px; height: 16px; }
+html[data-ui="classic"] .ck-palitem.on .ck-palret { opacity: 1; box-shadow: var(--neo-in-sm); }
+html[data-ui="classic"] .ck-palnote { display: flex; align-items: center; gap: 10px; margin: 8px 10px 2px; font: 400 13px/1.35 var(--c-body); color: var(--c-ink-3); }
+html[data-ui="classic"] .ck-palbusy i { width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2px solid var(--neo-ink-line); border-top-color: var(--c-brand); animation: ck-pal-spin .7s linear infinite; }
+html[data-ui="classic"] .ck-palempty { display: grid; justify-items: center; gap: 6px; padding: 30px 16px 26px; text-align: center; }
+html[data-ui="classic"] .ck-palempty svg { width: 30px; height: 30px; color: var(--c-ink-3); margin-bottom: 4px; }
+html[data-ui="classic"] .ck-palempty b { font: 700 15px/1.3 var(--c-head); color: var(--c-ink); }
+html[data-ui="classic"] .ck-palempty small { font: 400 13px/1.4 var(--c-body); color: var(--c-ink-3); max-width: 340px; }
+html[data-ui="classic"] .ck-palfoot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 20px 14px; border-top: 1px solid var(--neo-ink-line); font: 400 12.5px/1 var(--c-body); color: var(--c-ink-3); }
+html[data-ui="classic"] .ck-palfoot span { display: inline-flex; align-items: center; gap: 4px; }
+html[data-ui="classic"] .ck-palfoot kbd { min-width: 20px; height: 20px; font-size: 10.5px; }
+@media (max-width: 600px) {
+  html[data-ui="classic"] .ck-palback { padding: 12px; }
+  html[data-ui="classic"] .ck-pal { max-height: calc(100dvh - 24px); }
+  html[data-ui="classic"] .ck-palfoot { display: none; }
+  html[data-ui="classic"] .ck-palitem .ck-pill { display: none; }
+}
+@keyframes ck-pal-bg { from { opacity: 0; } }
+@keyframes ck-pal-bgout { to { opacity: 0; } }
+@keyframes ck-pal-in { from { opacity: 0; transform: translateY(-10px) scale(.97); } }
+@keyframes ck-pal-out { to { opacity: 0; transform: translateY(-6px) scale(.98); } }
+@keyframes ck-pal-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { html[data-ui="classic"] :is(.ck-pal, .ck-palback) { animation-name: ck-pal-bg !important; } html[data-ui="classic"] :is(.ck-palback.out, .ck-palback.out .ck-pal) { animation-name: ck-pal-bgout !important; } }

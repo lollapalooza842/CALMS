@@ -202,5 +202,6 @@
       h("div.ck-in", CK.note("For everyone: a session ends after 15 minutes without activity, and anyone who can approve loans, release money or change settings must sign in with a second factor. These rules are set on the Products and rules page, not here. Every change on this page is written to the audit log with your name.", "grey", "info"))
     ]);
     apply();
+    var asked = CK.q("u"); if (asked && get(asked)) pick(asked, true);   /* opened from quick search: that person, already picked */
   }, function (e) { CK.error(e); });
 })();

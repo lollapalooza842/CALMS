@@ -162,6 +162,8 @@
     isDown: function () { return down; },
     down: goDown,
     keep: keep, fromCache: fromCache, wipe: wipe, why: why, err: err,
+    /* a kept copy, read quietly (quick search offline): no notice, no stale mark; undefined if there is none */
+    peek: function (path) { return get("cache", uid() + "|" + path).then(function (hit) { return hit ? copy(hit.data) : undefined; }, function () { return undefined; }); },
     queue: enqueue, flush: flush, newId: newId, copyIfSlow: copyIfSlow, probe: probe, isSlow: function () { return slow && Date.now() - slow < 30000; },
     open: function () { openPanel(); },
   };
