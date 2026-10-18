@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Loans and calculator · GR8 Lending</title>
+<meta name="description" content="Salary, personal and business loans from GR8 Lending. See the full cost first, apply online, and follow your loan at every step.">
+<meta name="theme-color" content="#f6eedf">
+<link rel="icon" type="image/png" href="../assets/img/app/icon-192.png">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="trail.css">
+<link rel="stylesheet" href="kuwa-chat.css">
+</head>
+<body data-page="loans">
+<span class="draft">Draft</span>
+<main>
+<div class="band" data-parallax>
+  <div class="scene" aria-hidden="true"><div class="ly sky"></div><div class="ly l1" data-depth="0.3"><div class="sky2"></div></div><div class="ly l2" data-depth="0.2"></div><div class="ly l3" data-depth="0.12"></div><div class="ly l4" data-depth="0.05"></div><div class="tint"></div><div class="glow"></div><div class="ly l5"></div></div>
+  <div class="fade"></div>
+</div>
+  <section class="wrap hero-copy" data-kuwa="Howdy!|I'm Kuwa, your GR8 guide. Where shall we start?">
+    <h1 class="lines" aria-label="Our loans, and what they cost"><span><span style="--i:0"><em>Our</em> loans</span></span><span class="in2"><span style="--i:1">and what</span></span><span><span style="--i:2">they cost</span></span></h1>
+    <div class="sub">
+      <p class="mono rv" style="--d:3">Salary, personal and business loans.<br>See every peso before you sign.</p>
+      <div class="ctas rv" style="--d:4"><a class="btn" href="apply.html">Apply for a loan <span class="arr">↳</span></a><a class="btn wood" href="#weigh">Compute one first</a></div>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="loans" data-kuwa="Pick your loan|Employed? The salary loan is the gentlest. Running a shop? Look at SME.">
+    <div class="sec-head"><span class="tag">[01] The loans</span><h2 class="lines"><span><span>Three <em>ways</em> to borrow</span></span></h2></div>
+    <ul class="loans" id="loanRows"></ul>
+  </section>
+
+  <section class="sec wrap" id="weigh" data-kuwa="Weigh it|Pick the answers on the left. These are the same numbers your agreement would show.">
+    <div class="sec-head"><span class="tag">[02] Weigh a loan</span><h2 class="lines"><span><span><em>Know</em> the full cost</span></span></h2></div>
+    <div class="weigh">
+      <div>
+        <div class="row"><span class="lab">I need a…<i>*</i></span><div class="seg" id="cProd" role="group" aria-label="Which loan"></div></div>
+        <div class="row"><span class="lab">Around…<i>*</i></span><div><input class="input fig" id="cAmt" inputmode="numeric" value="50,000" aria-label="How much"><div class="range"><input type="range" id="cRange" aria-label="How much" min="10000" max="200000" step="1000" value="50000"><div class="ends"><span id="cMin">₱10,000</span><span id="cMax">₱200,000</span></div></div></div></div>
+        <div class="row"><span class="lab">Paid over… (months)<i>*</i></span><div class="seg terms" id="cTerm" role="group" aria-label="Months"></div></div>
+        <div class="row compare"><span class="lab">The same in each loan</span><table id="cCmp"></table></div>
+      </div>
+      <div class="slip rv" aria-live="polite">
+        <span class="lab">You would pay</span>
+        <div class="big2" id="cPay">₱0</div>
+        <span class="per" id="cPer">every month</span>
+        <dl><dt>You receive</dt><dd id="cNet">–</dd><dt>Processing fee</dt><dd id="cFee">–</dd><dt>Total interest</dt><dd id="cInt">–</dd><dt>Total you pay back</dt><dd id="cTot">–</dd></dl>
+        <div class="bars" aria-hidden="true"><i class="p" id="cBarP"></i><i class="i" id="cBarI"></i></div>
+        <div class="legend"><span>Borrowed</span><span class="i">Interest</span></div>
+        <p class="fine" id="cFine"></p>
+        <a class="btn" id="cGo" href="apply.html">Start my application <span class="arr">↳</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="how" data-kuwa="How it goes|A real person handles every step, and we text you each time your loan moves.">
+    <div class="sec-head"><span class="tag">[03] How it works</span><h2 class="lines"><span><span>Six steps to <em>cash</em></span></span></h2></div>
+    <ol class="stepsx">
+      <li class="rv"><span class="n">[01]</span><h3>Apply</h3><p>Online in about ten minutes, or with one of our agents.</p><span class="who">You</span></li>
+      <li class="rv"><span class="n">[02]</span><h3>Papers checked</h3><p>We check your ID and papers, and tell you exactly what's missing.</p><span class="who">Loan processor</span></li>
+      <li class="rv"><span class="n">[03]</span><h3>Review</h3><p>We read your income and credit report to find an amount that fits.</p><span class="who">Underwriter</span></li>
+      <li class="rv"><span class="n">[04]</span><h3>Decision</h3><p>Approved as asked, or a counter-offer you can take or leave.</p><span class="who">Underwriter</span></li>
+      <li class="rv"><span class="n">[05]</span><h3>Sign</h3><p>Read the agreement with every peso spelled out, then sign.</p><span class="who">You</span></li>
+      <li class="rv"><span class="n">[06]</span><h3>Released</h3><p>The money goes to your GCash or bank. Your schedule starts.</p><span class="who">Disbursement officer</span></li>
+    </ol>
+  </section>
+
+  <section class="statement wrap" id="why" data-kuwa="Why GR8?|No fine print, no surprises. That's the whole idea.">
+    <p id="words">Lending the <em>next step</em> to every Filipino family and business, clear on every peso and <em>fair</em> at every turn.</p>
+    <p class="mono">GR8 Lending Company · Malolos, Bulacan</p>
+  </section>
+
+  <section class="wrap" id="impact" data-kuwa="Our numbers|Sample figures for now. The real ones will come straight from CALMS.">
+    <div class="sec-head"><span class="tag">[04] So far · sample figures</span><h2 class="lines"><span><span>By the <em>numbers</em></span></span></h2></div>
+    <div class="nums">
+      <div class="rv"><b class="fig" data-count="1240">0</b><span>Loans released</span></div>
+      <div class="rv" style="--d:1"><b class="fig" data-count="86.4" data-pre="₱" data-suf="M" data-dec="1">0</b><span>Lent to borrowers</span></div>
+      <div class="rv" style="--d:2"><b class="fig" data-count="2" data-suf=" days">0</b><span>Typical wait for a decision</span></div>
+      <div class="rv" style="--d:3"><b class="fig" data-count="96" data-suf="%">0</b><span>Payments made on time</span></div>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="faq" style="padding-top:110px" data-kuwa="Questions|Folks ask me these the most. Still stuck? Tap me.">
+    <div class="sec-head"><span class="tag">[05] Questions</span><h2 class="lines"><span><span>Asked <em>often</em></span></span></h2></div>
+    <div class="faq">
+      <details><summary><span class="n">[01]</span>What do I need to apply?</summary><p>A government ID and proof of income for every loan. A salary loan also asks for pay stubs and a certificate of employment; an SME loan asks for your DTI or SEC registration, business permit and financial statements.</p></details>
+      <details><summary><span class="n">[02]</span>How long until I get the money?</summary><p>It depends on how complete your papers are. You can see where your loan is at any time on the Track page, and we text you at every step.</p></details>
+      <details><summary><span class="n">[03]</span>What is a counter-offer?</summary><p>If we can't lend the full amount or term you asked for, we may offer a different one. You decide: take it, or turn it down at no cost.</p></details>
+      <details><summary><span class="n">[04]</span>How do I pay?</summary><p>Cash at the branch, bank deposit, GCash, salary deduction (salary loans) or cheque. Every payment gets a receipt in My GR8.</p></details>
+      <details><summary><span class="n">[05]</span>What if I pay late?</summary><p>A late payment adds 3% of the late amount for each month or part of a month it stays unpaid. Pay what's due and the penalty stops growing.</p></details>
+      <details><summary><span class="n">[06]</span>Can I have two loans at once?</summary><p>You can hold different kinds, but only one application per kind of loan can be open at a time.</p></details>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <h2>Or reach out <em>directly</em></h2>
+    <div class="cols">
+      <div><h4>Visit ↴</h4><span class="li"><i>[01]</i>Malolos branch</span><span class="li"><i>[02]</i>Mon–Sat · 8:00–5:00</span><span class="li"><i>[03]</i>[Branch address]</span></div>
+      <div><h4>Call or write ↴</h4><span class="li"><i>[01]</i>[Hotline]</span><span class="li"><i>[02]</i>[Email]</span></div>
+      <div><h4>Borrowers ↴</h4><a href="apply.html"><i>[01]</i>Apply ↗</a><a href="track.html"><i>[02]</i>Track ↗</a><a href="signin.html"><i>[03]</i>My GR8 ↗</a><a href="loans.html#faq"><i>[04]</i>Questions ↗</a></div>
+      <div><h4>GR8 staff ↴</h4><a href="../"><i>[01]</i>CALMS sign-in ↗</a><a href="downloads.html#staff"><i>[02]</i>Get the staff app ↗</a><a href="#"><i>[03]</i>Privacy notice ↗</a></div>
+    </div>
+    <div class="word" aria-hidden="true">GR8 Lending</div>
+    <div class="legal"><span>© 2026 GR8 Lending Company · SEC Reg. No. [to follow]</span><span>Powered by CALMS · Group 2-3, BulSU</span></div>
+  </div>
+</footer>
+<div class="pill" id="pill">
+  <div class="say" id="say" hidden><button type="button" aria-label="Hide">×</button><b></b><span></span><div class="acts"><a href="apply.html">Apply</a><a href="loans.html#weigh">Compute a loan</a><a href="track.html">Track mine</a></div></div>
+  <div class="card" id="pillCard" role="dialog" aria-label="Menu">
+    <h5>Menu</h5>
+    <nav>
+      <a href="index.html"><span>01</span>Home<small></small></a>
+      <a href="loans.html"><span>02</span>Loans<small>Salary · Personal · SME</small></a>
+      <a href="apply.html"><span>03</span>Apply<small>About 10 minutes</small></a>
+      <a href="track.html"><span>04</span>Track an application<small></small></a>
+      <a href="signin.html"><span>05</span>My GR8<small>Borrowers</small></a>
+      <a href="downloads.html"><span>06</span>Resources<small>Downloads · Staff app</small></a>
+    </nav>
+    <h5 style="margin-top:20px">Settings</h5>
+    <div class="set">Dark mode <button class="sw" type="button" role="switch" aria-checked="false" id="darkSw" aria-label="Dark mode"></button></div>
+    <div class="set">Kuwa's tips <button class="sw" type="button" role="switch" aria-checked="true" id="tipSw" aria-label="Kuwa's tips"></button></div>
+    <div class="cta"><a class="btn" href="index.html#talk">Let's talk loans <span class="arr">↳</span></a></div>
+  </div>
+  <div class="bar">
+    <button class="tog" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pillCard"><i></i></button>
+    <a href="index.html" aria-label="GR8 Lending, home">GR8</a>
+    <button class="orb orbx" type="button" aria-label="Open the chat" id="kuwaBtn"><span class="o-glow"></span><span class="o-core" id="kuwa"></span><span class="o-swirl"></span><span class="o-shine"></span></button>
+  </div>
+</div>
+<div class="menu-scrim" id="scrim"></div>
+<script src="trail.js"></script>
+<script src="kuwa-chat.js"></script>
+</body>
+</html>

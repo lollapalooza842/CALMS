@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in · My GR8 · GR8 Lending</title>
+<meta name="theme-color" content="#f6eedf">
+<link rel="icon" type="image/png" href="../assets/img/app/icon-192.png">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="trail.css">
+<link rel="stylesheet" href="kuwa-chat.css">
+</head>
+<body data-page="signin">
+<span class="draft">Draft</span>
+
+<main>
+<div class="band short" data-parallax>
+  <div class="scene" aria-hidden="true"><div class="ly sky"></div><div class="ly l1" data-depth="0.3"><div class="sky2"></div></div><div class="ly l2" data-depth="0.2"></div><div class="ly l3" data-depth="0.12"></div><div class="ly l4" data-depth="0.05"></div><div class="tint"></div><div class="glow"></div><div class="ly l5"></div></div>
+  <div class="fade"></div>
+</div>
+<section class="wrap gate">
+  <div>
+    <span class="tag" style="color:var(--ink-3)">[ Borrowers ] Sign in</span>
+    <h1 class="lines" style="margin-top:12px"><span><span>My <em>GR8</em></span></span></h1>
+    <p class="mono" style="margin-top:22px;color:var(--ink-2);max-width:380px">Your loan, your schedule<br>and every receipt, on your phone.</p>
+  </div>
+  <div class="card">
+    <div id="gateOne">
+      <div class="row" style="grid-template-columns:1fr;border-top:1px solid var(--rule)"><div class="field" style="margin:0"><label for="gMob">Mobile number you applied with *</label><input class="input fig" id="gMob" inputmode="tel" autocomplete="tel" placeholder="0917 000 0000" pattern="[0-9 +]{11,16}" required></div></div>
+      <div style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px"><p class="mono" style="margin:0;color:var(--ink-3)">No password to remember.<br>We text a 6-digit code.</p><button class="btn" id="sendCode" type="button">Text me a code <span class="arr">↳</span></button></div>
+      <p style="margin:30px 0 0;color:var(--ink-2)">Haven't applied yet? <a class="link" href="apply.html">Apply for a loan</a>.</p>
+    </div>
+    <div id="gateTwo" hidden>
+      <h2 style="font-size:56px">Check your <em>phone</em></h2>
+      <p style="margin:12px 0 22px;color:var(--ink-2)">We texted a 6-digit code to <b class="fig" id="sentTo" style="font-weight:400"></b>. It works for 5 minutes.</p>
+      <div class="code"><input inputmode="numeric" autocomplete="one-time-code" aria-label="Digit 1" maxlength="1"><input inputmode="numeric" aria-label="Digit 2" maxlength="1"><input inputmode="numeric" aria-label="Digit 3" maxlength="1"><input inputmode="numeric" aria-label="Digit 4" maxlength="1"><input inputmode="numeric" aria-label="Digit 5" maxlength="1"><input inputmode="numeric" aria-label="Digit 6" maxlength="1"></div>
+      <p class="mono" style="margin:18px 0 0;color:var(--ink-3)">Draft: any 6 digits open the sample · <button class="link" id="back" type="button" style="border:0;background:none;padding:0;font:inherit;cursor:pointer">Use another number</button></p>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <h2>Or reach out <em>directly</em></h2>
+    <div class="cols">
+      <div><h4>Visit ↴</h4><span class="li"><i>[01]</i>Malolos branch</span><span class="li"><i>[02]</i>Mon–Sat · 8:00–5:00</span><span class="li"><i>[03]</i>[Branch address]</span></div>
+      <div><h4>Call or write ↴</h4><span class="li"><i>[01]</i>[Hotline]</span><span class="li"><i>[02]</i>[Email]</span></div>
+      <div><h4>Borrowers ↴</h4><a href="apply.html"><i>[01]</i>Apply ↗</a><a href="track.html"><i>[02]</i>Track ↗</a><a href="signin.html"><i>[03]</i>My GR8 ↗</a><a href="loans.html#faq"><i>[04]</i>Questions ↗</a></div>
+      <div><h4>GR8 staff ↴</h4><a href="../"><i>[01]</i>CALMS sign-in ↗</a><a href="downloads.html#staff"><i>[02]</i>Get the staff app ↗</a><a href="#"><i>[03]</i>Privacy notice ↗</a></div>
+    </div>
+    <div class="word" aria-hidden="true">GR8 Lending</div>
+    <div class="legal"><span>© 2026 GR8 Lending Company · SEC Reg. No. [to follow]</span><span>Powered by CALMS · Group 2-3, BulSU</span></div>
+  </div>
+</footer>
+<div class="pill" id="pill">
+  <div class="say" id="say" hidden><button type="button" aria-label="Hide">×</button><b></b><span></span><div class="acts"><a href="apply.html">Apply</a><a href="loans.html#weigh">Compute a loan</a><a href="track.html">Track mine</a></div></div>
+  <div class="card" id="pillCard" role="dialog" aria-label="Menu">
+    <h5>Menu</h5>
+    <nav>
+      <a href="index.html"><span>01</span>Home<small></small></a>
+      <a href="loans.html"><span>02</span>Loans<small>Salary · Personal · SME</small></a>
+      <a href="apply.html"><span>03</span>Apply<small>About 10 minutes</small></a>
+      <a href="track.html"><span>04</span>Track an application<small></small></a>
+      <a href="signin.html"><span>05</span>My GR8<small>Borrowers</small></a>
+      <a href="downloads.html"><span>06</span>Resources<small>Downloads · Staff app</small></a>
+    </nav>
+    <h5 style="margin-top:20px">Settings</h5>
+    <div class="set">Dark mode <button class="sw" type="button" role="switch" aria-checked="false" id="darkSw" aria-label="Dark mode"></button></div>
+    <div class="set">Kuwa's tips <button class="sw" type="button" role="switch" aria-checked="true" id="tipSw" aria-label="Kuwa's tips"></button></div>
+    <div class="cta"><a class="btn" href="index.html#talk">Let's talk loans <span class="arr">↳</span></a></div>
+  </div>
+  <div class="bar">
+    <button class="tog" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pillCard"><i></i></button>
+    <a href="index.html" aria-label="GR8 Lending, home">GR8</a>
+    <button class="orb orbx" type="button" aria-label="Open the chat" id="kuwaBtn"><span class="o-glow"></span><span class="o-core" id="kuwa"></span><span class="o-swirl"></span><span class="o-shine"></span></button>
+  </div>
+</div>
+<div class="menu-scrim" id="scrim"></div>
+<script src="trail.js"></script>
+<script src="kuwa-chat.js"></script>
+</body>
+</html>

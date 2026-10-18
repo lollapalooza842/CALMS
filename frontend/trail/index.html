@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GR8 Lending · Where hard work meets a fair loan</title>
+<meta name="description" content="Salary, personal and business loans from GR8 Lending. See every peso before you sign, apply online, and follow your loan at every step.">
+<meta name="theme-color" content="#2a1609">
+<link rel="icon" type="image/png" href="../assets/img/app/icon-192.png">
+<script src="theme.js"></script>
+<link rel="preload" href="../assets/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/ibm-plex-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="trail.css">
+<link rel="stylesheet" href="kuwa-chat.css">
+<link rel="stylesheet" href="stage.css">
+</head>
+<body class="stage-page" data-page="home">
+
+<!-- the way in: a loading screen, then "enter with or without sound", then a ring of smoke opens onto the scene -->
+<div class="gate0" id="gate0">
+  <canvas class="g-fx" id="gFx" aria-hidden="true"></canvas>
+  <div class="g-mid">
+    <div class="g-logo">GR8<em>lending</em></div>
+    <p class="mono">Clear, fair loans for Filipino<br>families and businesses</p>
+  </div>
+  <div class="g-acts">
+    <button class="g-snd" type="button" id="enterSnd" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6M18 7a7 7 0 0 1 0 10"/></svg>Enter with sound</button>
+    <button class="g-mute" type="button" id="enterMute" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M16 10l4 4M20 10l-4 4"/></svg><span>Enter without sound</span></button>
+  </div>
+  <div class="g-bar" aria-hidden="true">
+    <div class="g-line"><i id="gLoad"></i></div>
+    <div class="g-words"><span>Experience</span><span>is loading</span><span>Please</span><span>wait</span><span class="pc" id="gPct">000%</span><span class="w">out of</span><span class="w">100%</span></div>
+  </div>
+</div>
+
+<!-- the 3D scene; its canvas carries the cursor smoke too -->
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="nogl-bg" aria-hidden="true"></div>
+
+<header class="snav">
+  <a class="brand" href="index.html" aria-label="GR8 Lending, home">GR8<em>lending</em></a>
+  <nav class="links" aria-label="Main"><a href="#about" data-room="about">About</a><a href="#loans" data-room="loans">Loans</a><a href="#talk" data-talk>Contact</a></nav>
+  <div class="tools">
+    <div class="pop"><button class="set" type="button" aria-expanded="false" aria-controls="setCard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></button>
+      <div class="card" id="setCard" role="dialog" aria-label="Settings">
+        <p class="set-h">Settings</p>
+        <div class="set-row"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6M18 7a7 7 0 0 1 0 10"/></svg>Sound</span><button class="sw" type="button" role="switch" aria-checked="false" id="sndSw" aria-label="Sound"></button></div>
+        <div class="set-row"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Dark mode</span><button class="sw" type="button" role="switch" aria-checked="false" id="darkSw" aria-label="Dark mode"></button></div>
+        <div class="set-row"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Tips</span><button class="sw" type="button" role="switch" aria-checked="true" id="tipSw" aria-label="Tips"></button></div>
+        <div class="set-row"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12c3-6 6-6 9 0s6 6 9 0"/></svg>Motion</span><button class="sw" type="button" role="switch" aria-checked="true" id="motionSw" aria-label="Motion"></button></div>
+        <hr class="set-rule">
+        <button class="set-row set-q" type="button" id="qBtn"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l3.5-4"/></svg>Quality</span><span class="q"><span class="v">High</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+      </div>
+    </div>
+    <button class="bars" type="button" id="soundBtn" aria-pressed="false" aria-label="Soundtrack"><i></i><i></i><i></i><i></i><i></i><i></i></button>
+    <a class="talk" href="#talk" aria-controls="talk">Let's talk <span>↳</span></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mob">Menu</button>
+  </div>
+  <nav class="mob" id="mob" aria-label="Main"><a href="#about" data-room="about"><i>01</i>About</a><a href="#loans" data-room="loans"><i>02</i>Loans</a><a href="#talk" data-talk><i>03</i>Contact</a></nav>
+</header>
+
+<main class="scopy">
+  <p class="kick mono">Clear, fair loans for Filipino<br>families and businesses</p>
+  <h1 class="big" aria-label="Where hard work meets a fair loan">
+    <em class="w">Where</em>
+    <span class="l"><span>Hard work meets</span></span>
+    <span class="l"><span>a fair loan</span></span>
+  </h1>
+</main>
+
+
+<!-- LOANS: the ring of cards (rooms.js); this is its writing and controls -->
+<section class="lo-ui" id="loansUI" aria-label="Our loans" hidden>
+  <div class="lo-title"><h2>OUR LOANS<sup>™</sup></h2><p class="mono" id="loNow">_01 · SALARY LOAN</p></div>
+  <div class="lo-sheet" id="loSheet" hidden>
+    <button class="lo-x" type="button" id="loX" aria-label="Close">×</button>
+    <p class="mono" id="loCat">LOANS</p><h3 id="loHead">Salary loan</h3><p class="lo-lines" id="loLines"></p><p class="lo-body" id="loBody"></p>
+    <div class="lo-acts"><a class="tk-btn lo-btn" href="loans.html#weigh"><span>Compute it</span> <b>↳</b></a><a class="lo-link" href="#talk" data-talk>Let's talk</a></div>
+  </div>
+  <div class="lo-bar">
+    <div class="lo-filter"><button class="lo-fbtn" type="button" id="loF" aria-expanded="false"><span>Filter</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg></button>
+      <div class="lo-menu" id="loMenu" hidden><button type="button" data-cat="All" class="on">Everything</button><button type="button" data-cat="Loans">The loans</button><button type="button" data-cat="How it works">How it works</button><button type="button" data-cat="What to bring">What to bring</button><button type="button" data-cat="Fair rules">Fair rules</button></div></div>
+    <div class="lo-pager"><span class="mono" id="loI">01</span><div class="lo-ticks" id="loTicks"></div><span class="mono" id="loN">16</span></div>
+  </div>
+  <p class="lo-hint mono">Drag or scroll to turn · click a card to read it</p>
+</section>
+
+
+<!-- a card's own page: the card zooms forward and becomes this (stage.js fills it in for the card you chose) -->
+<section class="lp" id="loanPage" aria-label="Loan details" hidden>
+  <figure class="lp-hero"><img id="lpImg" alt=""></figure>
+  <div class="lp-meta">
+    <div class="lp-b"><h4><span id="lpL1">Type</span> <i>↴</i></h4><p class="lp-v" id="lpV1"></p></div>
+    <div class="lp-b"><h4><span id="lpL2">Amount</span> <i>↴</i></h4><p class="lp-v" id="lpV2"></p></div>
+    <div class="lp-b"><h4><span id="lpL3">For</span> <i>↴</i></h4><ul class="lp-chips" id="lpChips"></ul></div>
+    <div class="lp-b"><h4><span id="lpL4">The idea</span> <i>↴</i></h4><p class="lp-v lp-p" id="lpP"></p></div>
+  </div>
+  <div class="lp-acts"><a class="tk-btn" href="#talk" data-talk><span>Let's talk</span> <b>↳</b></a><button class="lp-back" type="button" id="lpBack">← All loans</button></div>
+  <div class="lp-foot"><h2 class="lp-name" id="lpName"></h2><p class="lp-v" id="lpTag"></p></div>
+  <p class="lp-more" id="lpMore"><span id="lpToolT">Work it out</span> <i>↓</i></p>
+  <div class="lp-tools" id="lpTools"></div>
+</section>
+
+
+<!-- APPLY: the whole online application (apply.js), opened from any "Apply" on the site -->
+<section class="ap tk-skin" id="apply" aria-label="Apply for a loan" hidden>
+  <div class="ap-left">
+    <button class="tk-back ap-close" type="button" id="apClose">← Close</button>
+    <div class="ap-form">
+      <h2 class="tk-h ap-h"><em>Apply</em> FOR<br><span class="ar">↳</span><span class="in">A LOAN</span></h2>
+      <p class="tk-kick">About ten minutes. You'll see the whole cost before you send.<br>Nothing is approved or charged online.</p>
+      <ol class="ap-steps"><li>Your loan</li><li>About you</li><li>Work and income</li><li>Papers</li><li>Sign and send</li></ol>
+      <p class="ap-now"><span id="apStepN">01</span> <b id="apStepT">Your loan</b></p>
+      <div class="ap-body" id="apBody"></div>
+      <div class="tk-send ap-nav"><button class="tk-btn" type="button" id="apNext"><span>Next</span> <b>↳</b></button><button class="tk-back" type="button" id="apBack" hidden>← Back</button></div>
+    </div>
+    <div class="ap-done">
+      <p class="tk-h2"><em>Salamat,</em> <span id="apDoneName"></span>!</p>
+      <p class="tk-kick">Your reference is <b id="apDoneRef">W-0000-0000</b>.<br>Keep it: you'll need it with the last 4 digits of your mobile (<span id="apDoneL4"></span>) to track it.</p>
+      <ol class="tl-list ap-next"><li>A loan processor calls you within one working day to go over your papers.</li><li>An underwriter reviews what you can carry, and an approver signs off.</li><li>You see the final numbers before you sign anything, then the money is released.</li></ol>
+      <div class="tl-acts"><button class="tk-btn" type="button" id="apTrack"><span>Track it now</span> <b>↳</b></button><button class="tk-back" type="button" id="apDoneClose">Back to the site</button></div>
+      <p class="tl-v" id="apTrackOut"></p>
+    </div>
+  </div>
+  <aside class="ap-ticket" aria-label="Your loan so far">
+    <p class="mono">Your loan</p><h3 id="apTProd">Salary loan</h3>
+    <dl><div><dt>Amount</dt><dd id="apTAmt">–</dd></div><div><dt>Term</dt><dd id="apTMo">–</dd></div><div class="big"><dt>Each month</dt><dd id="apTEach">–</dd></div><div><dt>Processing fee</dt><dd id="apTFee">–</dd></div><div><dt>You receive</dt><dd id="apTNet">–</dd></div><div><dt>Total you repay</dt><dd id="apTTot">–</dd></div></dl>
+    <div class="ap-dots"><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="ap-tnote">An estimate from CALMS's own rates. The underwriter may approve a different amount or term; you'll see it before you sign.</p>
+  </aside>
+</section>
+
+<!-- ABOUT: the branch after hours (rooms.js); scrolling moves the camera through it -->
+<section class="ab-ui" id="aboutUI" aria-label="About GR8" hidden>
+  <div class="ab-track" aria-hidden="true"></div>
+  <!-- text 1: before scrolling -->
+  <div class="ab-t ab-t1 on" id="abT1">
+    <p class="mono">Hi. We're GR8 Lending, and we care<br>about one thing more than most</p>
+    <h2 class="ab-big"><span>A LOAN IS A PROMISE <i class="ar">↘</i></span><span class="in"><i class="ar">↳</i> WE KEEP OURS</span><span class="in2">IN THE <em>open</em></span></h2>
+  </div>
+  <!-- text 2: once the camera has arrived at the table -->
+  <div class="ab-t ab-t2" id="abT2">
+    <h2 class="ab-big c"><span>WE'RE A LENDER BUILT ON</span><span>CALMS, WHERE EVERY PESO</span><span><i class="ar">↳</i> IS OUT IN THE OPEN</span></h2>
+    <p class="mono c ab-foot">Credit approval and loan management,<br>for Filipino families and businesses</p>
+  </div>
+  <p class="ab-hint mono" id="abHint">Scroll <i>↓</i></p>
+</section>
+
+<!-- "Let's talk": the camera flies to the far shore and this panel slides in from the right -->
+<section class="tk" id="talk" aria-label="Let's talk" hidden>
+  <div class="tk-in">
+    <!-- 1. who's asking -->
+    <div class="tk-v" data-v="who">
+      <h2 class="tk-h"><em>Let's</em> TALK<br><span class="ar">↳</span><span class="in">WHO'S</span><br>ASKING?</h2>
+      <p class="tk-kick">Tell us who you are,<br>and we'll show you the right things.</p>
+      <div class="tk-who">
+        <button class="tk-go" type="button" data-to="loan"><span class="n">01</span><span class="t">I'm looking for a loan</span><span class="a">↳</span></button>
+        <button class="tk-go" type="button" data-to="mine"><span class="n">02</span><span class="t">I already have a loan with GR8</span><span class="a">↳</span></button>
+        <button class="tk-go" type="button" data-to="staff"><span class="n">03</span><span class="t">I work at GR8</span><span class="a">↳</span></button>
+      </div>
+    </div>
+    <!-- 2a. looking for a loan -->
+    <div class="tk-v" data-v="loan" hidden>
+      <button class="tk-back" type="button" data-to="who">← Back</button>
+      <h2 class="tk-h"><em>Let's</em> FIND<br><span class="ar">↳</span><span class="in">THE RIGHT</span><br>LOAN</h2>
+      <p class="tk-kick">Ready now? Apply online in about ten minutes.<br>Not sure yet? Leave your number and we'll call.</p>
+      <div class="tk-who tk-two"><button class="tk-go" type="button" data-apply><span class="n">A</span><span class="t">Apply now</span><span class="a">↳</span></button></div>
+      <p class="tk-or">Or have a loan officer call you back</p>
+      <form class="tk-form" id="tkForm" novalidate>
+        <fieldset class="tk-q"><legend>I need a loan for...<i>*</i></legend><div class="tk-opts" data-name="need" id="tkNeed"></div></fieldset>
+        <fieldset class="tk-q"><legend>About how much...<i>*</i></legend><div class="tk-opts" data-name="amount" data-opts="Under ₱20,000|₱20,000 – ₱50,000|₱50,000 – ₱150,000|Over ₱150,000|Not sure yet"></div></fieldset>
+        <fieldset class="tk-q"><legend>I'd like to pay it over...</legend><div class="tk-opts" data-name="months" data-opts="3 months|6 months|12 months|24 months|Help me decide"></div></fieldset>
+        <fieldset class="tk-q"><legend>Reach me by...<i>*</i></legend><div class="tk-opts" data-name="reach" data-opts="A phone call|SMS or Viber|Email"></div></fieldset>
+        <fieldset class="tk-q tk-me"><legend>About me</legend>
+          <div class="tk-fields">
+            <label class="tk-f"><span>My name<i>*</i></span><input name="name" autocomplete="name" maxlength="80" required></label>
+            <label class="tk-f"><span>Mobile</span><input name="mobile" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX" maxlength="20"></label>
+            <label class="tk-f"><span>Email</span><input name="email" type="email" autocomplete="email" maxlength="120"></label>
+            <label class="tk-f"><span>Anything else we should know</span><textarea name="message" rows="3" maxlength="1500" placeholder="Where you work, when to call, what the loan is for..."></textarea></label>
+            <label class="tk-hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+        </fieldset>
+        <div class="tk-send"><button class="tk-btn" type="submit"><span>Send it</span> <b>↳</b></button><p class="tk-note" id="tkNote">We use this only to call you back. No spam, ever.</p></div>
+      </form>
+      <div class="tk-done" id="tkDone" hidden><p class="tk-h2"><em>Salamat,</em> <span id="tkName"></span>!</p><p class="tk-kick">Your reference is <b id="tkRef">T-00000</b>.<br>A loan officer will reach you within one working day.</p><button class="tk-btn ghost" type="button" id="tkAgain"><span>Send another</span></button></div>
+    </div>
+    <!-- 2b. already a borrower -->
+    <div class="tk-v" data-v="mine" hidden>
+      <button class="tk-back" type="button" data-to="who">← Back</button>
+      <h2 class="tk-h"><em>Welcome</em><br><span class="ar">↳</span><span class="in">BACK</span></h2>
+      <p class="tk-kick">Your loan, your schedule, your papers.<br>Pick what you need.</p>
+      <div class="tk-who">
+        <a class="tk-go" href="track.html"><span class="n">01</span><span class="t">Track my application</span><span class="a">↗</span></a>
+        <a class="tk-go" href="signin.html"><span class="n">02</span><span class="t">Open My GR8</span><span class="a">↗</span></a>
+        <button class="tk-go" type="button" data-to="loan" data-ask="1"><span class="n">03</span><span class="t">Ask about my loan</span><span class="a">↳</span></button>
+      </div>
+    </div>
+    <!-- 2c. GR8 staff: sign in (a curtain over the staff app download, not a lock) -->
+    <div class="tk-v" data-v="staff" hidden>
+      <button class="tk-back" type="button" data-to="who">← Back</button>
+      <h2 class="tk-h"><em>Staff</em> ONLY<br><span class="ar">↳</span><span class="in">SIGN</span><br>IN</h2>
+      <p class="tk-kick">Use your CALMS username and password.<br>The staff app is waiting on the other side.</p>
+      <form class="tk-form tk-sign" id="stForm" novalidate>
+        <div class="tk-fields">
+          <label class="tk-f"><span>Username</span><input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="60" required></label>
+          <label class="tk-f"><span>Password</span><input name="password" type="password" autocomplete="current-password" maxlength="200" required></label>
+          <label class="tk-f" id="stCodeRow" hidden><span>6-digit code from your authenticator</span><input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*"></label>
+        </div>
+        <div class="tk-send"><button class="tk-btn" type="submit"><span>Sign in</span> <b>↳</b></button><p class="tk-note" id="stNote">Forgot it? Ask your system administrator.</p></div>
+      </form>
+    </div>
+    <!-- 2d. signed in: the staff app -->
+    <div class="tk-v" data-v="staffok" hidden>
+      <h2 class="tk-h"><em>Welcome,</em><br><span class="ar">↳</span><span class="in" id="stName">FRIEND</span></h2>
+      <p class="tk-kick"><span id="stRole">GR8 staff</span><br>Here's CALMS for your computer.</p>
+      <div class="tk-app">
+        <div class="tk-app-h"><span class="tk-app-i" aria-hidden="true">C</span><div><b>CALMS for Windows</b><small>Windows 10 or 11 · 64-bit · installer (.exe)</small></div></div>
+        <!-- the installer's public link goes in data-href (its GitHub Releases address); left empty, the button says it is coming -->
+        <a class="tk-btn" id="stDl" data-href="" href="#"><span>Download for Windows</span> <b>↓</b></a>
+        <a class="tk-link" href="../">Or open CALMS in the browser ↗</a>
+        <ol class="tk-steps"><li>Open the downloaded file and follow the installer.</li><li>If Windows warns you, choose <i>More info → Run anyway</i>.</li><li>Sign in with the same username and password.</li></ol>
+      </div>
+      <button class="tk-link tk-out" type="button" id="stOut">Sign out</button>
+    </div>
+  </div>
+</section>
+
+<div class="kw">
+  <div class="kw-say hide" id="say"><b>Hi! I'm Kuwa, your GR8 guide.</b> <span id="sayTx">Move your cursor through the scene. Click me to talk, by typing or out loud.</span><div class="acts"><a href="apply.html">Apply</a><a href="loans.html#weigh">Compute a loan</a><a href="track.html">Track mine</a><a href="loans.html">See the loans</a></div></div>
+  <button class="kw-orb orbx" id="orb" type="button" aria-label="Open the chat"><span class="o-glow"></span><span class="o-core"></span><span class="o-swirl"></span><span class="o-shine"></span></button>
+</div>
+
+<script src="gate.js"></script>
+<script src="stage.js"></script>
+<script src="tools.js"></script>
+<script src="apply.js"></script>
+<script type="module" src="scene.js"></script>
+<script src="kuwa-chat.js"></script>
+</body>
+</html>

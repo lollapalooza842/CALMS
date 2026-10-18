@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My GR8 · GR8 Lending</title>
+<meta name="theme-color" content="#f6eedf">
+<link rel="icon" type="image/png" href="../assets/img/app/icon-192.png">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="trail.css">
+<link rel="stylesheet" href="kuwa-chat.css">
+</head>
+<body data-page="home">
+<span class="draft">Draft</span>
+
+<div class="band short" data-parallax>
+  <div class="scene" aria-hidden="true"><div class="ly sky"></div><div class="ly l1" data-depth="0.3"><div class="sky2"></div></div><div class="ly l2" data-depth="0.2"></div><div class="ly l3" data-depth="0.12"></div><div class="ly l4" data-depth="0.05"></div><div class="tint"></div><div class="glow"></div><div class="ly l5"></div></div>
+  <div class="fade"></div>
+</div>
+<section class="page-hero">
+  
+  <div class="wrap"><div><span class="tag">Personal loan · LN-2026-0180 · released Jun 5, 2026</span><h1 class="lines"><span><span>Hello, <em>Maria</em></span></span></h1><p>Your next payment, your schedule and every receipt.</p></div></div>
+</section>
+
+<main class="wrap" style="padding-bottom:90px">
+  <div class="home-top">
+    <section class="due rv" aria-label="Next payment">
+      <span class="lab">Next payment</span>
+      <div class="amt" id="hNext">₱0</div>
+      <div class="when">Due <b id="hDue">–</b> <span class="count" id="hIn">–</span></div>
+      <div class="ways"><button class="btn sm" type="button">Pay with GCash</button><button class="btn sm wood" type="button">Bank deposit details</button><button class="btn sm wood" type="button">Pay at the branch</button></div>
+      <p style="margin:16px 0 0;font-size:14px;color:#c9a877">Paid somewhere else? It shows here once the branch posts it, usually the same day.</p>
+    </section>
+    <section class="paper rv" style="--d:2" aria-label="How far along">
+      <h3 style="font-size:24px">How far along</h3>
+      <div class="fence" id="hFence" aria-hidden="true"></div>
+      <span id="hPaid" style="font-size:15px;color:var(--muted)"></span>
+      <div class="kv"><div><small>Balance left</small><b id="hBal">–</b></div><div><small>Paid so far</small><b id="hSoFar">–</b></div><div><small>Penalties</small><b>₱0.00</b></div></div>
+    </section>
+  </div>
+
+  <section class="telegram rv" id="offer" data-label="A counter-offer for you" style="margin-top:26px" aria-label="A counter-offer for you">
+    <p><b>About your salary loan application APP-2026-0419.</b> We can't lend the full ₱100,000 over 24 months, but we can offer <b>₱80,000 over 18 months</b> at ₱5,724.44 a month. You'd receive ₱78,000 after the 2.5% fee. This offer is good until Oct 24.</p>
+    <div class="acts"><button class="btn" type="button" data-answer="yes">Take the offer</button><button class="btn paper" type="button" data-answer="no">No, thank you</button><a class="btn wood" href="loans.html#assay">Weigh it first</a></div>
+  </section>
+
+  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="sched">Schedule</button><button role="tab" aria-selected="false" data-tab="rcpt">Receipts</button><button role="tab" aria-selected="false" data-tab="papers">Papers</button><button role="tab" aria-selected="false" data-tab="me">Profile</button></div>
+  <section class="paper plain" data-panel="sched" style="border-top:0">
+    <table class="ledger"><thead><tr><th>#</th><th>Due</th><th class="r hide-sm">Principal</th><th class="r hide-sm">Interest</th><th class="r">Amount</th><th>Status</th></tr></thead><tbody id="hSched"></tbody></table>
+  </section>
+  <section class="paper plain" data-panel="rcpt" hidden style="border-top:0">
+    <ul class="list" id="hRcpt"></ul>
+  </section>
+  <section class="paper plain" data-panel="papers" hidden style="border-top:0">
+    <p style="margin:0 0 14px;color:var(--muted)">For your salary loan application APP-2026-0419. One paper is still missing.</p>
+    <div class="slots">
+      <div class="slot got"><span><b>Signed consent form</b><small>Signed online · Oct 12</small></span><span class="stamp green" style="margin-left:auto;font-size:14px">On file</span></div>
+      <div class="slot got"><span><b>Government ID</b><small>PhilSys ID · checked by L. Mendoza</small></span><span class="stamp green" style="margin-left:auto;font-size:14px">Checked</span></div>
+      <div class="slot got"><span><b>Pay stubs</b><small>3 months · checked</small></span><span class="stamp green" style="margin-left:auto;font-size:14px">Checked</span></div>
+      <div class="slot"><span><b>Certificate of employment</b><small>Asked for on Oct 15: "The one sent is from 2024. Please send one from this year."</small></span><button class="btn sm" type="button">Send it</button></div>
+    </div>
+  </section>
+  <section class="paper plain" data-panel="me" hidden style="border-top:0">
+    <div class="row2">
+      <div class="field"><span class="lab">Mobile number</span><span class="fig">0917 ••• 4567</span></div>
+      <div class="field"><span class="lab">Email</span><span>maria.s••••@gmail.com</span></div>
+    </div>
+    <div class="field"><span class="lab">Address</span><span>Apalit, Pampanga</span><span class="hint">To change your name, address or ID, visit the branch with your ID.</span></div>
+    <div class="field"><span class="lab">Send me word by</span>
+      <label class="check"><input type="checkbox" checked> <span>Text message, 3 days before each due date and when my loan moves</span></label>
+      <label class="check"><input type="checkbox" checked> <span>Email, with my receipts</span></label></div>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <h2>Or reach out <em>directly</em></h2>
+    <div class="cols">
+      <div><h4>Visit ↴</h4><span class="li"><i>[01]</i>Malolos branch</span><span class="li"><i>[02]</i>Mon–Sat · 8:00–5:00</span><span class="li"><i>[03]</i>[Branch address]</span></div>
+      <div><h4>Call or write ↴</h4><span class="li"><i>[01]</i>[Hotline]</span><span class="li"><i>[02]</i>[Email]</span></div>
+      <div><h4>Borrowers ↴</h4><a href="apply.html"><i>[01]</i>Apply ↗</a><a href="track.html"><i>[02]</i>Track ↗</a><a href="signin.html"><i>[03]</i>My GR8 ↗</a><a href="loans.html#faq"><i>[04]</i>Questions ↗</a></div>
+      <div><h4>GR8 staff ↴</h4><a href="../"><i>[01]</i>CALMS sign-in ↗</a><a href="downloads.html#staff"><i>[02]</i>Get the staff app ↗</a><a href="#"><i>[03]</i>Privacy notice ↗</a></div>
+    </div>
+    <div class="word" aria-hidden="true">GR8 Lending</div>
+    <div class="legal"><span>© 2026 GR8 Lending Company · SEC Reg. No. [to follow]</span><span>Powered by CALMS · Group 2-3, BulSU</span></div>
+  </div>
+</footer>
+<div class="pill" id="pill">
+  <div class="say" id="say" hidden><button type="button" aria-label="Hide">×</button><b></b><span></span><div class="acts"><a href="apply.html">Apply</a><a href="loans.html#weigh">Compute a loan</a><a href="track.html">Track mine</a></div></div>
+  <div class="card" id="pillCard" role="dialog" aria-label="Menu">
+    <h5>Menu</h5>
+    <nav>
+      <a href="index.html"><span>01</span>Home<small></small></a>
+      <a href="loans.html"><span>02</span>Loans<small>Salary · Personal · SME</small></a>
+      <a href="apply.html"><span>03</span>Apply<small>About 10 minutes</small></a>
+      <a href="track.html"><span>04</span>Track an application<small></small></a>
+      <a href="signin.html"><span>05</span>My GR8<small>Borrowers</small></a>
+      <a href="downloads.html"><span>06</span>Resources<small>Downloads · Staff app</small></a>
+    </nav>
+    <h5 style="margin-top:20px">Settings</h5>
+    <div class="set">Dark mode <button class="sw" type="button" role="switch" aria-checked="false" id="darkSw" aria-label="Dark mode"></button></div>
+    <div class="set">Kuwa's tips <button class="sw" type="button" role="switch" aria-checked="true" id="tipSw" aria-label="Kuwa's tips"></button></div>
+    <div class="cta"><a class="btn" href="index.html#talk">Let's talk loans <span class="arr">↳</span></a></div>
+  </div>
+  <div class="bar">
+    <button class="tog" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pillCard"><i></i></button>
+    <a href="index.html" aria-label="GR8 Lending, home">GR8</a>
+    <button class="orb orbx" type="button" aria-label="Open the chat" id="kuwaBtn"><span class="o-glow"></span><span class="o-core" id="kuwa"></span><span class="o-swirl"></span><span class="o-shine"></span></button>
+  </div>
+</div>
+<div class="menu-scrim" id="scrim"></div>
+<script src="trail.js"></script>
+<script src="home.js"></script>
+<script src="kuwa-chat.js"></script>
+</body>
+</html>

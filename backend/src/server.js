@@ -29,6 +29,7 @@ app.use(helmet({
 // so these addresses accept bigger bodies; everything else stays small.
 const bigJson = express.json({ limit: "15mb" });
 app.post("/api/applications", bigJson);
+app.post("/api/public/apply", express.json({ limit: "25mb" }));   // an online application with its papers attached
 app.post("/api/applications/:ref/documents", bigJson);
 app.post("/api/applications/:ref/offers/:n/answer", bigJson);      // a photo of the borrower's signed answer
 app.post("/api/applications/:ref/agreement/signed", bigJson);
@@ -49,6 +50,9 @@ app.get("/api/health", async (req, res) => {
 // the signed-in users (lib/auth.js) and the side rail's counts (routes/queues.js).
 app.use("/api", (req, res, next) => { if (req.method !== "GET") res.on("finish", () => { auth.forgetUser(); require("./routes/queues").forgetRail(); }); next(); });
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/public/kuwa", require("./routes/kuwa"));   // Kuwa, the guide on the public site: no sign-in, rate-limited
+app.use("/api/public/talk", require("./routes/talk"));   // "Let's talk" on the public site: no sign-in, rate-limited
+app.use("/api/public", require("./routes/publicApply"));   // online applications and tracking: no sign-in, rate-limited
 // Everything below needs a signed-in user (checked once per request).
 app.use("/api", (req, res, next) => Promise.resolve(auth.requireUser(req, res, next)).catch(next));
 // Work saved on a computer while offline is sent with a key, so a retry never does it twice (lib/idempotency.js).

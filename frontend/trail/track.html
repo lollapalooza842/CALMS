@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Track your application · GR8 Lending</title>
+<meta name="theme-color" content="#f6eedf">
+<link rel="icon" type="image/png" href="../assets/img/app/icon-192.png">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="trail.css">
+<link rel="stylesheet" href="kuwa-chat.css">
+</head>
+<body data-page="track">
+<span class="draft">Draft</span>
+
+<div class="band short" data-parallax>
+  <div class="scene" aria-hidden="true"><div class="ly sky"></div><div class="ly l1" data-depth="0.3"><div class="sky2"></div></div><div class="ly l2" data-depth="0.2"></div><div class="ly l3" data-depth="0.12"></div><div class="ly l4" data-depth="0.05"></div><div class="tint"></div><div class="glow"></div><div class="ly l5"></div></div>
+  <div class="fade"></div>
+</div>
+<section class="page-hero">
+  
+  <div class="wrap"><div><span class="tag">Track</span><h1 class="lines"><span><span>Track your <em>application</em></span></span></h1><p>See which step your application has reached. Just the reference number and the mobile number you applied with.</p></div></div>
+</section>
+
+<main class="wrap" style="padding:46px 0 90px">
+  <form class="paper" id="trackForm" style="display:grid;grid-template-columns:1fr 1fr auto;gap:18px;align-items:end">
+    <div class="field" style="margin:0"><label for="ref">Reference number</label><input class="input fig" id="ref" placeholder="APP-2026-0000" autocomplete="off" required></div>
+    <div class="field" style="margin:0"><label for="mob">Mobile number</label><input class="input fig" id="mob" placeholder="0917 000 0000" inputmode="tel" required></div>
+    <button class="btn" type="submit">Track</button>
+  </form>
+
+  <section class="paper map2" id="trackOut" hidden style="margin-top:30px" aria-live="polite">
+    <div class="status-head">
+      <div class="who"><h2 id="rName">–</h2><p><span id="rRef">–</span> · <span id="rLoan">–</span></p></div>
+      <span class="stamp amber">Under review</span>
+    </div>
+    <div class="line" style="--p:0"><div class="fill"></div><div class="engine" aria-hidden="true"></div>
+      <div class="station"><b>Applied</b>Oct 14</div>
+      <div class="station"><b>Papers checked</b>Oct 15</div>
+      <div class="station"><b>Review</b>Now</div>
+      <div class="station"><b>Decision</b></div>
+      <div class="station"><b>Sign</b></div>
+      <div class="station"><b>Released</b></div>
+      <div class="station"><b>Paying off</b></div>
+    </div>
+    <div class="telegram" data-label="What happens next" style="margin-top:26px">
+      <p>The underwriter reads your credit report and decides. If we can't lend the full amount, you may get a counter-offer instead. You'll get a text either way.</p>
+    </div>
+    <h3 style="margin-top:30px;font-size:24px">Updates so far</h3>
+    <ul class="wires" id="wires"></ul>
+    <p style="margin:22px 0 0;color:var(--dim);font-size:15px">Want the whole picture, papers and payments too? <a class="link" href="signin.html">Open My GR8</a> with the same mobile number.</p>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <h2>Or reach out <em>directly</em></h2>
+    <div class="cols">
+      <div><h4>Visit ↴</h4><span class="li"><i>[01]</i>Malolos branch</span><span class="li"><i>[02]</i>Mon–Sat · 8:00–5:00</span><span class="li"><i>[03]</i>[Branch address]</span></div>
+      <div><h4>Call or write ↴</h4><span class="li"><i>[01]</i>[Hotline]</span><span class="li"><i>[02]</i>[Email]</span></div>
+      <div><h4>Borrowers ↴</h4><a href="apply.html"><i>[01]</i>Apply ↗</a><a href="track.html"><i>[02]</i>Track ↗</a><a href="signin.html"><i>[03]</i>My GR8 ↗</a><a href="loans.html#faq"><i>[04]</i>Questions ↗</a></div>
+      <div><h4>GR8 staff ↴</h4><a href="../"><i>[01]</i>CALMS sign-in ↗</a><a href="downloads.html#staff"><i>[02]</i>Get the staff app ↗</a><a href="#"><i>[03]</i>Privacy notice ↗</a></div>
+    </div>
+    <div class="word" aria-hidden="true">GR8 Lending</div>
+    <div class="legal"><span>© 2026 GR8 Lending Company · SEC Reg. No. [to follow]</span><span>Powered by CALMS · Group 2-3, BulSU</span></div>
+  </div>
+</footer>
+<div class="pill" id="pill">
+  <div class="say" id="say" hidden><button type="button" aria-label="Hide">×</button><b></b><span></span><div class="acts"><a href="apply.html">Apply</a><a href="loans.html#weigh">Compute a loan</a><a href="track.html">Track mine</a></div></div>
+  <div class="card" id="pillCard" role="dialog" aria-label="Menu">
+    <h5>Menu</h5>
+    <nav>
+      <a href="index.html"><span>01</span>Home<small></small></a>
+      <a href="loans.html"><span>02</span>Loans<small>Salary · Personal · SME</small></a>
+      <a href="apply.html"><span>03</span>Apply<small>About 10 minutes</small></a>
+      <a href="track.html"><span>04</span>Track an application<small></small></a>
+      <a href="signin.html"><span>05</span>My GR8<small>Borrowers</small></a>
+      <a href="downloads.html"><span>06</span>Resources<small>Downloads · Staff app</small></a>
+    </nav>
+    <h5 style="margin-top:20px">Settings</h5>
+    <div class="set">Dark mode <button class="sw" type="button" role="switch" aria-checked="false" id="darkSw" aria-label="Dark mode"></button></div>
+    <div class="set">Kuwa's tips <button class="sw" type="button" role="switch" aria-checked="true" id="tipSw" aria-label="Kuwa's tips"></button></div>
+    <div class="cta"><a class="btn" href="index.html#talk">Let's talk loans <span class="arr">↳</span></a></div>
+  </div>
+  <div class="bar">
+    <button class="tog" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pillCard"><i></i></button>
+    <a href="index.html" aria-label="GR8 Lending, home">GR8</a>
+    <button class="orb orbx" type="button" aria-label="Open the chat" id="kuwaBtn"><span class="o-glow"></span><span class="o-core" id="kuwa"></span><span class="o-swirl"></span><span class="o-shine"></span></button>
+  </div>
+</div>
+<div class="menu-scrim" id="scrim"></div>
+<script src="trail.js"></script>
+<script src="kuwa-chat.js"></script>
+</body>
+</html>

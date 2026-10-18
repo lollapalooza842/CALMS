@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apply for a loan · GR8 Lending</title>
+<meta name="theme-color" content="#f6eedf">
+<link rel="icon" type="image/png" href="../assets/img/app/icon-192.png">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="trail.css">
+<link rel="stylesheet" href="kuwa-chat.css">
+</head>
+<body data-page="apply">
+<span class="draft">Draft</span>
+
+<div class="band short" data-parallax>
+  <div class="scene" aria-hidden="true"><div class="ly sky"></div><div class="ly l1" data-depth="0.3"><div class="sky2"></div></div><div class="ly l2" data-depth="0.2"></div><div class="ly l3" data-depth="0.12"></div><div class="ly l4" data-depth="0.05"></div><div class="tint"></div><div class="glow"></div><div class="ly l5"></div></div>
+  <div class="fade"></div>
+</div>
+<section class="page-hero">
+  
+  <div class="wrap"><div><span class="tag">Apply online</span><h1 class="lines"><span><span><em>Apply</em> for a loan</span></span></h1><p>Five short steps, about ten minutes. Have a photo of your ID ready.</p></div></div>
+</section>
+
+<main class="wrap" style="padding-bottom:90px">
+  <ol class="steps" aria-label="Your progress"><li data-n="1">Your loan</li><li data-n="2">About you</li><li data-n="3">Work and income</li><li data-n="4">Papers</li><li data-n="5">Sign and submit</li></ol>
+
+  <div class="claim">
+    <form class="paper" id="claimForm" novalidate>
+      <!-- 1 -->
+      <div class="pane">
+        <h2>What are you after?</h2><p class="sub">Pick a loan and an amount. You'll see the full cost on the ticket as you go.</p>
+        <div class="field"><span class="lab">Which loan</span><div class="seg" id="cProd" role="group" aria-label="Which loan"></div></div>
+        <div class="field"><label for="cAmt">How much</label><input class="input fig" id="cAmt" inputmode="numeric" value="50,000">
+          <div class="range"><input type="range" id="cRange" aria-label="How much" min="10000" max="200000" step="1000" value="50000"><div class="ends"><span id="cMin"></span><span id="cMax"></span></div></div></div>
+        <div class="field"><span class="lab">For how long (months)</span><div class="seg terms" id="cTerm" role="group" aria-label="Months"></div></div>
+        <div class="field"><label for="purpose">What is it for?</label><select class="input" id="purpose" required><option value="">Choose one</option><option>Tuition and school</option><option>Home repair</option><option>Medical bills</option><option>Business stock or equipment</option><option>Paying off other debts</option><option>Something else</option></select></div>
+        <div class="field"><label for="agent">Did one of our agents help you? <span class="hint">(optional)</span></label><input class="input" id="agent" placeholder="Agent's name or code"></div>
+        <div class="nav-row"><a class="btn wood" href="index.html">Not now</a><button class="btn" type="button" data-next>Next</button></div>
+      </div>
+      <!-- 2 -->
+      <div class="pane" hidden>
+        <h2>About you</h2><p class="sub">Exactly as on your government ID, so your papers match.</p>
+        <div class="row2"><div class="field"><label for="fn">First name</label><input class="input" id="fn" autocomplete="given-name" required></div><div class="field"><label for="ln">Last name</label><input class="input" id="ln" autocomplete="family-name" required></div></div>
+        <div class="row2"><div class="field"><label for="bd">Birthday</label><input class="input" id="bd" type="date" required></div><div class="field"><label for="mob">Mobile number</label><input class="input fig" id="mob" inputmode="tel" autocomplete="tel" placeholder="0917 000 0000" pattern="[0-9 +]{11,16}" required><span class="hint">We send a code here to check it's yours.</span></div></div>
+        <div class="field"><label for="em">Email <span class="hint">(optional)</span></label><input class="input" id="em" type="email" autocomplete="email"></div>
+        <div class="field"><label for="addr">Home address</label><textarea class="input" id="addr" rows="2" autocomplete="street-address" required></textarea></div>
+        <div class="row2"><div class="field"><label for="idt">ID type</label><select class="input" id="idt" required><option value="">Choose one</option><option>PhilSys ID</option><option>TIN</option><option>SSS</option><option>Driver's license</option><option>Passport</option></select></div><div class="field"><label for="idn">ID number</label><input class="input fig" id="idn" required placeholder="0000-0000-0000-0000"></div></div>
+        <div class="nav-row"><button class="btn wood" type="button" data-back>Back</button><button class="btn" type="button" data-next>Next</button></div>
+      </div>
+      <!-- 3 -->
+      <div class="pane" hidden>
+        <h2>Work and income</h2><p class="sub">This helps us find an amount you can carry comfortably.</p>
+        <div class="field"><span class="lab">How do you earn?</span><div class="seg" role="group" aria-label="How do you earn"><button type="button" aria-pressed="true">Employed</button><button type="button" aria-pressed="false">Own business</button><button type="button" aria-pressed="false">Self-employed</button></div></div>
+        <div class="row2"><div class="field"><label for="emp">Employer or business name</label><input class="input" id="emp" required></div><div class="field"><label for="yrs">Years there</label><input class="input fig" id="yrs" inputmode="numeric" required></div></div>
+        <div class="row2"><div class="field"><label for="inc">Monthly income</label><input class="input fig" id="inc" inputmode="numeric" placeholder="₱" required></div><div class="field"><label for="pay">Other loan payments a month</label><input class="input fig" id="pay" inputmode="numeric" placeholder="₱ 0"></div></div>
+        <div class="nav-row"><button class="btn wood" type="button" data-back>Back</button><button class="btn" type="button" data-next>Next</button></div>
+      </div>
+      <!-- 4 -->
+      <div class="pane" hidden>
+        <h2>Your papers</h2><p class="sub">Snap a photo with your phone or pick a file. Missing one? You can file it later from My GR8.</p>
+        <div class="slots" id="papers"></div>
+        <div class="nav-row"><button class="btn wood" type="button" data-back>Back</button><button class="btn" type="button" data-next>Next</button></div>
+      </div>
+      <!-- 5 -->
+      <div class="pane" hidden>
+        <h2>Sign and submit</h2><p class="sub">Read these, tick them, and sign with your finger or mouse.</p>
+        <label class="check"><input type="checkbox" required> <span>I let GR8 Lending check my ID, my papers and my credit report (CIC) for this application.</span></label>
+        <label class="check"><input type="checkbox" required> <span>I've read the <a class="link" href="#">privacy notice</a>. My information is used only for my loan.</span></label>
+        <label class="check"><input type="checkbox" required> <span>Everything I wrote is true. A false statement can end the application.</span></label>
+        <div class="field" style="margin-top:16px"><span class="lab">Your signature</span><div class="sigpad"><canvas aria-label="Signature pad"></canvas></div><button class="link" id="sigClear" type="button" style="justify-self:start;border:0;background:none;padding:0;font:inherit;cursor:pointer">Clear and sign again</button></div>
+        <div class="nav-row"><button class="btn wood" type="button" data-back>Back</button><button class="btn" type="button" id="file">Submit my application</button></div>
+      </div>
+    </form>
+
+    <div class="paper filed" id="filed" hidden>
+      <span class="stamp green rv slam in" style="font-size:28px">Submitted</span>
+      <h2 style="margin-top:20px;font-size:40px">You're all set.</h2>
+      <p style="max-width:520px;margin:10px auto 0;color:var(--muted)">Keep this number. We also texted it to you. A loan processor will look at your papers next, usually within one working day.</p>
+      <div class="ref">APP-2026-0412</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn" href="track.html?ref=APP-2026-0412">Track it</a><a class="btn paper" href="signin.html">Open My GR8</a></div>
+    </div>
+
+    <aside class="ticket" aria-label="Your loan so far">
+      <span class="lab">Your loan</span>
+      <h3 id="tProd">Salary loan</h3>
+      <dl><dt>Amount</dt><dd id="tAmt">–</dd><dt>Months</dt><dd id="tTerm">–</dd><dt>Processing fee</dt><dd id="tFee">–</dd><dt>You receive</dt><dd id="tNet">–</dd></dl>
+      <div class="tot"><span>Each month</span><b id="tM">–</b></div>
+      <p class="note">An estimate. The underwriter may approve a different amount or term; you'll see it before you sign anything.</p>
+    </aside>
+  </div>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <h2>Or reach out <em>directly</em></h2>
+    <div class="cols">
+      <div><h4>Visit ↴</h4><span class="li"><i>[01]</i>Malolos branch</span><span class="li"><i>[02]</i>Mon–Sat · 8:00–5:00</span><span class="li"><i>[03]</i>[Branch address]</span></div>
+      <div><h4>Call or write ↴</h4><span class="li"><i>[01]</i>[Hotline]</span><span class="li"><i>[02]</i>[Email]</span></div>
+      <div><h4>Borrowers ↴</h4><a href="apply.html"><i>[01]</i>Apply ↗</a><a href="track.html"><i>[02]</i>Track ↗</a><a href="signin.html"><i>[03]</i>My GR8 ↗</a><a href="loans.html#faq"><i>[04]</i>Questions ↗</a></div>
+      <div><h4>GR8 staff ↴</h4><a href="../"><i>[01]</i>CALMS sign-in ↗</a><a href="downloads.html#staff"><i>[02]</i>Get the staff app ↗</a><a href="#"><i>[03]</i>Privacy notice ↗</a></div>
+    </div>
+    <div class="word" aria-hidden="true">GR8 Lending</div>
+    <div class="legal"><span>© 2026 GR8 Lending Company · SEC Reg. No. [to follow]</span><span>Powered by CALMS · Group 2-3, BulSU</span></div>
+  </div>
+</footer>
+<div class="pill" id="pill">
+  <div class="say" id="say" hidden><button type="button" aria-label="Hide">×</button><b></b><span></span><div class="acts"><a href="apply.html">Apply</a><a href="loans.html#weigh">Compute a loan</a><a href="track.html">Track mine</a></div></div>
+  <div class="card" id="pillCard" role="dialog" aria-label="Menu">
+    <h5>Menu</h5>
+    <nav>
+      <a href="index.html"><span>01</span>Home<small></small></a>
+      <a href="loans.html"><span>02</span>Loans<small>Salary · Personal · SME</small></a>
+      <a href="apply.html"><span>03</span>Apply<small>About 10 minutes</small></a>
+      <a href="track.html"><span>04</span>Track an application<small></small></a>
+      <a href="signin.html"><span>05</span>My GR8<small>Borrowers</small></a>
+      <a href="downloads.html"><span>06</span>Resources<small>Downloads · Staff app</small></a>
+    </nav>
+    <h5 style="margin-top:20px">Settings</h5>
+    <div class="set">Dark mode <button class="sw" type="button" role="switch" aria-checked="false" id="darkSw" aria-label="Dark mode"></button></div>
+    <div class="set">Kuwa's tips <button class="sw" type="button" role="switch" aria-checked="true" id="tipSw" aria-label="Kuwa's tips"></button></div>
+    <div class="cta"><a class="btn" href="index.html#talk">Let's talk loans <span class="arr">↳</span></a></div>
+  </div>
+  <div class="bar">
+    <button class="tog" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pillCard"><i></i></button>
+    <a href="index.html" aria-label="GR8 Lending, home">GR8</a>
+    <button class="orb orbx" type="button" aria-label="Open the chat" id="kuwaBtn"><span class="o-glow"></span><span class="o-core" id="kuwa"></span><span class="o-swirl"></span><span class="o-shine"></span></button>
+  </div>
+</div>
+<div class="menu-scrim" id="scrim"></div>
+<script src="trail.js"></script>
+<script src="kuwa-chat.js"></script>
+</body>
+</html>
