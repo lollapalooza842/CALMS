@@ -9,8 +9,8 @@
    - On install, every screen and its files are fetched once (the list comes from the server, /sw-files.json), so a
      screen opens offline even if it was never visited on this computer.
    Change VERSION to throw away every old copy. */
-var VERSION = "calms-shell-v35";
-var SHELL = ["./", "index.html", "assets/css/fonts.css", "assets/css/theme-ui.css", "assets/css/index.css", "assets/css/entrance.css", "assets/css/classic-fonts.css", "assets/css/classic.css", "assets/css/icons.css",
+var VERSION = "calms-shell-v36";
+var SHELL = ["index.html", "assets/css/fonts.css", "assets/css/theme-ui.css", "assets/css/index.css", "assets/css/entrance.css", "assets/css/classic-fonts.css", "assets/css/classic.css", "assets/css/icons.css",
   "assets/js/entrance.js", "assets/js/api.js", "assets/js/offline.js", "assets/js/app.js", "assets/js/index.js", "assets/js/links.js", "assets/fonts/badhorse.otf", "assets/img/logo-large.webp", "assets/img/kuwa.png", "assets/img/app/icon-192.png"];
 
 self.addEventListener("install", function (e) {
@@ -39,6 +39,7 @@ self.addEventListener("message", function (e) {
 self.addEventListener("fetch", function (e) {
   var req = e.request, url = new URL(req.url);
   if (req.method !== "GET" || url.origin !== location.origin || url.pathname.indexOf("/api/") !== -1) return;
+  if (req.mode === "navigate" && url.pathname === "/") return;   /* the front door redirects to the public site: let the browser follow it */
   /* The network first, so a new version shows at once; but if the server is slow to answer (a free server waking up
      can take a minute), the kept copy is used after a moment instead of a blank page waiting. The network's answer
      still updates the copy for next time. */

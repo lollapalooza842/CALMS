@@ -103,6 +103,8 @@ app.get("/sw-files.json", (req, res) => {
 });
 // Pictures, sounds and fonts hardly ever change: the browser keeps them for a day instead of asking again on every page.
 // Pages, styles and scripts are checked each time (a quick "not changed" when they have not), so an update shows at once.
+// The site's front door is the public 3D world; staff sign in at /index.html (the desktop app goes there directly).
+app.get("/", (req, res) => res.redirect(302, "/trail/" + (req.url.indexOf("?") >= 0 ? req.url.slice(req.url.indexOf("?")) : "")));
 app.use(express.static(path.join(__dirname, "..", "..", "frontend"), { extensions: ["html"], setHeaders: (res, file) => {
   if (/\.(png|jpe?g|webp|gif|svg|ico|mp3|ogg|wav|woff2?|otf|ttf)$/i.test(file)) res.setHeader("Cache-Control", "public, max-age=86400");
   else res.setHeader("Cache-Control", "no-cache");
