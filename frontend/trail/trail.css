@@ -438,3 +438,20 @@ input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 
 }
 .pill .say .acts { display: none; } .pill .say.help .acts { display: flex; }
 .pill .say { width: min(300px, 100%); }
+
+/* Apply — informational section above the form */
+.ap-info { margin: 0 0 52px; display: grid; gap: 40px; }
+.ap-info-sec { border-top: 1px solid var(--rule); padding-top: 28px; }
+.ap-info-sec h2 { font-size: clamp(22px, 2.2vw, 32px); margin: 0 0 14px; }
+.ap-info-sec p { color: var(--ink-2); max-width: 680px; margin: 0 0 10px; line-height: 1.7; }
+.ap-process { margin: 0; padding: 0; list-style: none; counter-reset: ap; display: grid; gap: 14px; max-width: 680px; }
+.ap-process li { counter-increment: ap; display: grid; grid-template-columns: 28px 1fr; gap: 10px; color: var(--ink-2); line-height: 1.65; }
+.ap-process li::before { content: counter(ap); color: var(--ink-3); font: 400 12px/1.8 var(--mono); }
+.ap-process li b { color: var(--ink); }
+.ap-reqs dl { margin: 16px 0 0; display: grid; gap: 14px; max-width: 680px; }
+.ap-reqs dt { font: 600 14px/1.3 var(--body); color: var(--ink); margin-bottom: 3px; }
+.ap-reqs dd { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.6; }
+.ap-qualify { background: color-mix(in srgb, var(--a) 6%, var(--card)); border-radius: 18px; padding: 26px 30px; border: 1px solid color-mix(in srgb, var(--a) 20%, transparent); border-top: 0; }
+.ap-qual-box { font-size: 28px; font-weight: 700; color: var(--a); margin: 8px 0 6px; }
+.ap-note { font-size: 13px; color: var(--ink-3); }
+@media (max-width: 640px) { .ap-info { gap: 28px; } .ap-qualify { padding: 20px 18px; } }

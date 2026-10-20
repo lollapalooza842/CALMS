@@ -23,6 +23,55 @@
 </section>
 
 <main class="wrap" style="padding-bottom:90px">
+
+  <!-- How the loan process works -------------------------------------------------- -->
+  <div class="ap-info">
+    <section class="ap-info-sec">
+      <h2>How it works</h2>
+      <ol class="ap-process">
+        <li><b>You apply</b> — Fill in the form below. About ten minutes; have a photo of your ID ready.</li>
+        <li><b>We assess</b> — A loan processor reviews your papers and our system checks your credit report from FinScore, the BSP-accredited bureau. This usually takes one working day.</li>
+        <li><b>We decide</b> — We send you the offer: the approved amount, term, and monthly payment. You have time to review it before signing anything.</li>
+        <li><b>Funds released</b> — Once signed, we release the money. Salary and personal loans typically via bank transfer; SME loans are coordinated with your preferred channel.</li>
+      </ol>
+    </section>
+
+    <section class="ap-info-sec">
+      <h2>What is FinScore?</h2>
+      <p>FinScore is the Philippines' BSP-supervised credit bureau. When you apply, we send a short inquiry — with your consent — and FinScore returns a score (300–850) and your credit history. A higher score means a longer, cleaner track record. Your score is one of several things we look at; a low score does not automatically mean a refusal.</p>
+    </section>
+
+    <section class="ap-info-sec">
+      <h2>Requirements &amp; eligibility</h2>
+      <p>To borrow from GR8 you must be at least 18 years old and a Philippine resident. Beyond that, each loan type has its own list:</p>
+      <div class="ap-reqs" id="apReqs">
+        <!-- populated by JS below using the live product data -->
+        <dl>
+          <dt>Salary loan · up to ₱200,000</dt>
+          <dd>Government ID · Pay stubs · Certificate of employment · Proof of billing · Bank statement</dd>
+          <dt>Personal loan · up to ₱150,000</dt>
+          <dd>Government ID · Proof of income · Proof of billing</dd>
+          <dt>SME loan · up to ₱1,000,000</dt>
+          <dd>Government ID · DTI or SEC registration · Financial statements · Proof of address · Business permit · Bank statements</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="ap-info-sec">
+      <h2>How we assess</h2>
+      <p>Our system checks three things automatically. First, your <b>debt-to-income ratio</b> (DTI) — how much of your monthly income goes to existing loan payments, including the one you're applying for. We look for DTI below 50%. Second, your <b>FinScore</b> from the credit bureau. Third, for loans with collateral, the <b>loan-to-value ratio</b> (LTV). A loan processor then reviews the full picture and makes the call. No single number is a hard disqualifier; we read the whole story.</p>
+    </section>
+
+    <!-- Qualified amount — shown only when the page receives FinScore data (not yet live on the public site) -->
+    <section class="ap-info-sec ap-qualify" id="apQualify" hidden>
+      <h2>How much you may qualify for</h2>
+      <p id="apQualifyNote">Based on your FinScore and the information you provided, here is a preliminary range.</p>
+      <div class="ap-qual-box" id="apQualifyBox"></div>
+      <p class="ap-note">This is an estimate only. The final approved amount depends on the full assessment by a loan processor.</p>
+    </section>
+  </div>
+  <!-- End info section ------------------------------------------------------------ -->
+
   <ol class="steps" aria-label="Your progress"><li data-n="1">Your loan</li><li data-n="2">About you</li><li data-n="3">Work and income</li><li data-n="4">Papers</li><li data-n="5">Sign and submit</li></ol>
 
   <div class="claim">

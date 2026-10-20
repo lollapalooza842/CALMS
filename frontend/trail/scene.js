@@ -283,6 +283,36 @@ async function main() {
   const dgeo = new THREE.BufferGeometry(); dgeo.setAttribute("position", new THREE.BufferAttribute(dpos, 3));
   const specks = new THREE.Points(dgeo, new THREE.PointsMaterial({ size: .09, color: 0xfff1d8, transparent: true, opacity: .7, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(specks);
 
+  /* ---- fisherman on a boat: drifts slowly and peacefully across the lake ---- */
+  const boatGroup = new THREE.Group();
+  scene.add(boatGroup);
+  { const woodD = new THREE.MeshLambertMaterial({ color: 0x4a2010, flatShading: true });
+    const woodL = new THREE.MeshLambertMaterial({ color: 0x7a4422, flatShading: true });
+    const shirtM = new THREE.MeshLambertMaterial({ color: 0x4a6878, flatShading: true });
+    const hatM = new THREE.MeshLambertMaterial({ color: 0xb07828, flatShading: true });
+    const skinM = new THREE.MeshLambertMaterial({ color: 0xd48858, flatShading: true });
+    const trousM = new THREE.MeshLambertMaterial({ color: 0x3a2a50, flatShading: true });
+    const rodM = new THREE.MeshLambertMaterial({ color: 0x9a6030, flatShading: true });
+    /* hull: flattened cylinder */
+    const hullGeo = new THREE.CylinderGeometry(.55, .75, 3.2, 7, 1);
+    { const p = hullGeo.attributes.position; for (let i = 0; i < p.count; i++) p.setY(i, p.getY(i) < 0 ? p.getY(i) * .22 : p.getY(i) * .55); hullGeo.computeVertexNormals(); }
+    const hull = new THREE.Mesh(hullGeo, woodD); hull.rotation.z = Math.PI / 2; hull.position.y = .10; boatGroup.add(hull);
+    /* seat plank */
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(.11, 2.6, .30), woodL); seat.rotation.z = Math.PI / 2; seat.position.set(0, .42, .09); boatGroup.add(seat);
+    /* fisherman figure: head, hat, torso, legs, arm, rod, line */
+    const mk = (g, m, x, y, z, rx = 0, ry = 0, rz = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); boatGroup.add(o); };
+    mk(new THREE.BoxGeometry(.26, .26, .24), skinM, 0, 1.04, .12);
+    mk(new THREE.CylinderGeometry(.23, .23, .04, 10), hatM, 0, 1.19, .12);
+    mk(new THREE.CylinderGeometry(.13, .17, .18, 10), hatM, 0, 1.29, .12);
+    mk(new THREE.BoxGeometry(.34, .44, .26), shirtM, 0, .68, .10);
+    mk(new THREE.BoxGeometry(.13, .28, .26), trousM, .16, .44, .28, .55);
+    mk(new THREE.BoxGeometry(.13, .28, .26), trousM, -.16, .44, .28, .55);
+    mk(new THREE.BoxGeometry(.09, .32, .09), shirtM, .22, .68, 0, 0, 0, -.56);
+    mk(new THREE.CylinderGeometry(.016, .010, 2.4, 5), rodM, .60, 1.05, 0, 0, 0, -.60);
+    mk(new THREE.CylinderGeometry(.005, .003, 1.2, 4), new THREE.MeshLambertMaterial({ color: 0xc8a870, transparent: true, opacity: .45, depthWrite: false }), 1.44, .28, 0, 0, 0, .20);
+    boatGroup.scale.setScalar(.60); }
+  const boatPhase = rnd(0, Math.PI * 2);
+
   /* ================= the cursor through milk: a real little fluid (stable fluids, on the GPU) =================
      Velocity and "milk" live in textures. Each frame the cursor stirs both, the flow curls on itself (vorticity),
      is made incompressible (divergence -> pressure -> subtract), and carries the milk along. The milk is then laid
@@ -346,7 +376,7 @@ async function main() {
     divM.uniforms.uVelocity.value = velo.read.texture; divM.uniforms.tx.value = velo.tx; pass(divM, one.write); one.swap();
     fadeM.uniforms.uTexture.value = pres.read.texture; pass(fadeM, pres.write); pres.swap();
     presM.uniforms.uDivergence.value = one.read.texture; presM.uniforms.tx.value = velo.tx;
-    for (let i = 0; i < 18; i++) { presM.uniforms.uPressure.value = pres.read.texture; pass(presM, pres.write); pres.swap(); }
+    for (let i = 0; i < 12; i++) { presM.uniforms.uPressure.value = pres.read.texture; pass(presM, pres.write); pres.swap(); }
     gradM.uniforms.uPressure.value = pres.read.texture; gradM.uniforms.uVelocity.value = velo.read.texture; gradM.uniforms.tx.value = velo.tx; pass(gradM, velo.write); velo.swap();
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = velo.read.texture; advectM.uniforms.tx.value = velo.tx; advectM.uniforms.dt.value = dt; advectM.uniforms.dissipation.value = .35; pass(advectM, velo.write); velo.swap();
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = dye.read.texture; advectM.uniforms.dissipation.value = 1.1; pass(advectM, dye.write); dye.swap();
@@ -391,7 +421,7 @@ async function main() {
          c += vec3(1.0, .8, .6)*horizon*.6;
          c *= mix(1.0, smoothstep(.0, .65*bh + .05, bhr), bh);                             /* the middle swallows the light */
          c = mix(c, vec3(.006, .0034, .0024), smoothstep(.55, 1.0, bh)); }   /* ends on the memory lane's own dark (#120b08, in linear light) */
-       c += (h(vUv*vec2(1920.0,1080.0) + fract(time)*10.0) - .5)*.025; /* film grain */
+       /* film grain removed */
        /* moving between places: a rolling wall of cream smoke sweeps in from the edges, covers everything, then thins away */
        if (wipe > .001) { vec2 w = vUv*vec2(2.6, 1.8); float e = fb(w + vec2(time*.18, -time*.12) + fb(w*1.7 - time*.2)*1.4);
          float rad = length((vUv - .5)*vec2(1.6, 1.0));
@@ -487,7 +517,7 @@ async function main() {
     talkT += (talkOn ? 1 : -1) * dt / 2.6; talkT = Math.min(1, Math.max(0, talkT));
     const te = talkT < .5 ? 4 * talkT * talkT * talkT : 1 - Math.pow(-2 * talkT + 2, 3) / 2, home = 1 - te, lift = Math.sin(te * Math.PI) * 6;
     camera.position.set((camBase.x + emx * 4) * home + (TALK.pos.x + emx * 2) * te, (camBase.y + emy * 1.6 - lastPulse * .06) * home + (TALK.pos.y + emy * .8 + Math.sin(hop * Math.PI) * 5) * te + lift, (camBase.z - lastPulse * .32) * home + TALK.pos.z * te);
-    homeLive = talkT < 1; eight.visible = homeLive;
+    homeLive = talkT < 1; eight.visible = homeLive; boatGroup.visible = homeLive;
     const shore = !inRoom && (talkOn || talkT > 0); grove.visible = office.visible = shore;   /* the far shore is only drawn when we go there */
     tmpLook.copy(look).lerp(TALK.look, te); camera.lookAt(tmpLook);   /* the heartbeat nudges the camera in; "Let's talk" flies it to the far shore */
     const offW = innerWidth > 900 && !inRoom ? innerWidth * .25 * te : 0; if (offW > .5) camera.setViewOffset(innerWidth, innerHeight, offW, 0, innerWidth, innerHeight); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
@@ -576,6 +606,18 @@ async function main() {
     }
     bg.attributes.position.needsUpdate = true;
     if (knocked > 8 && gather >= 1) dispatchEvent(new CustomEvent("gr8:rustle", { detail: Math.min(1, knocked / 260) }));   /* stage.js: tiny beads brushing and clicking */
+
+    /* fisherman drifts slowly across the lake (still mode: frozen in place) */
+    if (homeLive) {
+      if (!still) {
+        const bt = time * .0078 + boatPhase, btz = time * .0122 + boatPhase * 1.7;
+        const bx = Math.sin(bt) * 22 + 3, bz = Math.sin(btz) * 6 + 4;
+        const bdx = Math.cos(bt) * 22 * .0078, bdz = Math.cos(btz) * 6 * .0122;
+        boatGroup.position.set(bx, Math.sin(time * 1.7 + boatPhase) * .016, bz);
+        boatGroup.rotation.y = Math.atan2(-bdz, -bdx) + Math.PI * .5;
+        boatGroup.rotation.z = Math.sin(time * 1.3 + boatPhase + 1) * .022;
+      }
+    }
 
     /* leaves and specks */
     if (!still) {

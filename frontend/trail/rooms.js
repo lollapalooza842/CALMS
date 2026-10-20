@@ -231,8 +231,8 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
   let winK = 0;
 
   /* dust in the light */
-  { const n = 260, p = new Float32Array(n * 3); for (let i = 0; i < n; i++) { p[i * 3] = rnd(-18, 18); p[i * 3 + 1] = rnd(.5, 12); p[i * 3 + 2] = rnd(-18, 12); }
-    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(p, 3)); about.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffd8b0, size: .05, transparent: true, opacity: .7, depthWrite: false }))); }
+  { const n = 80, p = new Float32Array(n * 3); for (let i = 0; i < n; i++) { p[i * 3] = rnd(-18, 18); p[i * 3 + 1] = rnd(.5, 12); p[i * 3 + 2] = rnd(-18, 12); }
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(p, 3)); about.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffd8b0, size: .04, transparent: true, opacity: .35, depthWrite: false }))); }
   /* the camera path for scrolling: wide hall -> along the shelves -> down to the table (the reference's last angle) */
   const P = (x, y, z) => new THREE.Vector3(x, y, z).add(AO);
   const camPath = new THREE.CatmullRomCurve3([P(-2, 7.5, 19), P(-7, 6.2, 13), P(-9, 4.6, 7), P(-6.5, 3.6, 4.2), P(-4.2, 3.0, 3.4)], false, "centripetal", .4);
@@ -244,11 +244,12 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
      (scene 5) and is pulled into it (the black hole, scene.js). Holds between moves give time to read. */
   const S12 = .36, endPos = camPath.getPoint(1), endLook = lookPath.getPoint(1);
   const KEYS = [
-    [S12, endPos, endLook], [.44, endPos, endLook],
-    [.56, P(2, 3.6, 4), P(18, 3, -2.5)], [.645, P(2, 3.6, 4), P(18, 3, -2.5)],
-    [.75, P(0, 4.4, -3.5), P(0, 5.8, WZ)], [.79, P(0, 4.4, -3.5), P(0, 5.8, WZ)],
-    [.88, P(0, 5.2, 4.2), P(0, 5.9, WZ)], [.92, P(0, 5.2, 4.2), P(0, 5.9, WZ)],
-    [1, P(0, 6.1, 18.4), P(0, 6.2, WZ)]
+    /* Each move segment is now ~15 % of scroll range, matching the gradual pacing of scene 1→2 (36 %). */
+    [S12, endPos, endLook], [.37, endPos, endLook],           /* hold 1 % at scene 2 */
+    [.52, P(2, 3.6, 4), P(18, 3, -2.5)], [.53, P(2, 3.6, 4), P(18, 3, -2.5)],   /* move 15 %, hold 1 % */
+    [.68, P(0, 4.4, -3.5), P(0, 5.8, WZ)], [.69, P(0, 4.4, -3.5), P(0, 5.8, WZ)],   /* move 15 %, hold 1 % */
+    [.84, P(0, 5.2, 4.2), P(0, 5.9, WZ)], [.85, P(0, 5.2, 4.2), P(0, 5.9, WZ)],     /* move 15 %, hold 1 % */
+    [1, P(0, 6.1, 18.4), P(0, 6.2, WZ)]                                               /* move 15 % to window */
   ].map(([p, pos, lk]) => { const m = new THREE.Matrix4().lookAt(pos, lk, new THREE.Vector3(0, 1, 0)); return { p, pos, q: new THREE.Quaternion().setFromRotationMatrix(m) }; });
   const qTmp = new THREE.Quaternion();
   function aboutPose(p, ox, oy) {
@@ -268,7 +269,7 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
     if (name === "about") { scrollP = scrollV = 0; winK = 0; }
   }
   function setScroll(p, snap) { scrollP = Math.max(0, Math.min(1, p)); if (snap) scrollV = scrollP; }   /* snap: jump without the lag (used by checks) */
-  function bhK() { const k = Math.min(1, Math.max(0, (scrollV - .9) / .1)); return k * k * (3 - 2 * k); }
+  function bhK() { const k = Math.min(1, Math.max(0, (scrollV - .88) / .12)); return k * k * (3 - 2 * k); }
   function update(dt, time, mx, my) {
     if (current === "loans") {
       idle += dt; if (idle > 2.5 && zoomI < 0) turnT += dt * .018 * Math.min(1, (idle - 2.5) / 3);   /* left alone, the ring keeps turning, very slowly */
@@ -291,7 +292,7 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
       scrollV += (scrollP - scrollV) * Math.min(1, dt * 2.2);   /* the camera follows the scroll with a soft, cinematic lag */
       aboutPose(scrollV, mx * .6 * (1 - bhK()), my * .3 * (1 - bhK()));
       warm.intensity = 28 + Math.sin(time * .9) * 2; ringM.emissiveIntensity = .6 + Math.sin(time * 1.2) * .15;
-      const wk = Math.min(1, Math.max(0, (scrollV - .6) / .12)); winK += (wk - winK) * Math.min(1, dt * 3);
+      const wk = Math.min(1, Math.max(0, (scrollV - .50) / .18)); winK += (wk - winK) * Math.min(1, dt * 3);
       pool.material.opacity = winK * .3; winLight.intensity = winK * 26; winU.time.value = time;
     }
   }

@@ -191,6 +191,15 @@
       <button class="tk-back" type="button" data-to="who">← Back</button>
       <h2 class="tk-h"><em>Let's</em> FIND<br><span class="ar">↳</span><span class="in">THE RIGHT</span><br>LOAN</h2>
       <p class="tk-kick">Ready now? Apply online in about ten minutes.<br>Not sure yet? Leave your number and we'll call.</p>
+      <div class="tk-borrow" id="tkBorrow" aria-label="Loan ranges">
+        <span class="tk-borrow-label">Borrow up to</span>
+        <div class="tk-borrow-pills" id="tkBorrowPills">
+          <span class="tk-borrow-pill">Salary ₱200,000</span>
+          <span class="tk-borrow-pill">Personal ₱150,000</span>
+          <span class="tk-borrow-pill">SME ₱1,000,000</span>
+        </div>
+        <a class="tk-qualify-link" href="apply.html">See how much you may qualify for ↗</a>
+      </div>
       <div class="tk-who tk-two"><button class="tk-go" type="button" data-apply><span class="n">A</span><span class="t">Apply now</span><span class="a">↳</span></button></div>
       <p class="tk-or">Or have a loan officer call you back</p>
       <form class="tk-form" id="tkForm" novalidate>
@@ -260,6 +269,20 @@
 <script src="gate.js"></script>
 <script src="stage.js"></script>
 <script src="tools.js"></script>
+<script>
+(function() {
+  var pills = document.getElementById('tkBorrowPills');
+  if (!pills || !window.GR8_DATA_READY) return;
+  window.GR8_DATA_READY.then(function(d) {
+    var prods = (d && d.products) || [];
+    if (!prods.length) return;
+    var fmt = function(n) { return '₱' + Number(n).toLocaleString('en-PH'); };
+    pills.innerHTML = prods.map(function(p) {
+      return '<span class="tk-borrow-pill">' + p.name + ' ' + fmt(p.max) + '</span>';
+    }).join('');
+  });
+})();
+</script>
 <script src="apply.js"></script>
 <script type="module" src="scene.js"></script>
 <script src="memory.js" defer></script>
