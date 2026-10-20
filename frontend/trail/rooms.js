@@ -175,6 +175,61 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
     const ball = new THREE.Mesh(new THREE.SphereGeometry(1.4, 24, 18), letterM); ball.position.set(16.5, 1.4, -7); about.add(ball);
 
     for (let i = 0; i < 3; i++) { const s = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.1, 1.6), letterM); s.position.set(15.5 + i * 1.3, .55, 2.5 + i * 1.1); s.rotation.y = -.9; about.add(s); } }
+  /* ---- scene 3: the lounge on the right, where the hall says what GR8 stands for ----
+     a round rug, a floor lamp, a tall plant, and three tall lit panels on the wall: IN THE OPEN, FAIR BY DESIGN, PEOPLE FIRST */
+  const lounge = new THREE.Group(); about.add(lounge);
+  { const rug = new THREE.Mesh(new THREE.CircleGeometry(4.6, 48), M(0x3a2220, { roughness: 1 })); rug.rotation.x = -Math.PI / 2; rug.position.set(15.2, .02, -1.6); lounge.add(rug);
+    const rug2 = new THREE.Mesh(new THREE.RingGeometry(4.2, 4.4, 64), new THREE.MeshBasicMaterial({ color: 0x8a4a2a })); rug2.rotation.x = -Math.PI / 2; rug2.position.set(15.2, .03, -1.6); lounge.add(rug2);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, 4.6, 8), metalM); pole.position.set(18.6, 2.3, -5.4); lounge.add(pole);
+    const shade = new THREE.Mesh(new THREE.ConeGeometry(.7, .8, 20, 1, true), new THREE.MeshStandardMaterial({ color: 0xe8c8a8, emissive: 0xffa860, emissiveIntensity: .9, side: THREE.DoubleSide })); shade.position.set(18.6, 4.8, -5.4); lounge.add(shade);
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(.5, .38, 1, 14), M(0x2a2024)); pot.position.set(12.2, .5, -6.4); lounge.add(pot);
+    for (let i = 0; i < 9; i++) { const lf = new THREE.Mesh(new THREE.ConeGeometry(.22, 2.6 + rnd(0, 1.4), 4), M(0x4a5a2e)); lf.position.set(12.2 + rnd(-.3, .3), 2.2, -6.4 + rnd(-.3, .3)); lf.rotation.set(rnd(-.45, .45), rnd(0, 6), rnd(-.45, .45)); lounge.add(lf); } }
+  const loungeLight = new THREE.PointLight(0xffa860, 16, 16, 1.6); loungeLight.position.set(18, 4.2, -4.8); about.add(loungeLight);
+  function panelTex(top, word) { const c = document.createElement("canvas"); c.width = 360; c.height = 720; const g = c.getContext("2d");
+    const bg = g.createLinearGradient(0, 0, 0, 720); bg.addColorStop(0, "#3a1c12"); bg.addColorStop(1, "#140906"); g.fillStyle = bg; g.fillRect(0, 0, 360, 720);
+    const rg = g.createRadialGradient(180, 300, 10, 180, 300, 300); rg.addColorStop(0, "rgba(255,150,70,.35)"); rg.addColorStop(1, "rgba(255,150,70,0)"); g.fillStyle = rg; g.fillRect(0, 0, 360, 720);
+    g.fillStyle = "rgba(255,210,170,.75)"; g.font = "500 22px 'IBM Plex Mono', monospace"; g.fillText(top, 34, 70);
+    g.fillStyle = "#fff4ea"; g.font = "400 64px 'Instrument Serif', Georgia, serif"; word.split(" ").forEach((w, k) => g.fillText(w, 34, 560 + k * 64 - (word.split(" ").length - 1) * 64));
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+  [["01 / PURPOSE", "In the open"], ["02 / IDENTITY", "Fair by design"], ["03 / VALUES", "People first"]].forEach(([top, word], k) => {
+    const a = Math.PI * (.58 - k * .08), r = HR - .35, pnl = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 4.8), new THREE.MeshBasicMaterial({ map: panelTex(top, word), toneMapped: false }));
+    pnl.position.set(Math.sin(a) * r, 4.4, Math.cos(a) * r); pnl.lookAt(0, 4.4, 0); about.add(pnl);
+    const fr = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 5), new THREE.MeshBasicMaterial({ color: 0xff8a3c, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false })); fr.position.copy(pnl.position).multiplyScalar(1.002); fr.lookAt(0, 4.4, 0); about.add(fr); });
+
+  /* ---- scenes 4 and 5: a tall window in the front wall that looks out on the lake and the 8 ----
+     It is not a picture: scene.js renders the real home world through it each frame, from a camera that moves with
+     ours, so the view has depth and parallax (sampled in screen space, like looking through real glass). */
+  const WZ = 20.3, WW = 15, WH = 9.4, WY = 6.2, winC = P0(0, WY, WZ);
+  function P0(x, y, z) { return new THREE.Vector3(x, y, z).add(AO); }
+  const winU = { tWin: { value: null }, res: { value: new THREE.Vector2(1, 1) }, on: { value: 0 }, time: { value: 0 } };
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(WW, WH), new THREE.ShaderMaterial({ uniforms: winU,
+    vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
+    fragmentShader: `uniform sampler2D tWin; uniform vec2 res; uniform float on, time; varying vec2 vUv;
+      void main(){ vec2 s = gl_FragCoord.xy / res; vec3 w = texture2D(tWin, s).rgb;
+        float sheen = smoothstep(.2, 1.0, vUv.x*.5 + vUv.y*.5) * .05; w = w*1.06 + vec3(1.0,.9,.8)*sheen;
+        w = mix(vec3(.06,.035,.03), w, on); gl_FragColor = vec4(w, 1.0);
+#include <colorspace_fragment>
+
+      }` }));
+  glass.position.set(0, WY, WZ); glass.rotation.y = Math.PI; about.add(glass);
+  { const fm = M(0x2a1814, { roughness: .55 }), bar = (w, h, d, x, y, z) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), fm); b.position.set(x, y, z); about.add(b); return b; };
+    const z = WZ - .2;
+    bar(WW + 1.2, .6, 1, 0, WY + WH / 2 + .3, z); bar(WW + 1.6, .35, 1.6, 0, WY - WH / 2 - .17, z - .3);   /* head and a deep sill */
+    bar(.6, WH + 1.2, 1, -WW / 2 - .3, WY, z); bar(.6, WH + 1.2, 1, WW / 2 + .3, WY, z);                      /* jambs */
+    [-WW / 6, WW / 6].forEach((x) => bar(.16, WH, .3, x, WY, WZ - .1)); bar(WW, .14, .3, 0, WY + WH * .18, WZ - .1);   /* mullions and a transom */
+    /* the wall around the window is flat, so the window sits in it like a real opening */
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(24, 14), M(0x1c1013, { roughness: .95 })); face.position.set(0, 7, WZ + .05); face.rotation.y = Math.PI;
+    const hole = new THREE.Shape(); hole.moveTo(-12, -7); hole.lineTo(12, -7); hole.lineTo(12, 7); hole.lineTo(-12, 7); hole.lineTo(-12, -7);
+    const hp = new THREE.Path(); hp.moveTo(-WW / 2 - .6, WY - 7 - WH / 2 - .3); hp.lineTo(-WW / 2 - .6, WY - 7 + WH / 2 + .6); hp.lineTo(WW / 2 + .6, WY - 7 + WH / 2 + .6); hp.lineTo(WW / 2 + .6, WY - 7 - WH / 2 - .3); hole.holes.push(hp);
+    face.geometry.dispose(); face.geometry = new THREE.ShapeGeometry(hole); about.add(face); }
+  /* daylight falling in: a warm pool on the floor and a light just inside the glass (both fade in with the window) */
+  const poolTex = (() => { const c = document.createElement("canvas"); c.width = 256; c.height = 256; const g = c.getContext("2d"), gr = g.createLinearGradient(0, 0, 0, 256);
+    gr.addColorStop(0, "rgba(255,210,160,.5)"); gr.addColorStop(.7, "rgba(255,190,130,.08)"); gr.addColorStop(1, "rgba(255,190,130,0)"); g.fillStyle = gr; g.filter = "blur(14px)"; g.beginPath(); g.moveTo(56, -20); g.lineTo(200, -20); g.lineTo(236, 256); g.lineTo(20, 256); g.fill(); return new THREE.CanvasTexture(c); })();
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(WW + 2, 11), new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  pool.rotation.x = -Math.PI / 2; pool.rotation.z = Math.PI; pool.position.set(0, .03, WZ - 5.6); about.add(pool);
+  const winLight = new THREE.PointLight(0xffd2a0, 0, 26, 1.4); winLight.position.set(0, 6, WZ - 3); about.add(winLight);
+  let winK = 0;
+
   /* dust in the light */
   { const n = 260, p = new Float32Array(n * 3); for (let i = 0; i < n; i++) { p[i * 3] = rnd(-18, 18); p[i * 3 + 1] = rnd(.5, 12); p[i * 3 + 2] = rnd(-18, 12); }
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(p, 3)); about.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffd8b0, size: .05, transparent: true, opacity: .7, depthWrite: false }))); }
@@ -184,6 +239,24 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
   const lookPath = new THREE.CatmullRomCurve3([P(2, 3.2, -4), P(4, 3.4, -6), P(2, 2.8, -4), P(0, 2.2, -2.2), P(1.4, 2.0, -2.6)], false, "centripetal", .4);
   let scrollP = 0, scrollV = 0;
   const tmp = new THREE.Vector3(), tmpL = new THREE.Vector3();
+  /* the whole About walk, as scroll progress p (0..1). Scenes 1 and 2 are the original path above, played over the first
+     36% exactly as before; then the camera turns to the lounge (scene 3), turns to the window (scene 4), walks up to it
+     (scene 5) and is pulled into it (the black hole, scene.js). Holds between moves give time to read. */
+  const S12 = .36, endPos = camPath.getPoint(1), endLook = lookPath.getPoint(1);
+  const KEYS = [
+    [S12, endPos, endLook], [.44, endPos, endLook],
+    [.56, P(2, 3.6, 4), P(18, 3, -2.5)], [.645, P(2, 3.6, 4), P(18, 3, -2.5)],
+    [.75, P(0, 4.4, -3.5), P(0, 5.8, WZ)], [.79, P(0, 4.4, -3.5), P(0, 5.8, WZ)],
+    [.88, P(0, 5.2, 4.2), P(0, 5.9, WZ)], [.92, P(0, 5.2, 4.2), P(0, 5.9, WZ)],
+    [1, P(0, 6.1, 18.4), P(0, 6.2, WZ)]
+  ].map(([p, pos, lk]) => { const m = new THREE.Matrix4().lookAt(pos, lk, new THREE.Vector3(0, 1, 0)); return { p, pos, q: new THREE.Quaternion().setFromRotationMatrix(m) }; });
+  const qTmp = new THREE.Quaternion();
+  function aboutPose(p, ox, oy) {
+    if (p <= S12) { const s = p / S12, t = s * s * (3 - 2 * s) * .2 + s * .8; camPath.getPoint(t, tmp); lookPath.getPoint(t, tmpL); camera.position.set(tmp.x + ox, tmp.y + oy, tmp.z); camera.lookAt(tmpL); return; }
+    let i = 0; while (i < KEYS.length - 2 && p > KEYS[i + 1].p) i++;
+    const a = KEYS[i], b = KEYS[i + 1], k = Math.min(1, Math.max(0, (p - a.p) / (b.p - a.p))), e = k * k * k * (k * (k * 6 - 15) + 10);   /* smootherstep: eased in and out */
+    camera.position.lerpVectors(a.pos, b.pos, e); qTmp.slerpQuaternions(a.q, b.q, e); camera.quaternion.copy(qTmp); camera.position.x += ox; camera.position.y += oy;
+  }
 
   /* ======================= shared ======================= */
   let current = null, savedFog = null;
@@ -192,9 +265,10 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
     if (name) { if (!savedFog) savedFog = scene.fog; scene.fog = roomFog; renderer.setClearColor(0x0a0606, 1); }
     else if (savedFog) { scene.fog = savedFog; savedFog = null; }
     if (name === "loans") { turn = turnT = CARDS[focusI].a; }
-    if (name === "about") scrollV = scrollP;
+    if (name === "about") { scrollP = scrollV = 0; winK = 0; }
   }
-  function setScroll(p) { scrollP = Math.max(0, Math.min(1, p)); }
+  function setScroll(p, snap) { scrollP = Math.max(0, Math.min(1, p)); if (snap) scrollV = scrollP; }   /* snap: jump without the lag (used by checks) */
+  function bhK() { const k = Math.min(1, Math.max(0, (scrollV - .9) / .1)); return k * k * (3 - 2 * k); }
   function update(dt, time, mx, my) {
     if (current === "loans") {
       idle += dt; if (idle > 2.5 && zoomI < 0) turnT += dt * .018 * Math.min(1, (idle - 2.5) / 3);   /* left alone, the ring keeps turning, very slowly */
@@ -215,11 +289,12 @@ export function makeRooms({ THREE, scene, camera, renderer, Reflector, small, rn
       else { camera.position.copy(basePos); camera.lookAt(baseLook); }
     } else if (current === "about") {
       scrollV += (scrollP - scrollV) * Math.min(1, dt * 2.2);   /* the camera follows the scroll with a soft, cinematic lag */
-      const t = scrollV * scrollV * (3 - 2 * scrollV) * .2 + scrollV * .8;
-      camPath.getPoint(t, tmp); lookPath.getPoint(t, tmpL);
-      camera.position.set(tmp.x + mx * .6, tmp.y + my * .3, tmp.z); camera.lookAt(tmpL);
+      aboutPose(scrollV, mx * .6 * (1 - bhK()), my * .3 * (1 - bhK()));
       warm.intensity = 28 + Math.sin(time * .9) * 2; ringM.emissiveIntensity = .6 + Math.sin(time * 1.2) * .15;
+      const wk = Math.min(1, Math.max(0, (scrollV - .6) / .12)); winK += (wk - winK) * Math.min(1, dt * 3);
+      pool.material.opacity = winK * .3; winLight.intensity = winK * 26; winU.time.value = time;
     }
   }
-  return { show, update, setScroll, focus, nudge, filter, pick, zoom, hero, cards: CARDS, get focusI() { return focusI; }, get current() { return current; } };
+  const win = { center: winC, uniforms: winU, get on() { return current === "about" && winK > .01; }, get k() { return winK; } };
+  return { show, update, setScroll, focus, nudge, filter, pick, zoom, hero, win, about, get bh() { return current === "about" ? bhK() : 0; }, cards: CARDS, get focusI() { return focusI; }, get current() { return current; } };
 }

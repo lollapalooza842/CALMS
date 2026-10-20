@@ -351,12 +351,25 @@ async function main() {
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = velo.read.texture; advectM.uniforms.tx.value = velo.tx; advectM.uniforms.dt.value = dt; advectM.uniforms.dissipation.value = .35; pass(advectM, velo.write); velo.swap();
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = dye.read.texture; advectM.uniforms.dissipation.value = 1.1; pass(advectM, dye.write); dye.swap();
   }
-  const outMat = mat({ tScene: U(rtScene.texture), tDye: U(null), dtx: U(dye.tx), time: U(0), on: U(canFloat ? 1 : 0), milk: U(new THREE.Color(1, .96, .9)), deep: U(new THREE.Color(.55, .32, .2)), beat: U(0), alarm: U(0), wipe: U(0) },
-    `uniform sampler2D tScene, tDye; uniform vec2 dtx; uniform float time, on; uniform vec3 milk, deep; uniform float beat, alarm, wipe; varying vec2 vUv;
+  const outMat = mat({ tScene: U(rtScene.texture), tDye: U(null), dtx: U(dye.tx), time: U(0), on: U(canFloat ? 1 : 0), milk: U(new THREE.Color(1, .96, .9)), deep: U(new THREE.Color(.55, .32, .2)), beat: U(0), alarm: U(0), wipe: U(0), rip: U(99), ripC: U(new THREE.Vector2(.5, .5)), asp: U(1), bh: U(0) },
+    `uniform sampler2D tScene, tDye; uniform vec2 dtx, ripC; uniform float time, on; uniform vec3 milk, deep; uniform float beat, alarm, wipe, rip, asp, bh; varying vec2 vUv;
      float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233)))*43758.5453); }
      float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
      float fb(vec2 p){ float v = 0.0, a = .5; for (int i = 0; i < 5; i++){ v += a*vn(p); p = p*2.02 + 3.1; a *= .5; } return v; }
-     void main(){ vec3 c = texture2D(tScene, vUv).rgb;
+     void main(){ vec2 uv = vUv; float rr = 0.0;
+       /* moving between places: a thin digital ripple runs out from where you clicked (two rings, stepped like a screen),
+          bending the picture a hair as it passes. It costs one distance and a sine; nothing when idle */
+       if (rip < 1.6) { vec2 dq = (vUv - ripC)*vec2(asp, 1.0); float dd = length(dq), fade = 1.0 - rip/1.6;
+         float b1 = exp(-pow((dd - rip*1.15)/.035, 2.0)), b2 = exp(-pow((dd - rip*.75)/.025, 2.0))*.5;
+         float stp = .6 + .4*step(.5, fract(dd*70.0 - rip*5.0));
+         rr = (b1 + b2)*fade*fade*stp; uv += dq/max(dd, .001)/vec2(asp, 1.0)*rr*.009; }
+       /* the end of About: a gravitational pull toward the window. The room swirls into the middle, stretches into thin
+          warm light trails and goes dark; no cut, no shake */
+       float bhr = 1.0; vec2 bd = vec2(0.0);
+       if (bh > .001) { bd = (uv - .5)*vec2(asp, 1.0); bhr = length(bd); float sw = bh*bh*1.9/(bhr + .18); float cs = cos(sw), sn = sin(sw);
+         bd = mat2(cs, -sn, sn, cs)*bd*(1.0 - bh*.55*exp(-bhr*1.6)); uv = .5 + bd/vec2(asp, 1.0); }
+       vec3 c = texture2D(tScene, uv).rgb;
+       c += vec3(1.0, .88, .74)*rr*.09;
        if (on > .5) {
          float d = texture2D(tDye, vUv).r;
          vec2 o = dtx*2.5; float gx = texture2D(tDye, vUv + vec2(o.x,0.)).r - texture2D(tDye, vUv - vec2(o.x,0.)).r, gy = texture2D(tDye, vUv + vec2(0.,o.y)).r - texture2D(tDye, vUv - vec2(0.,o.y)).r;
@@ -371,6 +384,13 @@ async function main() {
        c *= 1.0 + .045*beat;
        /* a wrong sign-in: a soft red glow spreads through the scene and fades (stage.js, gr8:alarm) */
        if (alarm > .001) { float rg = alarm * (.45 + .55*smoothstep(1.0, .1, length(q*vec2(1.6,1.0)))); vec3 warn = c*vec3(1.18,.52,.5) + vec3(.2,.015,.03); c = mix(c, warn, clamp(rg*.8, 0., .8)); }
+       if (bh > .001) { float ang = atan(bd.y, bd.x);
+         float trail = pow(vn(vec2(ang*7.0 + bhr*9.0 - time*1.4, bhr*4.0 - time*2.2)), 6.0) * smoothstep(.95, .1, bhr);
+         c += vec3(1.0, .7, .45)*trail*bh*(1.0 - bh)*2.2;                                 /* light pulled into spirals */
+         float horizon = exp(-pow((bhr - .07 - .1*(1.0 - bh))/.02, 2.0))*bh*(1.0 - bh*.8);
+         c += vec3(1.0, .8, .6)*horizon*.6;
+         c *= mix(1.0, smoothstep(.0, .65*bh + .05, bhr), bh);                             /* the middle swallows the light */
+         c = mix(c, vec3(.006, .0034, .0024), smoothstep(.55, 1.0, bh)); }   /* ends on the memory lane's own dark (#120b08, in linear light) */
        c += (h(vUv*vec2(1920.0,1080.0) + fract(time)*10.0) - .5)*.025; /* film grain */
        /* moving between places: a rolling wall of cream smoke sweeps in from the edges, covers everything, then thins away */
        if (wipe > .001) { vec2 w = vUv*vec2(2.6, 1.8); float e = fb(w + vec2(time*.18, -time*.12) + fb(w*1.7 - time*.2)*1.4);
@@ -383,15 +403,19 @@ async function main() {
   /* ================= input ================= */
   let lastPulse = 0, windKick = 0, homeLive = true, alarmT = 0, alarmV = 0;
   addEventListener("gr8:alarm", () => { alarmT = 1; }); const tmpLook = new THREE.Vector3();
+  let ripT = 99; addEventListener("gr8:ripple", (e) => { const d = e.detail || {}; outMat.uniforms.ripC.value.set(d.x == null ? .5 : d.x, d.y == null ? .5 : d.y); ripT = 0; });
+  /* the memory lane covers the whole screen: stop drawing the world under it (stage.js) */
+  let paused = false; addEventListener("gr8:pause3d", (e) => { paused = !!e.detail; });
+  addEventListener("gr8:room", () => { paused = false; }); addEventListener("gr8:talk", () => { paused = false; });   /* any move wakes it at once */
   const ripA = [99, 99, 99, 99], ripS = [0, 0, 0, 0]; let ripI = 0, beatT = 99, beats = 0, nextBeat = rnd(4, 6), sinceBeat = 0;
-  let fr = 0, morph = 0, plx = 0, ply = 0, mx = .5, my = .5, pmx = .5, pmy = .5, moved = false, emx = 0, emy = 0, still = !!window.GR8_STILL, gather = 0, gathering = false, t0 = performance.now();
+  let reading = false, fr = 0, morph = 0, plx = 0, ply = 0, mx = .5, my = .5, pmx = .5, pmy = .5, moved = false, emx = 0, emy = 0, still = !!window.GR8_STILL, gather = 0, gathering = false, t0 = performance.now();
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3(), plane = new THREE.Plane(), local = new THREE.Vector3(9e9, 9e9, 0);
-  let hitOn = false; const clicks = [];
-  const onMove = (x, y) => { mx = x / innerWidth; my = 1 - y / innerHeight; moved = true; hitOn = true; };
+  let hitOn = false, stirAt = -1e9; const clicks = [];
+  const onMove = (x, y) => { mx = x / innerWidth; my = 1 - y / innerHeight; moved = true; hitOn = true; stirAt = performance.now(); };
   addEventListener("pointermove", (e) => onMove(e.clientX, e.clientY), { passive: true });
   addEventListener("touchmove", (e) => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
   document.addEventListener("pointerleave", () => { hitOn = false; });
-  addEventListener("pointerdown", (e) => { if (still || talkOn || inRoom || e.target.closest("a, button, .card, .kw, .snav")) return; burst(1); if (canFloat) { const a = Math.random() * 6.28; for (let k = 0; k < 6; k++) { const b = a + k * 1.047; clicks.push([mx + Math.cos(b) * .02, my + Math.sin(b) * .03, -Math.sin(b) * 1400, Math.cos(b) * 1400]); } } });
+  addEventListener("pointerdown", (e) => { if (still || talkOn || inRoom || e.target.closest("a, button, .card, .kw, .snav")) return; burst(1); stirAt = performance.now(); if (canFloat) { const a = Math.random() * 6.28; for (let k = 0; k < 6; k++) { const b = a + k * 1.047; clicks.push([mx + Math.cos(b) * .02, my + Math.sin(b) * .03, -Math.sin(b) * 1400, Math.cos(b) * 1400]); } } });
   function burst(k) { for (let i = 0; i < N; i++) { const q = i * 3, x = pos[q], y = pos[q + 1], d = Math.hypot(x, y) || 1, sp = rnd(4, 9) * k; ov[q] += (x / d * .8 - y / d * .6) * sp; ov[q + 1] += (y / d * .8 + x / d * .6) * sp; ov[q + 2] += rnd(-1, 1) * sp * .6; } }
   addEventListener("gr8:enter", () => { gathering = true; t0 = performance.now(); });
   addEventListener("gr8:still", (e) => { still = e.detail.on; });
@@ -399,7 +423,7 @@ async function main() {
   /* ================= resize ================= */
   function resize() {
     const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    rtScene.setSize(w * DPR, h * DPR); water.getRenderTarget().setSize(w * DPR * .5, h * DPR * .5); beadU.scale.value = h * DPR * .5; velo.size(); dye.size(); pres.size(); one.size();
+    rtScene.setSize(w * DPR, h * DPR); rtWin.setSize(w * DPR * .5, h * DPR * .5); water.getRenderTarget().setSize(w * DPR * .5, h * DPR * .5); beadU.scale.value = h * DPR * .5; velo.size(); dye.size(); pres.size(); one.size();
   }
   addEventListener("resize", resize);
   addEventListener("gr8:quality", (e) => { const q = e.detail; if (!QK[q]) return; DPR = Math.min(devicePixelRatio || 1, 1.75) * QK[q]; renderer.setPixelRatio(DPR); resize(); });
@@ -427,9 +451,28 @@ async function main() {
   addEventListener("pointermove", (e) => { if (dragX == null) return; const d = e.clientX - dragX; dragX = e.clientX; dragMoved += Math.abs(d); rooms.nudge(-d * .0025); });
   addEventListener("pointerup", (e) => { if (dragX == null) return; dragX = null; if (dragMoved < 6) { const i = rooms.pick(e.clientX / innerWidth * 2 - 1, 1 - e.clientY / innerHeight * 2); if (i >= 0) { rooms.focus(i); dispatchEvent(new CustomEvent("gr8:card", { detail: i })); } } });
   window.GR8_ROOMS = rooms;
+  /* ---- the window in the About hall: a portal onto the home world ----
+     Room and home face opposite ways (the window looks out toward +z, the home view looks toward -z), so our camera's
+     offset from the glass is turned half round and laid onto a point just behind the home camera. The home world is
+     drawn from there with our own lens, into a half-size picture the glass samples in screen space: real depth and
+     parallax as the camera moves, for one extra small render, only while the window is in view. */
+  const rtWin = new THREE.WebGLRenderTarget(innerWidth * DPR * .5, innerHeight * DPR * .5, { type: canFloat ? THREE.HalfFloatType : THREE.UnsignedByteType });
+  const winCam = new THREE.PerspectiveCamera(), HOME_AT = new THREE.Vector3(0, small ? 7.4 : 6.6, 22), qHalf = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI), rel = new THREE.Vector3();
+  rooms.win.uniforms.tWin.value = rtWin.texture;
+  function renderWindow() {
+    rel.subVectors(camera.position, rooms.win.center).applyQuaternion(qHalf); winCam.position.copy(HOME_AT).add(rel);
+    winCam.quaternion.copy(qHalf).multiply(camera.quaternion); winCam.projectionMatrix.copy(camera.projectionMatrix); winCam.projectionMatrixInverse.copy(camera.projectionMatrixInverse); winCam.updateMatrixWorld();
+    const fog = scene.fog; scene.fog = worldFog; rooms.about.visible = false; worldList.forEach((o) => { o.visible = o !== grove && o !== office; }); eight.visible = true;
+    renderer.setRenderTarget(rtWin); renderer.render(scene, winCam);
+    worldList.forEach((o) => { o.visible = false; }); rooms.about.visible = true; scene.fog = fog; eight.visible = false;
+    rooms.win.uniforms.res.value.set(rtScene.width, rtScene.height); rooms.win.uniforms.on.value = 1;
+  }
   const clock = new THREE.Clock(); let time = 0;
   function frame() {
-    const dt = Math.min(clock.getDelta(), .05); if (!still) time += dt;
+    const dt = Math.min(clock.getDelta(), .05);
+    if (paused && !wipeDir && inRoom === "about") { requestAnimationFrame(frame); return; }
+    if (!still) time += dt;
+    const flowAwake = performance.now() - stirAt < 7000;   /* the milk settles in a few seconds; after that the fluid sleeps */
     /* day and night, eased */
     moodT = document.documentElement.classList.contains("dark") ? 1 : 0; mood += (moodT - mood) * Math.min(1, .04 * dt * 60);
     skyU.top.value.copy(C(DAY.top, NIGHT.top)); skyU.mid.value.copy(C(DAY.mid, NIGHT.mid)); skyU.hor.value.copy(C(DAY.hor, NIGHT.hor)); skyU.sunC.value.copy(C(DAY.sun, NIGHT.sun)); skyU.night.value = mood; skyU.time.value = time;
@@ -445,6 +488,7 @@ async function main() {
     const te = talkT < .5 ? 4 * talkT * talkT * talkT : 1 - Math.pow(-2 * talkT + 2, 3) / 2, home = 1 - te, lift = Math.sin(te * Math.PI) * 6;
     camera.position.set((camBase.x + emx * 4) * home + (TALK.pos.x + emx * 2) * te, (camBase.y + emy * 1.6 - lastPulse * .06) * home + (TALK.pos.y + emy * .8 + Math.sin(hop * Math.PI) * 5) * te + lift, (camBase.z - lastPulse * .32) * home + TALK.pos.z * te);
     homeLive = talkT < 1; eight.visible = homeLive;
+    const shore = !inRoom && (talkOn || talkT > 0); grove.visible = office.visible = shore;   /* the far shore is only drawn when we go there */
     tmpLook.copy(look).lerp(TALK.look, te); camera.lookAt(tmpLook);   /* the heartbeat nudges the camera in; "Let's talk" flies it to the far shore */
     const offW = innerWidth > 900 && !inRoom ? innerWidth * .25 * te : 0; if (offW > .5) camera.setViewOffset(innerWidth, innerHeight, offW, 0, innerWidth, innerHeight); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
     if (inRoom) { homeLive = false; eight.visible = false; rooms.update(dt, time, emx, emy); }
@@ -458,10 +502,10 @@ async function main() {
     }
     outMat.uniforms.wipe.value = wipe;
     { const k = 1 - Math.exp(-dt * 1.5); TALK.pos.lerp(SPOTS[spot].pos, k); TALK.look.lerp(SPOTS[spot].look, k); hop *= Math.exp(-dt * 1.2); }
-    for (let i = 0; i < PN; i++) { const q = PP[i]; dummy.position.set(q.x + Math.sin(time * q.sp + q.ph) * .6, q.y + Math.sin(time * .7 + q.ph) * .35, q.z); dummy.rotation.set(Math.sin(time * .4 + q.ph) * .8, time * q.sp + q.ph, Math.cos(time * .3 + q.ph) * .5); dummy.scale.setScalar(1); dummy.updateMatrix(); papers.setMatrixAt(i, dummy.matrix); }
+    if (shore) for (let i = 0; i < PN; i++) { const q = PP[i]; dummy.position.set(q.x + Math.sin(time * q.sp + q.ph) * .6, q.y + Math.sin(time * .7 + q.ph) * .35, q.z); dummy.rotation.set(Math.sin(time * .4 + q.ph) * .8, time * q.sp + q.ph, Math.cos(time * .3 + q.ph) * .5); dummy.scale.setScalar(1); dummy.updateMatrix(); papers.setMatrixAt(i, dummy.matrix); }
     papers.instanceMatrix.needsUpdate = true; lampLight.intensity = 13 + Math.sin(time * 3.1) * .4;
     grassU.time.value = time; glowLight.intensity = 22 + 10 * Math.sin(time * .8) + Math.max(0, lastPulse) * 10;
-    for (let i = 0; i < fallN; i++) { const f = FL[i]; f.y -= dt * f.sp * .7; f.x += Math.sin(time * 1.3 + f.ph) * dt * .5; f.r += dt * 2; if (f.y < .7) { f.y = rnd(7, 11); f.x = rnd(-6, 6); f.z = rnd(-6, 5); }
+    if (shore) for (let i = 0; i < fallN; i++) { const f = FL[i]; f.y -= dt * f.sp * .7; f.x += Math.sin(time * 1.3 + f.ph) * dt * .5; f.r += dt * 2; if (f.y < .7) { f.y = rnd(7, 11); f.x = rnd(-6, 6); f.z = rnd(-6, 5); }
       dummy.position.set(f.x, f.y, f.z); dummy.rotation.set(f.r, f.r * .7, f.r * .4); dummy.scale.setScalar(.38); dummy.updateMatrix(); fall.setMatrixAt(i, dummy.matrix); }
     fall.instanceMatrix.needsUpdate = true;
 
@@ -477,7 +521,9 @@ async function main() {
     const wantM = window.GR8_MORPH != null ? window.GR8_MORPH : want;   /* GR8_MORPH: set 0 or 1 in the console to hold a shape */
     morph = still ? 0 : morph + (wantM - morph) * Math.min(1, dt * 1.6);
     /* the beads ride the milk's current: read the flow (a small copy, every other frame) */
-    if (homeLive && canFloat && (fr++ & 1) === 0) { readM.uniforms.uVelocity.value = velo.read.texture; pass(readM, rtRead); renderer.readRenderTargetPixels(rtRead, 0, 0, RW, RH, readBuf); }
+    /* read without stalling: the copy comes back a frame or two later (asynchronous), and only while the flow is moving */
+    if (homeLive && canFloat && flowAwake && !reading && (fr++ & 1) === 0) { readM.uniforms.uVelocity.value = velo.read.texture; pass(readM, rtRead); reading = true;
+      renderer.readRenderTargetPixelsAsync(rtRead, 0, 0, RW, RH, readBuf).catch(() => {}).then(() => { reading = false; }); }
     const mvp = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(eight.matrixWorld).elements;
     const dist = camera.position.distanceTo(eight.position), viewH = 2 * dist * Math.tan(camera.fov * Math.PI / 360), viewW = viewH * camera.aspect;
     const kx = viewW / velo.w * VMAX / 127.5, ky = viewH / velo.h * VMAX / 127.5;   /* flow (grid cells a second) -> world units a second */
@@ -505,7 +551,8 @@ async function main() {
     if (window.GR8_RING) { window.GR8_RING = 0; ripA[ripI] = 0; ripS[ripI] = 1; ripI = (ripI + 1) % 4; }   /* GR8_RING = 1 in the console rings the water once */
     water.material.uniforms.ripA.value.set(ripA[0], ripA[1], ripA[2], ripA[3]); water.material.uniforms.ripS.value.set(ripS[0], ripS[1], ripS[2], ripS[3]);
     let knocked = 0; const relax = Math.exp(-2.0 * dt), drag = Math.exp(-2.8 * dt), K = 1.8 * dt;
-    if (homeLive && (!still || gather < 1)) for (let i = 0; i < N; i++) {
+    const winLive = inRoom === "about" && rooms.win.on;   /* the 8 is seen through the About window too, so it keeps living there */
+    if ((homeLive || winLive) && (!still || gather < 1)) for (let i = 0; i < N; i++) {
       const q = i * 3, sd = seed[i];
       /* home: between the two shapes, each bead leaving at its own moment and arcing on the way */
       const lag = Math.min(1, Math.max(0, morph * 1.6 - (sd % 1) * .6)), e = lag * lag * (3 - 2 * lag), arc = Math.sin(e * Math.PI);
@@ -516,7 +563,7 @@ async function main() {
       hx *= hb; hy *= hb; hz *= hb;
       if (gather < 1) { const a = time * .25 + sd, gi = gather * gather * (3 - 2 * gather); hx = hx * gi + Math.cos(a) * 13 * (1 - gi); hy = hy * gi + (Math.sin(a * .7) * 5 + 3) * (1 - gi); hz = hz * gi + (Math.sin(a) * 9 - 6) * (1 - gi); }
       /* the milk's current at this bead, on screen: it pushes the bead along, and lifts it a little in depth */
-      if (canFloat && gather >= .6) { const px = hx + off[q], py = hy + off[q + 1], pz = hz + off[q + 2];
+      if (canFloat && homeLive && flowAwake && gather >= .6) { const px = hx + off[q], py = hy + off[q + 1], pz = hz + off[q + 2];
         const cw = mvp[3] * px + mvp[7] * py + mvp[11] * pz + mvp[15], sx = (mvp[0] * px + mvp[4] * py + mvp[8] * pz + mvp[12]) / cw, sy = (mvp[1] * px + mvp[5] * py + mvp[9] * pz + mvp[13]) / cw;
         const gx = (sx * .5 + .5) * (RW - 1), gy = (sy * .5 + .5) * (RH - 1);
         if (gx >= 0 && gy >= 0 && gx <= RW - 1 && gy <= RH - 1) { const ix = Math.min(RW - 2, gx | 0), iy = Math.min(RH - 2, gy | 0), fx = gx - ix, fy = gy - iy, b = (iy * RW + ix) * 4, b2 = b + RW * 4;
@@ -550,10 +597,13 @@ async function main() {
         const n = Math.min(12, Math.ceil(len / .01)), rad = .0022 + sp * .0018, over = Math.max(1, Math.min(n, Math.sqrt(rad) / (len / n) * .5));
         for (let k = 1; k <= n; k++) { const f = k / n; splat(pmx + ddx * f, pmy + ddy * f, ux * velo.h * 1.6 / over, uy * velo.h * 1.6 / over, (.012 + .05 * sp) / over * Math.min(1, dt * 60) * (inRoom === "loans" ? .12 : 1), rad); } }   /* barely any smoke in the Loans hall */
       while (clicks.length) { const c = clicks.pop(); splat(c[0], c[1], c[2], c[3], .35, .006); }
-      step(dt);
+      if (flowAwake) step(dt);
     }
     pmx = mx; pmy = my; moved = false;
 
+    /* the About window: draw the home world from a camera that mirrors ours through the glass, then the room */
+    if (inRoom === "about" && rooms.win.on) renderWindow();
+    ripT += dt; outMat.uniforms.rip.value = ripT; outMat.uniforms.asp.value = innerWidth / innerHeight; outMat.uniforms.bh.value = rooms.bh;
     /* the picture, then the milk over it */
     renderer.setRenderTarget(rtScene); renderer.render(scene, camera);
     outMat.uniforms.tDye.value = dye.read.texture; outMat.uniforms.dtx.value = dye.tx; outMat.uniforms.time.value = time; quad.material = outMat;
@@ -563,7 +613,7 @@ async function main() {
   /* first leaves placed, then go */
   for (let i = 0; i < LN; i++) { const l = L[i]; dummy.position.set(l.x, l.y, l.z); dummy.rotation.set(l.r, l.r, 0); dummy.updateMatrix(); leaves.setMatrixAt(i, dummy.matrix); }
   if (still) { gather = .999; gathering = true; }
-  prog(.95); renderer.compile(scene, camera);
+  prog(.95); renderer.compile(scene, camera); grove.visible = office.visible = false; renderer.compile(scene, camera);   /* both light setups, so going to the far shore never stalls */
   requestAnimationFrame(frame);
   setTimeout(() => { prog(1); dispatchEvent(new Event("gr8:ready")); }, 200);
 }

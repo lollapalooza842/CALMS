@@ -150,18 +150,26 @@
   }
 
   /* ---- open / close ---- */
-  var lastFocus = null;
+  var lastFocus = null, apTok = 0, want = false;
+  function isOpen() { return want; }
   function open(pre) {
+    want = true; var tok = ++apTok;
     (window.GR8_DATA_READY || Promise.resolve()).then(function () {
+      if (tok !== apTok) return;   /* closed (or moved away) before the data arrived */
       fresh(pre); ap.classList.remove("sent"); ap.hidden = false; ap.inert = false; lastFocus = document.activeElement;
-      root.classList.add("ap-open"); draw(); requestAnimationFrame(function () { root.classList.add("ap-set"); });
+      root.classList.add("ap-open"); draw(); requestAnimationFrame(function () { if (tok === apTok) root.classList.add("ap-set"); });
       if (location.hash !== "#apply") history.pushState({ ap: 1 }, "", "#apply");
       if (window.GR8_STAGE) window.GR8_STAGE.menuSnd(true);
+      window.dispatchEvent(new Event("gr8:applyopen"));
     });
   }
-  function close() {
-    if (!root.classList.contains("ap-open")) return; root.classList.remove("ap-set"); setTimeout(function () { root.classList.remove("ap-open"); ap.inert = true; }, 700);
-    if (location.hash === "#apply") history.back();
+  /* close({ nav: true }) is used when the visitor goes somewhere else from here: no "back", no sound, no focus jump;
+     the #apply entry is swapped for a plain one so the next page's own entry follows it cleanly */
+  function close(opt) {
+    var nav = opt && opt.nav; if (!want) return; want = false; var tok = ++apTok;
+    root.classList.remove("ap-set"); ap.inert = true; setTimeout(function () { if (tok === apTok) root.classList.remove("ap-open"); }, 700);
+    if (location.hash === "#apply") { if (nav) history.replaceState(null, "", location.pathname + location.search); else history.back(); }
+    if (nav) return;
     if (window.GR8_STAGE) window.GR8_STAGE.menuSnd(false); if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
   ap.inert = true;
@@ -177,7 +185,7 @@
     fetch("/api/public/track?ref=" + encodeURIComponent($("#apDoneRef").textContent) + "&last4=" + encodeURIComponent($("#apDoneL4").textContent)).then(function (r) { return r.json(); })
       .then(function (j) { out.textContent = j.note || j.error || ""; }).catch(function () { out.textContent = "We couldn't reach CALMS just now."; });
   });
-  addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("ap-open") && !root.classList.contains("kc-open")) close(); });
-  addEventListener("popstate", function () { if (location.hash !== "#apply" && root.classList.contains("ap-open")) close(); });
-  window.GR8_APPLY = { open: open, close: close };
+  addEventListener("keydown", function (e) { if (e.key === "Escape" && want && !root.classList.contains("kc-open")) close(); });
+  addEventListener("popstate", function () { if (location.hash !== "#apply" && want) close({ nav: true }); });
+  window.GR8_APPLY = { open: open, close: close, isOpen: isOpen };
 })();

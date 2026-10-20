@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Website visitors · CALMS</title>
+<!-- Who opens the public website: counts only (no names, no addresses). For the System Administrator, the Operations
+     Manager and the Compliance Auditor. Data: GET /api/visits?days=N (backend/src/routes/visits.js). -->
+<style>
+  :root { --bg: #f7f1ea; --card: #fffaf4; --ink: #2a1810; --soft: #6e5446; --mute: #9a8072; --line: #e6d8ca; --bar: #c0562f; --bar2: #e8892a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #161009; --card: #20170f; --ink: #f6e8da; --soft: #cdb6a4; --mute: #9a8072; --line: #3a2a20; --bar: #e8892a; --bar2: #f3cf7a; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 28px 16px 60px; }
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  h1 { margin: 0; font: 600 28px/1.1 Georgia, serif; } .sub { margin: 6px 0 0; color: var(--soft); max-width: 640px; }
+  .range { display: flex; gap: 6px; } .range button { border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 8px 12px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px; }
+  .range button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 22px 0; }
+  .tile, .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .tile b { display: block; font: 600 34px/1.1 Georgia, serif; } .tile span { color: var(--soft); font-size: 13px; }
+  .card h2 { margin: 0 0 12px; font: 600 16px/1.3 system-ui, sans-serif; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-top: 12px; }
+  .chart { position: relative; height: 220px; } .chart svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .chart .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); padding: 6px 9px; border-radius: 8px; font-size: 12.5px; white-space: nowrap; transform: translate(-50%, -110%); opacity: 0; transition: opacity .12s; }
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .rows li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+  .rows i { grid-column: 1 / -1; display: block; height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; } .rows i::after { content: ""; display: block; height: 100%; width: var(--w); background: var(--bar); border-radius: 4px; }
+  .rows b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .note { color: var(--soft); font-size: 13px; margin-top: 18px; } .msg { margin-top: 30px; padding: 18px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); }
+  details { margin-top: 10px; } summary { cursor: pointer; color: var(--soft); font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; } th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); } td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>Website visitors</h1><p class="sub">How many people open the public website, which parts they open, where they come from and on what device. Counts only: no names and no addresses are kept.</p></div>
+    <div class="range" role="group" aria-label="Period"><button type="button" data-d="7">7 days</button><button type="button" data-d="30" aria-pressed="true">30 days</button><button type="button" data-d="90">90 days</button></div>
+  </header>
+  <div id="out"></div>
+  <p class="note">A "visitor" is one person on one browser on one day; the same person coming back on another day counts again. Visitors whose browser asks not to be tracked are not counted. <a href="../index.html">Back to CALMS</a></p>
+</div>
+<script src="../assets/js/visitors.js"></script>
+</body>
+</html>

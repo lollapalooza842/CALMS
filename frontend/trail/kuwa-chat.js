@@ -175,14 +175,14 @@
   window.KUWA_CHAT = { open: open, close: close, ask: function (q) { open(); ask(q); } };
 })();
 
-/* The orb on every page: hovering it draws the surroundings in, very faintly (a vignette centred on the orb). */
+/* The orb on every page: hovering it dims the surroundings toward the edges (a vignette centred on the orb). */
 (function () {
   var vig = document.createElement("div"); vig.className = "orb-vig"; vig.setAttribute("aria-hidden", "true");
   function add() { if (!vig.isConnected) document.body.appendChild(vig); }
   document.addEventListener("pointerover", function (e) {
     var o = e.target.closest && e.target.closest(".orbx"); if (!o || (e.relatedTarget && o.contains(e.relatedTarget))) return;
     add(); var r = o.getBoundingClientRect(); vig.style.setProperty("--ox", (r.left + r.width / 2) + "px"); vig.style.setProperty("--oy", (r.top + r.height / 2) + "px");
-    requestAnimationFrame(function () { vig.classList.add("on"); });
+    requestAnimationFrame(function () { requestAnimationFrame(function () { vig.classList.add("on"); }); });   /* two frames, so the fade always runs */
   });
   document.addEventListener("pointerout", function (e) { var o = e.target.closest && e.target.closest(".orbx"); if (o && !(e.relatedTarget && o.contains(e.relatedTarget))) vig.classList.remove("on"); });
 })();

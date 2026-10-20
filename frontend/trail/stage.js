@@ -107,13 +107,59 @@
       isOn: function () { return on; }
     };
   }
-  /* which music plays where: the Loans hall has its own upbeat track; everywhere else, the calm one. They crossfade. */
-  var groove = null, here = "home";
+  /* ---- the memory lane's music (end of About): mellow and nostalgic, like an old cassette. A soft electric piano rolls
+     slow chords (Fmaj9, Em7, Dm9, Cadd9) at 64 bpm with a round bass, a few quiet melody notes through a long echo, a
+     gentle "tape wow" bending every note a hair, and a faint crackle. Original, built here. ---- */
+  function Memory() {
+    var A = ctx(), master = A.createGain(); master.gain.value = 0;
+    var lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1900; lp.Q.value = .3;
+    var comp = A.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
+    /* tape wow: everything passes through a short delay whose length drifts slowly, bending the pitch a hair */
+    var wd = A.createDelay(.1); wd.delayTime.value = .014; master.connect(wd); wd.connect(lp); lp.connect(comp); comp.connect(A.destination);
+    var rev = A.createConvolver(), rl = A.sampleRate * 3.5, ir = A.createBuffer(2, rl, A.sampleRate); for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var k = 0; k < rl; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / rl, 2.8); }
+    rev.buffer = ir; var wet = A.createGain(); wet.gain.value = .5; rev.connect(wet); wet.connect(master);
+    var dl = A.createDelay(2), fb = A.createGain(); dl.delayTime.value = .7; fb.gain.value = .35; dl.connect(fb); fb.connect(dl); dl.connect(rev); dl.connect(master);
+    var wow = A.createOscillator(), wowG = A.createGain(); wow.frequency.value = .5; wowG.gain.value = .0018; wow.connect(wowG); wowG.connect(wd.delayTime); wow.start();
+    /* the crackle: a few random tiny ticks in a loop of near-silence */
+    var cb = A.createBuffer(1, A.sampleRate * 3, A.sampleRate), cd = cb.getChannelData(0); for (var i = 0; i < 70; i++) { var at = Math.random() * cd.length | 0, v = Math.random() * .6; for (var j = 0; j < 30 && at + j < cd.length; j++) cd[at + j] = (Math.random() * 2 - 1) * v * Math.exp(-j / 6); }
+    var crk = null, crkG = A.createGain(), crkF = A.createBiquadFilter(); crkF.type = "highpass"; crkF.frequency.value = 1800; crkG.gain.value = .05; crkF.connect(crkG); crkG.connect(master);
+    var mtof = function (m) { return 440 * Math.pow(2, (m - 69) / 12); }, BEAT = 60 / 64, BAR = BEAT * 4;
+    var CH = [[53, 57, 60, 64, 67], [52, 55, 59, 62], [50, 53, 57, 60, 64], [48, 55, 59, 62, 64]], MEL = [72, 74, 76, 77, 79, 81, 84];
+    var ci = 0, next = 0, timer = 0, on = false;
+    function ep(t, m, v, len, send) {   /* one electric-piano note: a sine with a soft second and third harmonic, a quick knock and a long fade */
+      var g = A.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .012); g.gain.exponentialRampToValueAtTime(v * .35, t + .5); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      [[1, 1], [2, .22], [3, .06]].forEach(function (h) { var o = A.createOscillator(), hg = A.createGain(); o.type = "sine"; o.frequency.value = mtof(m) * h[0]; hg.gain.value = h[1]; o.connect(hg); hg.connect(g); o.start(t); o.stop(t + len + .05); });
+      g.connect(master); g.connect(rev); if (send) g.connect(dl);
+    }
+    function tick() {
+      var now = A.currentTime;
+      while (next < now + 1) {
+        var ch = CH[ci % CH.length], t = next;
+        ch.forEach(function (m, k) { ep(t + k * .035, m, .045, BAR + 1.5); });
+        var b = A.createOscillator(), bg = A.createGain(); b.type = "sine"; b.frequency.value = mtof(ch[0] - 12);
+        bg.gain.setValueAtTime(0, t); bg.gain.linearRampToValueAtTime(.16, t + .06); bg.gain.exponentialRampToValueAtTime(.0001, t + BAR); b.connect(bg); bg.connect(master); b.start(t); b.stop(t + BAR + .05);
+        var n = 1 + (Math.random() * 3 | 0); for (var q = 0; q < n; q++) ep(t + BEAT * (1 + (Math.random() * 3 | 0)) + Math.random() * .05, MEL[Math.random() * MEL.length | 0], .03, 3, true);
+        ci++; next += BAR;
+      }
+      timer = setTimeout(tick, 500);
+    }
+    return {
+      start: function () { if (on) return; on = true; var t = A.currentTime + .05; if (next < t) next = t + .3; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(.5, t + 3);
+        if (!crk) { crk = A.createBufferSource(); crk.buffer = cb; crk.loop = true; crk.connect(crkF); crk.start(); } clearTimeout(timer); tick(); },
+      stop: function () { if (!on) return; on = false; var t = A.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(0, t + 2.2); setTimeout(function () { if (!on) clearTimeout(timer); }, 2300); },
+      isOn: function () { return on; }
+    };
+  }
+  /* which music plays where: the Loans hall has its own upbeat track, the memory lane its nostalgic one; everywhere
+     else, the calm one. They crossfade. */
+  var groove = null, memory = null, here = "home", memOn = false;
   function syncBgm() {
     var want = soundOn() && !document.hidden;
-    if (!want) { if (music) music.stop(); if (groove) groove.stop(); return; }
-    if (here === "loans") { if (!groove) groove = Groove(); groove.start(); if (music) music.stop(); }
-    else { if (!music) music = Music(); music.start(); if (groove) groove.stop(); }
+    if (!want) { if (music) music.stop(); if (groove) groove.stop(); if (memory) memory.stop(); return; }
+    var which = memOn && here === "about" ? "memory" : here === "loans" ? "groove" : "music";
+    if (which === "memory") { if (!memory) memory = Memory(); memory.start(); } else if (memory) memory.stop();
+    if (which === "groove") { if (!groove) groove = Groove(); groove.start(); } else if (groove) groove.stop();
+    if (which === "music") { if (!music) music = Music(); music.start(); } else if (music) music.stop();
   }
   addEventListener("gr8:place", function (e) { here = e.detail; syncBgm(); });
   /* ---- sound effects (only while sound is on) ---- */
@@ -178,7 +224,8 @@
     ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(v * .8, t + .02); ng.gain.setTargetAtTime(0, t + .04, .06); s.connect(nl); nl.connect(ng); ng.connect(o); s.start(t, Math.random(), .4);
   }
   /* the orb in the corner beats with the 8: a quick swell of its glow */
-  function orbBeat() { [document.getElementById("orb"), body].forEach(function (el) { if (!el) return; el.classList.remove("beat"); void el.offsetWidth; el.classList.add("beat"); }); }
+  /* (only the orb's own small layers animate, with transform and opacity: no page-wide class, no forced layout) */
+  function orbBeat() { var o = document.getElementById("orb"); if (!o) return; o.classList.remove("beat"); requestAnimationFrame(function () { requestAnimationFrame(function () { if (page === "home") o.classList.add("beat"); }); }); }
   addEventListener("gr8:beat", function () {
     if (page !== "home") return;
     orbBeat();
@@ -249,6 +296,24 @@
     ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(.12, t + .05); ng.gain.exponentialRampToValueAtTime(.0001, t + .24);
     s.connect(bp); bp.connect(ng); ng.connect(o); s.start(t, Math.random(), .3);
   }
+  /* moving between places (About, Loans, Let's talk, home): a soft digital ripple. A glassy sine drop gliding down, then
+     three quieter, higher echoes spreading out like rings on water, each with a faint FM shimmer, over a low round body.
+     Short and quiet; the big smoke "whoosh" belongs only to the first way in. */
+  var lastRipple = 0;
+  function navRipple() {
+    if (!soundOn()) return; var now = performance.now(); if (now - lastRipple < 250) return; lastRipple = now;
+    var A = ctx(), o = out(), t = A.currentTime + .01;
+    [[0, 880, .1], [.12, 1320, .045], [.26, 1760, .026], [.42, 2350, .015]].forEach(function (r) {
+      var at = t + r[0], osc = A.createOscillator(), mod = A.createOscillator(), mg = A.createGain(), g = A.createGain(), p = A.createStereoPanner ? A.createStereoPanner() : null;
+      osc.type = "sine"; osc.frequency.setValueAtTime(r[1], at); osc.frequency.exponentialRampToValueAtTime(r[1] * .62, at + .2);
+      mod.type = "sine"; mod.frequency.value = r[1] * 1.5; mg.gain.setValueAtTime(r[1] * .3, at); mg.gain.exponentialRampToValueAtTime(1, at + .14); mod.connect(mg); mg.connect(osc.frequency);
+      g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(r[2], at + .008); g.gain.exponentialRampToValueAtTime(.0001, at + .45);
+      osc.connect(g); if (p) { p.pan.value = (Math.random() * 2 - 1) * .5; g.connect(p); p.connect(o); } else g.connect(o);
+      osc.start(at); mod.start(at); osc.stop(at + .5); mod.stop(at + .5);
+    });
+    var b = A.createOscillator(), bg = A.createGain(); b.type = "sine"; b.frequency.setValueAtTime(230, t); b.frequency.exponentialRampToValueAtTime(140, t + .3);
+    bg.gain.setValueAtTime(0, t); bg.gain.linearRampToValueAtTime(.07, t + .02); bg.gain.exponentialRampToValueAtTime(.0001, t + .5); b.connect(bg); bg.connect(o); b.start(t); b.stop(t + .55);
+  }
   /* choosing something (a switch, a setting, the orb): two quick bright notes, up for on, down for off */
   function pick(on) {
     if (!soundOn()) return; var A = ctx(), o = out(), t = A.currentTime;
@@ -279,7 +344,7 @@
   }
   document.addEventListener("pointerover", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
-    var el = e.target.closest && e.target.closest(".snav .links a, .set > span, .set-row > span:first-child, .set-q > span:first-child, .talk, .menu-btn, .mob a, .tk-opt .t, .tk-btn > span, .tk-go .t, .tk-back, .tk-link, .lo-link, .kw-say .acts a, .g-snd, .g-mute, .kc-chips button");   /* only things you can click */
+    var el = e.target.closest && e.target.closest(".snav .links a, .talk, .menu-btn, .mob a, .tk-opt .t, .tk-btn > span, .tk-go .t, .tk-back, .tk-link, .lo-link, .kw-say .acts a, .g-snd, .g-mute, .kc-chips button");   /* only things you can click */
     if (!el || el === hoverEl || !activeHere(el)) return; hoverEl = el; typeIn(el);
   }, true);
   document.addEventListener("pointerout", function (e) { if (hoverEl && !hoverEl.contains(e.relatedTarget)) hoverEl = null; }, true);
@@ -301,7 +366,7 @@
   /* ================= settings, menu ================= */
   var pop = $(".pop"), setBtn = $(".set", pop), nav = $(".snav"), popT = 0;
   /* Settings rolls down by itself while the pointer is over it, and rolls back up when it leaves; a click (or a tap) still works */
-  function popOpen(o) { if (pop.classList.contains("open") === o) return; pop.classList.toggle("open", o); setBtn.setAttribute("aria-expanded", String(o)); menuSnd(o); }
+  function popOpen(o) { if (pop.classList.contains("open") === o) return; pop.classList.toggle("open", o); setBtn.setAttribute("aria-expanded", String(o)); }   /* silent: no sound on hover, open or close */
   pop.addEventListener("pointerenter", function (e) { if (e.pointerType !== "mouse") return; clearTimeout(popT); popOpen(true); });
   pop.addEventListener("pointerleave", function (e) { if (e.pointerType !== "mouse") return; clearTimeout(popT); popT = setTimeout(function () { popOpen(false); }, 220); });
   setBtn.addEventListener("click", function (e) { e.stopPropagation(); popOpen(!pop.classList.contains("open")); });
@@ -388,7 +453,7 @@
     talkBtn.innerHTML = open ? 'Close <span>↵</span>' : talkLabel;
     window.dispatchEvent(new CustomEvent("gr8:talk", { detail: { open: open, spot: spotFor(view) } }));
     if (open) show2(view === "staffok" ? "staffok" : "who", true);
-    if (!quiet) { menuSnd(open); if (soundOn()) whoosh(); }
+    if (!quiet) { navRipple(); ripple(); }
     if (open) { say.classList.add("hide"); if (location.hash !== "#talk") history.pushState(null, "", "#talk"); setTimeout(function () { var f = $("input, button", tk); if (f && innerWidth > 900) f.focus({ preventScroll: true }); }, 2000); }
     else if (location.hash === "#talk") history.pushState(null, "", location.pathname + location.search);
   }
@@ -454,11 +519,35 @@
   });
   $("#stOut").addEventListener("click", function () { fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(function () {}).then(function () { stStep = "pw"; $("#stCodeRow").hidden = true; show2("staff"); }); });
   $("#stDl").addEventListener("click", function (e) { if (!this.dataset.href) e.preventDefault(); });
-  Array.prototype.forEach.call(document.querySelectorAll("[data-talk]"), function (a) { a.addEventListener("click", function (e) { e.preventDefault(); if (!entered) return; nav.classList.remove("open"); setTalk(true); }); });
-  talkBtn.addEventListener("click", function (e) { e.preventDefault(); if (!entered) return; setTalk(!talkOpen); });
-  addEventListener("popstate", function () { var h = location.hash; if (h === "#talk") setTalk(true); else if (h === "#loans" || h === "#about") setRoom(h.slice(1)); else if (h === "#apply") { if (window.GR8_APPLY) window.GR8_APPLY.open({}); } else { setTalk(false); setRoom(null); } });
-  addEventListener("keydown", function (e) { if (e.key === "Escape" && talkOpen && !root.classList.contains("kc-open")) setTalk(false); });
-  addEventListener("gr8:enter", function () { var h = location.hash; if (h === "#talk") setTimeout(function () { setTalk(true, true); }, 3200); else if (h === "#loans" || h === "#about") setTimeout(function () { setRoom(h.slice(1)); }, 2400); });
+  /* ================= one way to move between places =================
+     Every link, button, the back button and the other scripts go through go(). It first closes whatever lies on top
+     (the Apply page, a card's page, the menus) without touching the history, then moves. A move can start while another
+     is still running: the smoke simply turns round (scene.js), nothing waits for anything, so nothing can get stuck. */
+  var px = innerWidth / 2, py = innerHeight / 2;
+  addEventListener("pointerdown", function (e) { px = e.clientX; py = e.clientY; }, true);
+  function ripple() { window.dispatchEvent(new CustomEvent("gr8:ripple", { detail: { x: px / innerWidth, y: 1 - py / innerHeight } })); }
+  function closeOverlays() {
+    if (window.GR8_APPLY && window.GR8_APPLY.isOpen()) window.GR8_APPLY.close({ nav: true });
+    if (lpI != null || lpBusy) lpReset();
+    popOpen(false); nav.classList.remove("open"); mb.setAttribute("aria-expanded", "false"); mb.textContent = "Menu";
+    if (!loMenu.hidden) { loMenu.hidden = true; loF.setAttribute("aria-expanded", "false"); }
+  }
+  function go(where) {
+    if (!entered) return; closeOverlays();
+    if (where === "talk") setTalk(true);
+    else if (where === "loans" || where === "about") setRoom(where);
+    else { if (talkOpen) setTalk(false); if (room) setRoom(null); }
+    var h = where === "home" ? "" : "#" + where;   /* already there (e.g. under the Apply page): just make the address match */
+    if (location.hash !== h) history.replaceState(null, "", h || location.pathname + location.search);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-talk]"), function (a) { a.addEventListener("click", function (e) { e.preventDefault(); go("talk"); }); });
+  talkBtn.addEventListener("click", function (e) { e.preventDefault(); if (!entered) return; var covered = window.GR8_APPLY && window.GR8_APPLY.isOpen(); go(talkOpen && !covered ? "home" : "talk"); });
+  addEventListener("popstate", function () {
+    var h = location.hash; if (h === "#apply") { if (window.GR8_APPLY) window.GR8_APPLY.open({}); return; }
+    go(h === "#talk" ? "talk" : h === "#loans" || h === "#about" ? h.slice(1) : "home");
+  });
+  addEventListener("keydown", function (e) { if (e.key === "Escape" && talkOpen && !root.classList.contains("kc-open") && !(window.GR8_APPLY && window.GR8_APPLY.isOpen())) go("home"); });
+  addEventListener("gr8:enter", function () { var h = location.hash; if (h === "#talk") setTimeout(function () { if (!talkOpen && !room) setTalk(true, true); }, 3200); else if (h === "#loans" || h === "#about") setTimeout(function () { if (!talkOpen && !room) setRoom(h.slice(1)); }, 2400); });
   /* the choices: radio rows, built from the lists in the page (and the live loan products for the first one) */
   function opts(box, list) {
     var name = box.dataset.name; box.innerHTML = "";
@@ -507,17 +596,17 @@
     var o = document.getElementById("orb"); if (o) o.classList.remove("beat"); body.classList.remove("beat");
     var want = name ? "#" + name : ""; if (location.hash !== want) history.pushState(null, "", want || location.pathname + location.search);
     window.dispatchEvent(new CustomEvent("gr8:room", { detail: { room: name } }));
-    if (soundOn()) whoosh(); menuSnd(!!name);
+    navRipple(); ripple();
   }
   /* the smoke has covered the screen and the place has changed: show that place's writing */
   addEventListener("gr8:place", function (e) {
     var at = e.detail; root.classList.toggle("at-loans", at === "loans"); root.classList.toggle("at-about", at === "about");
     loUI.inert = at !== "loans"; abUI.inert = at !== "about";
-    if (at === "loans") loansReady(); if (at === "about") { abUI.scrollTop = 0; abState = -1; abSet(0); window.dispatchEvent(new CustomEvent("gr8:aboutscroll", { detail: 0 })); }
+    if (at === "loans") loansReady(); if (at === "about") abReset();
     if (at !== "loans") $("#loSheet").hidden = true;
   });
-  Array.prototype.forEach.call(document.querySelectorAll("[data-room]"), function (a) { a.addEventListener("click", function (e) { e.preventDefault(); nav.classList.remove("open"); setRoom(a.dataset.room); }); });
-  $(".brand").addEventListener("click", function (e) { if (!room && !talkOpen) return; e.preventDefault(); if (talkOpen) setTalk(false); if (room) setRoom(null); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-room]"), function (a) { a.addEventListener("click", function (e) { e.preventDefault(); go(a.dataset.room); }); });
+  $(".brand").addEventListener("click", function (e) { var covered = window.GR8_APPLY && window.GR8_APPLY.isOpen(); if (!room && !talkOpen && !covered) return; e.preventDefault(); go("home"); });
   /* LOANS: pager ticks, the filter, the card you're looking at, the sheet for the card you clicked */
   var loBuilt = false, loCat = "All";
   function cards() { return (window.GR8_ROOMS && window.GR8_ROOMS.cards) || []; }
@@ -543,14 +632,33 @@
     window.dispatchEvent(new CustomEvent("gr8:loansfilter", { detail: loCat })); pick(true); }); });
   addEventListener("keydown", function (e) { if (room !== "loans" || /input|textarea/i.test(document.activeElement.tagName)) return; var i = (window.GR8_ROOMS && window.GR8_ROOMS.focusI) || 0;
     if (e.key === "ArrowRight") window.dispatchEvent(new CustomEvent("gr8:cardgo", { detail: i + 1 })); if (e.key === "ArrowLeft") window.dispatchEvent(new CustomEvent("gr8:cardgo", { detail: i - 1 })); if (e.key === "Escape") $("#loSheet").hidden = true; });
-  /* ABOUT: the scroll drives the camera (scene.js follows it with a soft lag). Text 1 holds until the move begins and
-     fades away; text 2 arrives only once the camera has reached the table. Nothing else appears in between. */
-  var abState = 1;
+  /* ABOUT: five scenes, driven by the scroll (scene.js follows it with a soft lag). p runs 0..1 over the tall track:
+       1 and 2 (0 - .44): the original walk to the table, its two texts at the same moments as before;
+       3 (lounge: purpose, identity, values), 4 (turning to the window), 5 (at the window: history, leadership, team);
+       then (.92 - 1) the pull into the window, and past the track the memory lane scrolls up out of the dark.
+     Each text shows only while the camera holds still for it. */
+  var abState = 1, AB_T = [[0, .065], [.31, .45], [.53, .645], [.735, .8], [.865, .93]], memCover = false;
   function abSet(p) {
-    var st = p < .18 ? 1 : p > .86 ? 2 : 0; if (st === abState) return; abState = st;
-    $("#abT1").classList.toggle("on", st === 1); $("#abT2").classList.toggle("on", st === 2); $("#abHint").classList.toggle("gone", st !== 1);
+    var st = 0; AB_T.forEach(function (r, k) { if (p >= r[0] && p < r[1]) st = k + 1; }); if (p <= 0) st = 1; if (st === abState) return; abState = st;
+    for (var k = 1; k <= 5; k++) $("#abT" + k).classList.toggle("on", st === k); $("#abHint").classList.toggle("gone", st !== 1);
   }
-  abUI.addEventListener("scroll", function () { var m = abUI.scrollHeight - abUI.clientHeight, p = m > 0 ? abUI.scrollTop / m : 0; abSet(p); window.dispatchEvent(new CustomEvent("gr8:aboutscroll", { detail: p })); }, { passive: true });
+  function abScroll() {
+    var track = $(".ab-track", abUI), m = track.offsetHeight - abUI.clientHeight, p = m > 0 ? Math.min(1, abUI.scrollTop / m) : 0;
+    abSet(p); window.dispatchEvent(new CustomEvent("gr8:aboutscroll", { detail: p }));
+    var past = abUI.scrollTop - m, mem = p > .97;   /* the nostalgic music fades in as the pull ends */
+    if (mem !== memOn) { memOn = mem; syncBgm(); }
+    var cover = past > abUI.clientHeight * 1.45;   /* the memory lane fills the screen: the 3D world can rest */
+    if (cover !== memCover) { memCover = cover; window.dispatchEvent(new CustomEvent("gr8:pause3d", { detail: cover })); }
+    root.classList.toggle("ab-mem", past > 0);
+  }
+  abUI.addEventListener("scroll", abScroll, { passive: true });
+  /* leaving About (or coming back) always starts it fresh: top of the walk, calm music, the world drawing again */
+  function abReset() { abUI.scrollTop = 0; abState = -1; abSet(0); if (memOn) { memOn = false; syncBgm(); } if (memCover) { memCover = false; window.dispatchEvent(new CustomEvent("gr8:pause3d", { detail: false })); } root.classList.remove("ab-mem"); window.dispatchEvent(new CustomEvent("gr8:aboutscroll", { detail: 0 })); }
+  addEventListener("gr8:place", function (e) { if (e.detail !== "about") abReset(); });
+  abUI.addEventListener("click", function (e) {
+    if (e.target.closest("[data-top]")) { e.preventDefault(); abUI.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (e.target.closest("[data-talk-ml]")) { e.preventDefault(); go("talk"); }
+  });
 
   /* ================= the Loans hall: a small gear tick each time the ring clicks round to the next card ================= */
   var lastGear = 0;
@@ -583,7 +691,7 @@
     { l1: "Type", v1: "Fair rule", l2: "Since", v2: "Day one", l3: "In practice", chips: ["We call first", "Rate shown up front", "In your agreement"], l4: "Our promise", p: "If you miss a due date we reach out first and talk it through. The late penalty is in your agreement from day one.", name: "late? we'll talk.", tag: "A call before any penalty" },
     { l1: "Type", v1: "Fair rule", l2: "Since", v2: "Day one", l3: "In practice", chips: ["CALMS only", "Need to know", "Every view logged"], l4: "Our promise", p: "What you give us stays in CALMS, seen only by the people working on your loan, and every look is written down.", name: "your data, kept.", tag: "Used only for your loan" }
   ];
-  var lpI = null, lpBusy = false;
+  var lpI = null, lpBusy = false, lpTok = 0;
   function lpFill(i) {
     var c = cards()[i], d = PAGES[i] || {}; if (!c) return;
     $("#lpL1").textContent = d.l1 || "Type"; $("#lpV1").textContent = d.v1 || c.cat;
@@ -596,30 +704,50 @@
   }
   /* click a card -> the camera glides into it -> the card's picture fills the screen -> it settles to the right as the page */
   function lpOpen(i) {
-    if (lpBusy || lpI != null || room !== "loans") return; lpBusy = true; lpI = i; lpFill(i);
-    window.dispatchEvent(new CustomEvent("gr8:cardzoom", { detail: i })); pick(true); if (soundOn()) whoosh();
+    if (lpBusy || lpI != null || room !== "loans") return; lpBusy = true; lpI = i; lpFill(i); var tok = ++lpTok;
+    window.dispatchEvent(new CustomEvent("gr8:cardzoom", { detail: i })); pick(true);
     var pg = $("#loanPage"); pg.hidden = false; pg.inert = false; loUI.inert = true;
-    setTimeout(function () { root.classList.add("lp-open"); }, 900);
-    setTimeout(function () { root.classList.add("lp-set"); lpBusy = false; }, 1500);
+    setTimeout(function () { if (tok === lpTok) root.classList.add("lp-open"); }, 900);
+    setTimeout(function () { if (tok === lpTok) { root.classList.add("lp-set"); lpBusy = false; } }, 1500);
   }
+  /* drop a card's page at once (when moving somewhere else) */
+  function lpReset() { lpTok++; root.classList.remove("lp-set", "lp-open"); $("#loanPage").inert = true; loUI.inert = room !== "loans"; lpI = null; lpBusy = false; window.dispatchEvent(new CustomEvent("gr8:cardzoom", { detail: null })); }
   function lpClose() {
-    if (lpI == null || lpBusy) return; lpBusy = true; root.classList.remove("lp-set");
-    setTimeout(function () { root.classList.remove("lp-open"); window.dispatchEvent(new CustomEvent("gr8:cardzoom", { detail: null })); }, 700);
-    setTimeout(function () { $("#loanPage").inert = true; loUI.inert = room !== "loans"; lpI = null; lpBusy = false; }, 1400); menuSnd(false);
+    if (lpI == null || lpBusy) return; lpBusy = true; root.classList.remove("lp-set"); var tok = ++lpTok;
+    setTimeout(function () { if (tok !== lpTok) return; root.classList.remove("lp-open"); window.dispatchEvent(new CustomEvent("gr8:cardzoom", { detail: null })); }, 700);
+    setTimeout(function () { if (tok !== lpTok) return; $("#loanPage").inert = true; loUI.inert = room !== "loans"; lpI = null; lpBusy = false; }, 1400); menuSnd(false);
   }
   $("#loanPage").inert = true;
   $("#lpBack").addEventListener("click", lpClose);
   addEventListener("keydown", function (e) { if (e.key === "Escape" && lpI != null) lpClose(); });
-  addEventListener("gr8:place", function (e) { if (e.detail !== "loans" && lpI != null) { root.classList.remove("lp-set", "lp-open"); $("#loanPage").inert = true; lpI = null; lpBusy = false; window.dispatchEvent(new CustomEvent("gr8:cardzoom", { detail: null })); } });
+  addEventListener("gr8:place", function (e) { if (e.detail !== "loans" && (lpI != null || lpBusy)) lpReset(); });
 
   /* the page's working parts sit below the first screen of a card page; the hint scrolls down to them */
   $("#lpMore").addEventListener("click", function () { var t = $("#lpTools"); $("#loanPage").scrollTo({ top: t.offsetTop - 90, behavior: "smooth" }); });
   /* "Apply now" anywhere opens the Apply page */
   Array.prototype.forEach.call(document.querySelectorAll("[data-apply]"), function (b) { b.addEventListener("click", function (e) { e.preventDefault(); if (window.GR8_APPLY) window.GR8_APPLY.open({}); }); });
   addEventListener("gr8:enter", function () { if (location.hash === "#apply") setTimeout(function () { if (window.GR8_APPLY) window.GR8_APPLY.open({}); }, 2600); });
+  /* ================= counting visits (no names) =================
+     One small note to CALMS when the page opens, and one the first time each part (About, Loans, Let's talk, Apply) is
+     opened in a visit. Only the part, the referring site's name and phone/computer are sent; the server keeps a one-way
+     daily code to count a person once a day, never the address. Browsers that ask not to be tracked send nothing. */
+  var noTrack = navigator.doNotTrack === "1" || window.doNotTrack === "1" || navigator.globalPrivacyControl === true;
+  var sentParts = {};
+  function beacon(kind, part) {
+    if (noTrack || location.protocol === "file:") return;
+    var body = JSON.stringify({ kind: kind, part: part, ref: kind === "open" ? document.referrer : "" });
+    try { if (navigator.sendBeacon && navigator.sendBeacon("/api/public/visit", new Blob([body], { type: "application/json" }))) return; } catch (e) {}
+    fetch("/api/public/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body: body, keepalive: true }).catch(function () {});
+  }
+  function partSeen(part) { if (sentParts[part]) return; sentParts[part] = true; beacon("part", part); }
+  beacon("open", "home");
+  addEventListener("gr8:place", function (e) { if (e.detail === "about" || e.detail === "loans" || e.detail === "talk") partSeen(e.detail); });
+  addEventListener("gr8:talk", function (e) { if (e.detail && e.detail.open) partSeen("talk"); });
+  addEventListener("gr8:applyopen", function () { partSeen("apply"); });
   /* what the other scripts (tools.js, apply.js) may use */
   window.GR8_STAGE = {
     pick: function (on) { pick(on); }, menuSnd: function (on) { menuSnd(on); }, alarm: function () { window.dispatchEvent(new Event("gr8:alarm")); },
-    talk: function (message) { if (window.GR8_APPLY) window.GR8_APPLY.close(); setTalk(true); setTimeout(function () { show2("loan"); var m = $("#tkForm [name=message]"); if (m && message) m.value = message; }, 600); }
+    go: go,
+    talk: function (message) { go("talk"); setTimeout(function () { show2("loan"); var m = $("#tkForm [name=message]"); if (m && message) m.value = message; }, 600); }
   };
 })();
