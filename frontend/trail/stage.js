@@ -2,10 +2,9 @@
    corner, and the soundtrack. The 3D scene itself is scene.js; the two talk through window events:
      gr8:progress {p} / gr8:ready  from the scene while it loads;   gr8:enter  when the visitor comes in;
      gr8:still {on}                when motion is switched off or on.
-   The soundtrack is played live by the browser (Web Audio), nothing to download and no one else's music: a soft "aah"
-   choir (sawtooth voices through vowel formants) in a nine-second cathedral reverb, a high shimmer above it, a deep bass,
-   and a lone soprano line that enters on the emotional chords. The progression lifts through a minor iv (Gm6) and the
-   bVI - bVII - I climb (Bb - C - D) before landing home. Moving the cursor brightens the choir, so it answers the hand. */
+   The soundtrack is played live by the browser (Web Audio), nothing to download and no one else's music: warm pads moving
+   through four chords, a soft bass, bell notes picked at random from a pentatonic scale, all through a long reverb.
+   Moving the cursor opens the filter a little, so the music answers the hand like the picture does. */
 (function () {
   "use strict";
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -20,101 +19,53 @@
   function Music() {
     var A = ctx();
     var master = A.createGain(); master.gain.value = 0;
-    var comp = A.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; comp.knee.value = 14;
+    var comp = A.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.knee.value = 12;
     master.connect(comp); comp.connect(A.destination);
-    /* a cathedral: nine seconds of soft tail, eased in so it blooms rather than clicks, each side its own */
-    var rev = A.createConvolver(), len = A.sampleRate * 9, ir = A.createBuffer(2, len, A.sampleRate), ease = A.sampleRate * .06;
-    for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.4) * Math.min(1, i / ease); }
-    rev.buffer = ir; var wet = A.createGain(); wet.gain.value = .9; rev.connect(wet); wet.connect(master);
-    var dry = A.createGain(); dry.gain.value = .5; dry.connect(master);
+    /* a long, soft room */
+    var rev = A.createConvolver(), len = A.sampleRate * 5, ir = A.createBuffer(2, len, A.sampleRate);
+    for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    rev.buffer = ir; var wet = A.createGain(); wet.gain.value = .55; rev.connect(wet); wet.connect(master);
+    var dry = A.createGain(); dry.gain.value = .85; dry.connect(master);
+    /* the pads' filter, opened by the cursor */
+    var lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 900; lp.Q.value = .6; lp.connect(dry); lp.connect(rev);
+    /* a slow echo for the bells */
+    var dl = A.createDelay(2), fb = A.createGain(); dl.delayTime.value = .48; fb.gain.value = .38; dl.connect(fb); fb.connect(dl);
+    var bellBus = A.createGain(); bellBus.gain.value = .5; bellBus.connect(dry); bellBus.connect(rev); bellBus.connect(dl); dl.connect(rev);
     var mtof = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
-    /* the choir: every voice is a sawtooth sung through the formants of an open "aah" (shared, so it costs three filters) */
-    var choir = A.createGain(), vowel = A.createGain();
-    [[750, 1, 5], [1180, .6, 7], [2700, .22, 9], [3400, .12, 10]].forEach(function (f) { var bp = A.createBiquadFilter(), g = A.createGain(); bp.type = "bandpass"; bp.frequency.value = f[0]; bp.Q.value = f[2]; g.gain.value = f[1]; choir.connect(bp); bp.connect(g); g.connect(vowel); });
-    var warm = A.createGain(); warm.gain.value = .25; choir.connect(warm); warm.connect(vowel);   /* a little body under the vowel */
-    var lp = A.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 2200; lp.Q.value = .5; vowel.connect(lp); lp.connect(dry); lp.connect(rev);
-    /* three slow vibratos, so the voices never sway together like a machine */
-    var vib = [4.6, 5.3, 5.9].map(function (r) { var o = A.createOscillator(), g = A.createGain(); o.frequency.value = r; g.gain.value = 9; o.connect(g); o.start(); return g; });
-    /* the shimmer: high sines that live almost entirely in the reverb, like light through stained glass */
-    var shim = A.createGain(); shim.gain.value = 1; shim.connect(rev); var shimDry = A.createGain(); shimDry.gain.value = .12; shim.connect(shimDry); shimDry.connect(dry);
-    /* breath: a whisper of air that swells with every chord */
-    var nb = A.createBuffer(1, A.sampleRate * 2, A.sampleRate), nd = nb.getChannelData(0); for (var j = 0; j < nd.length; j++) nd[j] = Math.random() * 2 - 1;
-    var air = A.createBufferSource(), airF = A.createBiquadFilter(), airG = A.createGain(); air.buffer = nb; air.loop = true; airF.type = "bandpass"; airF.frequency.value = 5200; airF.Q.value = .7; airG.gain.value = 0;
-    air.connect(airF); airF.connect(airG); airG.connect(rev); air.start();
-    /* a slow echo for the bells and the soprano */
-    var dl = A.createDelay(2), fb = A.createGain(); dl.delayTime.value = .62; fb.gain.value = .42; dl.connect(fb); fb.connect(dl); dl.connect(rev);
-    var bellBus = A.createGain(); bellBus.gain.value = .4; bellBus.connect(dry); bellBus.connect(rev); bellBus.connect(dl);
-    var solo = A.createGain(); solo.gain.value = 1; var soloLp = A.createBiquadFilter(); soloLp.type = "lowpass"; soloLp.frequency.value = 3200; solo.connect(soloLp); soloLp.connect(dry); soloLp.connect(rev); soloLp.connect(dl);
-    /* D major, eight chords, nine seconds each. The goosebumps live at 4 (G major turns minor: Gm6/9) and 5-6-7, the
-       Bb - C - D climb that lands on the brightest chord of all. Each: [bass, choir voicing, soprano phrase, swell] */
-    var CH = [
-      [38, [57, 62, 66, 69, 73, 76], null, 1],                                   /* Dmaj9 */
-      [35, [59, 62, 66, 69, 73, 78], [[78, 1, 3.5], [76, 4.5, 4]], 1],            /* Bm9 */
-      [43, [59, 62, 66, 69, 71, 73], null, 1.05],                                 /* Gmaj9#11 */
-      [43, [58, 62, 64, 67, 69, 74], [[74, 1, 2.5], [70, 3.5, 5]], 1.1],          /* Gm6/9: the turn */
-      [46, [57, 62, 65, 69, 70, 76], null, 1.1],                                  /* Bbmaj7#11 */
-      [48, [55, 60, 64, 67, 72, 74], [[76, .5, 2.5], [79, 3, 2.5], [81, 5.5, 4]], 1.2],   /* Cadd9: rising */
-      [38, [57, 62, 64, 69, 74, 78], [[81, 0, 6], [78, 6, 4]], 1.45],             /* D add9: home, the arrival */
-      [45, [57, 62, 64, 69, 71, 76], null, .95]                                   /* Asus4 add9: breathe in */
-    ];
-    var BAR = 9, ci = 0, nextBar = 0, nextBell = 0, timer = 0, on = false, cur = CH[0];
-    function chord(c, t) {
-      var sw = c[3], hold = BAR + 4;
-      c[1].forEach(function (m, k) {
-        [-11, 0, 11].forEach(function (det, v) {
-          var o = A.createOscillator(), g = A.createGain(); o.type = "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det + (Math.random() * 6 - 3);
-          vib[(k + v) % 3].connect(o.detune);
-          var peak = .028 * sw * (k > 3 ? .8 : 1), at = t + Math.random() * .6;
-          g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(peak * .7, at + 2.5); g.gain.linearRampToValueAtTime(peak, at + BAR * .6);   /* each chord swells as it goes */
-          g.gain.linearRampToValueAtTime(0, at + hold);
-          o.connect(g); g.connect(choir); o.start(at); o.stop(at + hold + .1);
+    /* D major, warm: Dmaj9, Bm11, Gmaj7#11, A6sus */
+    var CH = [[50, 57, 61, 64, 66, 69], [47, 54, 57, 61, 64, 66], [43, 50, 54, 57, 61, 62], [45, 52, 54, 57, 59, 64]];
+    var SCALE = [62, 64, 66, 69, 71, 74, 76, 78, 81, 83];
+    var BAR = 8, ci = 0, nextBar = 0, nextBell = 0, timer = 0, on = false;
+    function pad(notes, t) {
+      notes.forEach(function (m, k) {
+        [-6, 6].forEach(function (det) {
+          var o = A.createOscillator(), g = A.createGain(); o.type = k < 2 ? "triangle" : "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det + (Math.random() * 4 - 2);
+          var peak = (k < 2 ? .05 : .018);
+          g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 3); g.gain.setValueAtTime(peak, t + BAR - 1); g.gain.linearRampToValueAtTime(0, t + BAR + 3);
+          o.connect(g); g.connect(lp); o.start(t); o.stop(t + BAR + 3.2);
         });
       });
-      /* shimmer: the top three voices an octave up, fading in late and slow */
-      c[1].slice(3).forEach(function (m, k) {
-        var o = A.createOscillator(), g = A.createGain(); o.type = "sine"; o.frequency.value = mtof(m + 12) * (1 + (k - 1) * .0015);
-        var p = .014 * sw; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(p, t + 5); g.gain.linearRampToValueAtTime(0, t + hold);
-        o.connect(g); g.connect(shim); o.start(t); o.stop(t + hold + .1);
-      });
-      /* bass: two sines an octave apart, round and deep */
-      [[0, .16], [12, .05]].forEach(function (b) {
-        var o = A.createOscillator(), g = A.createGain(); o.type = "sine"; o.frequency.value = mtof(c[0] + b[0]);
-        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(b[1] * sw, t + 2); g.gain.linearRampToValueAtTime(0, t + BAR + 2);
-        o.connect(g); g.connect(dry); o.start(t); o.stop(t + BAR + 2.1);
-      });
-      airG.gain.setValueAtTime(0, t); airG.gain.linearRampToValueAtTime(.006 * sw, t + BAR * .7); airG.gain.linearRampToValueAtTime(0, t + BAR + 1);
-      if (c[2] && Math.random() < .9) c[2].forEach(function (n) { sing(n[0], t + n[1], n[2], sw); });
+      var b = A.createOscillator(), bg = A.createGain(); b.type = "sine"; b.frequency.value = mtof(notes[0] - 12);
+      bg.gain.setValueAtTime(0, t); bg.gain.linearRampToValueAtTime(.2, t + 1.5); bg.gain.linearRampToValueAtTime(0, t + BAR + 1); b.connect(bg); bg.connect(dry); b.start(t); b.stop(t + BAR + 1.2);
     }
-    /* the soprano: a pure voice whose vibrato only blooms after the note has settled, the way a singer's does */
-    function sing(m, t, dur, sw) {
-      var o = A.createOscillator(), o2 = A.createOscillator(), g = A.createGain(), g2 = A.createGain(), lfo = A.createOscillator(), lg = A.createGain();
-      o.type = "triangle"; o2.type = "sine"; o.frequency.value = o2.frequency.value = mtof(m); o2.detune.value = 4;
-      lfo.frequency.value = 5.4; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(0, t + .5); lg.gain.linearRampToValueAtTime(16, t + 1.6);
-      lfo.connect(lg); lg.connect(o.detune); lg.connect(o2.detune);
-      g2.gain.value = .6; o2.connect(g2); g2.connect(g); o.connect(g); g.connect(solo);
-      var p = .05 * Math.min(1.2, sw);
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(p, t + .7); g.gain.setValueAtTime(p, t + dur - .4); g.gain.linearRampToValueAtTime(0, t + dur + 1.6);
-      [o, o2, lfo].forEach(function (x) { x.start(t); x.stop(t + dur + 1.7); });
-    }
-    /* bells: sparse, and only ever notes of the chord that is sounding, two octaves up */
     function bell(t) {
-      var ns = cur[1], m = ns[2 + Math.floor(Math.random() * (ns.length - 2))] + 12, f = mtof(m), o = A.createOscillator(), o2 = A.createOscillator(), g = A.createGain();
-      o.type = "sine"; o.frequency.value = f; o2.type = "sine"; o2.frequency.value = f * 2.76;   /* a glassy, bell-like overtone */
-      var g2 = A.createGain(); g2.gain.value = .12; o2.connect(g2); g2.connect(g); o.connect(g); g.connect(bellBus);
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.05, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + 4);
-      o.start(t); o2.start(t); o.stop(t + 4.1); o2.stop(t + 4.1);
+      var m = SCALE[Math.floor(Math.random() * SCALE.length)], f = mtof(m), o = A.createOscillator(), o2 = A.createOscillator(), g = A.createGain();
+      o.type = "sine"; o.frequency.value = f; o2.type = "sine"; o2.frequency.value = f * 2.01;
+      var g2 = A.createGain(); g2.gain.value = .25; o2.connect(g2); g2.connect(g); o.connect(g); g.connect(bellBus);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.09, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + 2.6);
+      o.start(t); o2.start(t); o.stop(t + 2.7); o2.stop(t + 2.7);
     }
     function tick() {
       var now = A.currentTime;
-      while (nextBar < now + 1) { cur = CH[ci % CH.length]; chord(cur, nextBar); ci++; nextBar += BAR; }
-      while (nextBell < now + 1) { if (Math.random() < .45) bell(nextBell); nextBell += [1.5, 2, 2.5, 3][Math.floor(Math.random() * 4)]; }
+      while (nextBar < now + 1) { pad(CH[ci % CH.length], nextBar); ci++; nextBar += BAR; }
+      while (nextBell < now + 1) { if (Math.random() < .7) bell(nextBell); nextBell += [.5, 1, 1, 1.5, 2][Math.floor(Math.random() * 5)]; }
       timer = setTimeout(tick, 400);
     }
     return {
-      start: function () { if (A.state === "suspended") A.resume(); if (on) return; on = true; var t = A.currentTime + .1; nextBar = t; nextBell = t + 4; ci = 0;
-        master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(.62, t + 5); tick(); },   /* the music sits under every sound effect */
-      stop: function () { if (!on) return; on = false; clearTimeout(timer); var t = A.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(0, t + 1.6); },
-      hand: function (x, y, speed) { lp.frequency.setTargetAtTime(1800 + (1 - y) * 1400 + Math.min(1600, speed * 9000), A.currentTime, .3); },
+      start: function () { if (A.state === "suspended") A.resume(); if (on) return; on = true; var t = A.currentTime + .1; nextBar = t; nextBell = t + 2;
+        master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(.42, t + 3); tick(); },   /* the music sits under every sound effect */
+      stop: function () { if (!on) return; on = false; clearTimeout(timer); var t = A.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(0, t + 1.2); },
+      hand: function (x, y, speed) { lp.frequency.setTargetAtTime(700 + (1 - y) * 900 + Math.min(1400, speed * 9000), A.currentTime, .25); },
       isOn: function () { return on; }
     };
   }
