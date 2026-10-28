@@ -15,7 +15,8 @@
 <!-- My GR8 (DRAFT), in 3D: the GR8 branch on its island in the lake. Sign in with your mobile number and a texted code;
      the door lights up, the camera walks in, and your loan rises out of the water as a ring of stones, one for each
      monthly payment (gold when paid, glowing orange for the next one). The card shows the numbers.
-     Borrower sign-in is not built on the server yet, so any 6 digits open a SAMPLE account. Scene and logic: mygr8.js. -->
+     Sign-in and data: /api/public/me (backend/src/routes/borrower.js). Scene and logic: mygr8.js. -->
+<div class="hz" aria-hidden="true"><i class="hz-t"></i><i class="hz-b"></i><i class="hz-l"></i></div>
 <canvas id="gl" aria-hidden="true"></canvas>
 <div class="nogl-bg" aria-hidden="true"></div>
 <div class="labels" id="labels" aria-hidden="true"></div>
@@ -44,63 +45,58 @@
         <div class="acts"><button class="pbtn" type="submit">Text me a code <span aria-hidden="true">↳</span></button></div>
       </form>
       <p class="fine">Haven't applied yet? <a href="apply.html">Apply for a loan</a>. Just want your status? <a href="track.html">Track it</a>.</p>
+      <p class="fine"><button class="plink" type="button" id="sample">See a sample account</button></p>
     </div>
 
     <!-- 2. the code -->
     <div class="view" id="vTwo" hidden>
       <p class="kick">[ Borrowers ] Sign in · 2 of 2</p>
       <h1 class="ph">Check your <em>phone</em></h1>
-      <p class="lede">We texted a 6-digit code to <span id="sentTo"></span>. It works for 5 minutes.</p>
+      <p class="lede">If <span id="sentTo"></span> is the number you applied with, we texted it a 6-digit code. It works for 5 minutes.</p>
       <div class="code" role="group" aria-label="The 6-digit code"><input inputmode="numeric" autocomplete="one-time-code" aria-label="Digit 1" maxlength="1"><input inputmode="numeric" aria-label="Digit 2" maxlength="1"><input inputmode="numeric" aria-label="Digit 3" maxlength="1"><input inputmode="numeric" aria-label="Digit 4" maxlength="1"><input inputmode="numeric" aria-label="Digit 5" maxlength="1"><input inputmode="numeric" aria-label="Digit 6" maxlength="1"></div>
-      <p class="fine"><span class="sample">Draft</span> Any 6 digits open a sample account. <button class="plink" type="button" id="back">Use another number</button></p>
+      <p class="err" id="eTwo" role="alert"></p>
+      <p class="fine" id="pHint" hidden><span class="sample">Practice mode</span> For class demos the practice code works too, for numbers GR8 has on file.</p>
+      <p class="fine"><button class="plink" type="button" id="back">Use another number</button></p>
     </div>
 
     <!-- 3. the loan -->
     <div class="view" id="vHome" hidden>
-      <p class="kick">[ My GR8 ] <span class="sample">Sample account</span></p>
-      <h1 class="ph">Hello, <em>Maria</em></h1>
+      <p class="kick">[ My GR8 ] <span class="sample" id="mSample" hidden>Sample account · nothing is sent</span></p>
+      <h1 class="ph" id="mHello">Hello</h1>
       <p class="lede" id="mLoan"></p>
+      <div id="mApps"></div>
 
-      <section class="due" aria-label="Next payment">
-        <span class="lbl">Next payment</span>
-        <div class="amt" id="mNext">₱0</div>
-        <p class="when">Due <b id="mDue">–</b> · <span id="mIn">–</span></p>
-        <div class="ways"><button class="pbtn sm" type="button" data-pay>Pay with GCash</button><button class="pbtn sm ghost" type="button" data-pay>Bank deposit</button><button class="pbtn sm ghost" type="button" data-pay>At the branch</button></div>
-        <p class="note" id="payNote" hidden></p>
-      </section>
+      <div id="mAcct" hidden>
+        <section class="due" aria-label="Next payment">
+          <span class="lbl">Next payment</span>
+          <div class="amt" id="mNext">₱0</div>
+          <p class="when">Due <b id="mDue">–</b> · <span id="mIn">–</span></p>
+          <div class="ways"><button class="pbtn sm" type="button" id="iPaid">I've paid</button><button class="pbtn sm ghost" type="button" data-way="gcash">GCash</button><button class="pbtn sm ghost" type="button" data-way="bank">Bank</button><button class="pbtn sm ghost" type="button" data-way="branch">Branch</button></div>
+          <form class="payf" id="fPay" hidden novalidate>
+            <input type="hidden" id="pAcct">
+            <label>Amount<input id="pAmt" inputmode="decimal" required></label>
+            <label>How<select id="pHow"><option>GCash</option><option>Bank deposit</option><option>Cash at the branch</option><option>Salary deduction</option><option>Cheque</option></select></label>
+            <label>Reference no.<input id="pRef" maxlength="40" placeholder="optional"></label>
+            <label>Paid on<input id="pDay" type="date" required></label>
+            <p class="err" id="ePay"></p>
+            <button class="pbtn sm" type="submit">Tell GR8</button>
+          </form>
+          <p class="note" id="payNote" hidden></p>
+          <div id="mTold"></div>
+        </section>
 
-      <section class="prog" aria-label="How far along">
-        <div class="bar" id="mBar" aria-hidden="true"></div>
-        <p id="mPaid"></p>
-        <dl class="facts"><div><dt>Balance left</dt><dd id="mBal">–</dd></div><div><dt>Paid so far</dt><dd id="mSoFar">–</dd></div><div><dt>Penalties</dt><dd id="mPen">–</dd></div></dl>
-      </section>
+        <section class="prog" aria-label="How far along">
+          <div class="bar" id="mBar" aria-hidden="true"></div>
+          <p id="mPaid"></p>
+          <dl class="facts"><div><dt>Balance left</dt><dd id="mBal">–</dd></div><div><dt>Paid so far</dt><dd id="mSoFar">–</dd></div><div><dt>Penalties due</dt><dd id="mPen">–</dd></div></dl>
+        </section>
+      </div>
 
-      <section class="offer" id="mOffer" aria-label="A counter-offer for you">
-        <span class="lbl">A counter-offer for you</span>
-        <p><b>About your salary loan application APP-2026-0419.</b> We can't lend the full ₱100,000 over 24 months, but we can offer <b>₱80,000 over 18 months</b> at ₱5,724.44 a month. You'd receive ₱78,000 after the 2.5% fee. This offer is good until Nov 6.</p>
-        <div class="acts" style="margin-top:16px"><button class="pbtn sm" type="button" data-answer="yes">Take the offer</button><button class="pbtn sm ghost" type="button" data-answer="no">No, thank you</button><a class="plink" href="loans.html#assay">Weigh it first</a></div>
-      </section>
-
-      <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="sched">Schedule</button><button role="tab" aria-selected="false" data-tab="rcpt">Receipts</button><button role="tab" aria-selected="false" data-tab="papers">Papers</button><button role="tab" aria-selected="false" data-tab="me">Profile</button></div>
+      <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="sched">Schedule</button><button role="tab" aria-selected="false" data-tab="rcpt">Receipts</button><button role="tab" aria-selected="false" data-tab="me" id="mPapersTab2">Profile</button><span id="mPapersTab" hidden></span></div>
       <div data-panel="sched"><table class="ledger"><thead><tr><th>#</th><th>Due</th><th class="r">Amount</th><th>Status</th></tr></thead><tbody id="mSched"></tbody></table><p class="fine" style="margin-top:12px">Tip: point at a stone on the lake to see that payment.</p></div>
       <div data-panel="rcpt" hidden><ul class="rows" id="mRcpt"></ul></div>
-      <div data-panel="papers" hidden>
-        <p class="fine" style="margin-top:0">For your salary loan application APP-2026-0419. One paper is still missing.</p>
-        <ul class="rows">
-          <li><span><b>Signed consent form</b><small>Signed online · Oct 12</small></span><span class="tag ok">On file</span></li>
-          <li><span><b>Government ID</b><small>PhilSys ID · checked by L. Mendoza</small></span><span class="tag ok">Checked</span></li>
-          <li><span><b>Pay stubs</b><small>3 months · checked</small></span><span class="tag ok">Checked</span></li>
-          <li><span><b>Certificate of employment</b><small>Asked for on Oct 15: "The one sent is from 2024. Please send one from this year."</small></span><button class="pbtn sm" type="button" data-pay>Send it</button></li>
-        </ul>
-      </div>
-      <div data-panel="me" hidden>
-        <ul class="rows">
-          <li><span><b>Mobile number</b><small>0917 ••• 4567</small></span></li>
-          <li><span><b>Email</b><small>maria.s••••@gmail.com</small></span></li>
-          <li><span><b>Address</b><small>Apalit, Pampanga. To change your name, address or ID, visit the branch with your ID.</small></span></li>
-        </ul>
-      </div>
-      <div class="acts" style="margin-top:30px"><button class="pbtn ghost sm" type="button" data-kuwa-chat>Ask Kuwa</button><button class="plink" type="button" id="out">Sign out</button></div>
+      <div data-panel="me" hidden><ul class="rows" id="mMe"></ul></div>
+      <div class="acts" style="margin-top:30px"><button class="pbtn ghost sm" type="button" data-kuwa-chat>Ask Kuwa</button><a class="plink" href="track.html">Track an application</a><button class="plink" type="button" id="out">Sign out</button></div>
     </div>
   </div>
 </section>

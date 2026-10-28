@@ -26,17 +26,18 @@ function build(W) {
   const path = new THREE.CatmullRomCurve3(pts, false, "centripetal", .5);
   const U_AT = [.035, .205, .375, .545, .715, .885];   // where each lantern stands along the boardwalk
 
-  /* the boardwalk: planks across the path on short stilts */
+  /* the boardwalk: planks across the path, floating on the water, with a beam along each edge */
   const len = path.getLength(), N = Math.floor(len / .44);
   const wood = new THREE.MeshLambertMaterial({ color: 0x7a5038, flatShading: true }), woodD = new THREE.MeshLambertMaterial({ color: 0x4a2e22, flatShading: true });
-  const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(1.7, .1, .34), wood, N), stilts = new THREE.InstancedMesh(new THREE.CylinderGeometry(.07, .09, 1.6, 6), woodD, Math.ceil(N / 6) * 2);
+  const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(1.7, .16, .36), wood, N), edgeL = [], edgeR = [];
   const o = new THREE.Object3D(), tg = new THREE.Vector3(), side = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0); let si = 0;
   for (let i = 0; i < N; i++) {
     const u = i / (N - 1), p = path.getPointAt(u); path.getTangentAt(u, tg);
-    o.position.copy(p); o.rotation.set(0, Math.atan2(tg.x, tg.z) + Math.PI / 2, (Math.random() - .5) * .03); o.position.y += (Math.random() - .5) * .02; o.updateMatrix(); planks.setMatrixAt(i, o.matrix);
-    if (i % 6 === 0) { side.crossVectors(tg, UP).normalize(); [-1, 1].forEach((s) => { o.position.copy(p).addScaledVector(side, s * .72); o.position.y = -.4; o.rotation.set(0, 0, 0); o.updateMatrix(); if (si < stilts.count) stilts.setMatrixAt(si++, o.matrix); }); }
+    o.position.copy(p); o.rotation.set(0, Math.atan2(tg.x, tg.z), (Math.random() - .5) * .03); o.position.y += (Math.random() - .5) * .02; o.updateMatrix(); planks.setMatrixAt(i, o.matrix);
+    if (i % 4 === 0 || i === N - 1) { side.crossVectors(tg, UP).normalize(); edgeL.push(p.clone().addScaledVector(side, -.86)); edgeR.push(p.clone().addScaledVector(side, .86)); }
   }
-  stilts.count = si; scene.add(planks, stilts);
+  scene.add(planks);
+  [edgeL, edgeR].forEach((e) => { const beam = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(e), 300, .05, 5, false), wood); beam.position.y = -.02; scene.add(beam); });
 
   /* the line of light along the middle of the boardwalk; it fills up to the step reached */
   const lineU = { prog: { value: 0 }, lit: { value: new THREE.Color(0xffcf8f) }, dim: { value: new THREE.Color(0x3a2620) }, time: { value: 0 }, stop: { value: 0 }, cool: { value: new THREE.Color(0xa9c2db) } };
@@ -44,22 +45,25 @@ function build(W) {
     vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
     fragmentShader: `uniform float prog, time, stop; uniform vec3 lit, dim, cool; varying vec2 vUv;
       void main(){ float on = 1.0 - smoothstep(prog - .004, prog + .004, vUv.x); float shimmer = .75 + .25 * sin(vUv.x * 160.0 - time * 5.0);
-        vec3 c = mix(lit, cool, stop * smoothstep(prog - .06, prog, vUv.x)); gl_FragColor = vec4(mix(dim, c * (1.2 * shimmer), on), 1.0); }` }));
+        vec3 c = mix(lit, cool, stop * smoothstep(prog - .06, prog, vUv.x)); gl_FragColor = vec4(mix(dim, c * (1.2 * shimmer), on), 1.0);
+        #include <colorspace_fragment>
+      }` }));
   line.position.y = .1; scene.add(line);
 
   /* the lanterns */
   const lan = U_AT.map((u, i) => {
     const p = path.getPointAt(u); path.getTangentAt(u, tg); side.crossVectors(tg, UP).normalize();
-    const g = new THREE.Group(); g.position.copy(p).addScaledVector(side, -1.05); g.position.y = .3;
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(.06, .085, 2.5, 7), woodD); post.position.y = 1.25; g.add(post);
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(.3, .26, 6), woodD); cap.position.y = 2.95; g.add(cap);
-    const globeM = new THREE.MeshBasicMaterial({ color: 0x4a3a3a }); const globe = new THREE.Mesh(new THREE.SphereGeometry(.24, 18, 12), globeM); globe.position.y = 2.68; g.add(globe);
-    const gl = glow(0xffcf8f, 3.4); gl.position.y = 2.68; gl.material.opacity = 0; g.add(gl);
+    const g = new THREE.Group(); g.position.copy(p).addScaledVector(side, -.62); g.position.y = .46;
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.16, .2, .14, 8), woodD); base.position.y = .07; g.add(base);
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(.045, .06, 1.5, 7), woodD); post.position.y = .82; g.add(post);
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(.3, .26, 6), woodD); cap.position.y = 1.98; g.add(cap);
+    const globeM = new THREE.MeshBasicMaterial({ color: 0x4a3a3a }); const globe = new THREE.Mesh(new THREE.SphereGeometry(.24, 18, 12), globeM); globe.position.y = 1.74; g.add(globe);
+    const gl = glow(0xffcf8f, 3.4); gl.position.y = 1.74; gl.material.opacity = 0; g.add(gl);
     const ring = new THREE.Mesh(new THREE.RingGeometry(.9, 1.05, 48), new THREE.MeshBasicMaterial({ color: 0xffcf8f, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
-    ring.rotation.x = -Math.PI / 2; ring.position.y = .02 - .3; g.add(ring);
+    ring.rotation.x = -Math.PI / 2; ring.position.y = -.42; g.add(ring);
     scene.add(g);
     const tag = document.createElement("div"); tag.className = "lab3"; tag.innerHTML = `<i>0${i + 1}</i><b>${STAGES[i]}</b>`; $("#labels").appendChild(tag);
-    W.label(tag, g.position.clone().add(new THREE.Vector3(0, 3.35, 0)));
+    W.label(tag, g.position.clone().add(new THREE.Vector3(0, 2.55, 0)));
     return { g, globeM, gl, ring, tag, at: u, level: 0, want: 0, kind: "lit", pos: g.position.clone() };
   });
 
@@ -157,3 +161,5 @@ function answer(j, example) {
 /* a link with ?ref=…&last4=… (or the older &m=0917…) fills the form and looks it up */
 const qs = new URLSearchParams(location.search);
 if (qs.get("ref")) { ref.value = qs.get("ref").toUpperCase(); const m = (qs.get("last4") || qs.get("m") || "").replace(/\D/g, ""); l4.value = m.slice(-4); if (l4.value.length === 4) setTimeout(find, 900); }
+
+if (W) W.intro();   /* rise out of the water as the curtain opens */

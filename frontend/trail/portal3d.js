@@ -5,8 +5,8 @@
    pauses when the tab is hidden. The Motion setting (gr8-motion) or the system's "reduce motion" keeps it still. */
 import * as THREE from "../assets/vendor/three/three.module.min.js";
 
-const DUSK = { top: 0xb9786a, mid: 0xe9a47c, hor: 0xffd7aa, sun: 0xfff1d6, fog: 0xe9b48c, water: 0xa27066, deep: 0x7a5258, hill: 0x5a3a3c, glint: 0xffe2b8, amb: 0xffd9b8, ground: 0x6a4a4c };
-const NIGHT = { top: 0x070a18, mid: 0x18203d, hor: 0x41385a, sun: 0xe4eaff, fog: 0x2a2640, water: 0x26304e, deep: 0x111829, hill: 0x141626, glint: 0xd6e0ff, amb: 0x8d9ac4, ground: 0x1d1b2a };
+const DUSK = { top: 0x9a6a78, mid: 0xd98f74, hor: 0xffcf9e, sun: 0xfff1d6, fog: 0xe3a888, water: 0x84575a, deep: 0x4f3341, hill: 0x6b4448, glint: 0xffe2b8, amb: 0xffd9b8, ground: 0x6a4a4c, key: 0xffe0c0 };
+const NIGHT = { top: 0x0a1030, mid: 0x1f2c5c, hor: 0x52578a, sun: 0xf2f5ff, fog: 0x2e3760, water: 0x2f3d68, deep: 0x1c2648, hill: 0x1e2442, glint: 0xe6edff, amb: 0xaebdf0, ground: 0x2a2c48, key: 0xc9d8ff };
 
 export function makeWorld(canvas, opt = {}) {
   topBar();
@@ -14,7 +14,7 @@ export function makeWorld(canvas, opt = {}) {
   let still = matchMedia("(prefers-reduced-motion: reduce)").matches; try { if (localStorage.getItem("gr8-motion") === "off") still = true; } catch (e) {}
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" }); }
-  catch (e) { document.body.classList.add("nogl"); return null; }
+  catch (e) { document.body.classList.add("nogl"); requestAnimationFrame(() => { document.body.classList.add("ready"); horizon(); }); return null; }
   const QK = { high: 1, balanced: .8, low: .6 }; let q = "high"; try { q = localStorage.getItem("gr8-quality") || "high"; } catch (e) {}
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5) * (QK[q] || 1));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -31,9 +31,12 @@ export function makeWorld(canvas, opt = {}) {
     fragmentShader: `uniform vec3 top, mid, hor, sun, sunDir; uniform float night, time; varying vec3 vD;
       float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,45.164)))*43758.5453); }
       void main(){ float y = max(vD.y, 0.0); vec3 c = mix(hor, mid, smoothstep(0.0, .18, y)); c = mix(c, top, smoothstep(.15, .7, y));
-        float s = max(dot(vD, sunDir), 0.0); c += sun * (pow(s, 900.0) * 2.2 + pow(s, 24.0) * (.32 - night*.22) + pow(s, 5.0) * (.12 - night*.1));
+        float s = max(dot(vD, sunDir), 0.0); c += sun * (pow(s, 900.0) * 2.2 + pow(s, 24.0) * (.32 - night*.12) + pow(s, 5.0) * (.12 - night*.04));
+        if (night > .5) c = mix(c, vec3(.96,.97,1.0), smoothstep(.99955, .99975, s));   /* the moon's disc */
         if (night > .5) { vec3 g = floor(vD * 260.0); float st = step(.9965, h(g)) * smoothstep(.04, .3, vD.y); c += vec3(st) * (.55 + .45*sin(time*1.5 + h(g+1.0)*30.0)); }
-        gl_FragColor = vec4(c, 1.0); }` }));
+        gl_FragColor = vec4(c, 1.0);
+        #include <colorspace_fragment>
+      }` }));
   scene.add(sky);
 
   /* the water: still, darker toward you, with the sun's glint broken by small slow waves */
@@ -43,9 +46,11 @@ export function makeWorld(canvas, opt = {}) {
       void main(){ vec3 V = normalize(vW - cameraPosition); float d = length(vW.xz - cameraPosition.xz);
         vec2 p = vW.xz * .35; vec3 n = normalize(vec3(sin(p.x*1.7 + time*.6)*.05 + sin(p.y*2.3 - time*.4)*.04, 1.0, cos(p.y*1.3 + time*.5)*.05 + sin(p.x*2.9 + time*.3)*.03));
         vec3 R = reflect(V, n); float s = max(dot(R, sunDir), 0.0);
-        vec3 c = mix(deep, water, smoothstep(0.0, 160.0, d)); c += glint * (pow(s, 180.0) * (1.6 - night*1.15) + pow(s, 14.0) * (.18 - night*.14));
+        vec3 c = mix(deep, water, smoothstep(0.0, 160.0, d)); c += glint * (pow(s, 180.0) * (1.6 - night*.9) + pow(s, 40.0) * night * .35 + pow(s, 14.0) * (.18 - night*.08));   /* at night: a silver path of moonlight */
         float fr = pow(1.0 - max(dot(-V, vec3(0,1,0)), 0.0), 4.0); c = mix(c, fog, fr * .55);
-        c = mix(c, fog, smoothstep(120.0, 520.0, d)); gl_FragColor = vec4(c, 1.0); }` }));
+        c = mix(c, fog, smoothstep(120.0, 520.0, d)); gl_FragColor = vec4(c, 1.0);
+        #include <colorspace_fragment>
+      }` }));
   water.rotation.x = -Math.PI / 2; scene.add(water);
 
   /* hills all round the far shore, low-poly, in silhouette */
@@ -68,9 +73,9 @@ export function makeWorld(canvas, opt = {}) {
   function theme() {
     const p = P(), night = html.classList.contains("dark");
     ["top", "mid", "hor", "sun", "fog", "water", "deep", "glint"].forEach((k) => U[k].value.set(p[k])); U.night.value = night ? 1 : 0;
-    sunDir.set(night ? -.35 : .55, night ? .32 : .16, -1).normalize();
-    scene.fog.color.set(p.fog); hillMat.color.set(p.hill); hemi.color.set(p.amb); hemi.groundColor.set(p.ground); hemi.intensity = night ? .85 : 1.25;
-    sunL.color.set(p.sun); sunL.intensity = night ? .6 : 1.6; sunL.position.copy(sunDir).multiplyScalar(80); specks.material.opacity = night ? .5 : .7;
+    sunDir.set(night ? -.42 : .55, night ? .3 : .16, -1).normalize();
+    scene.fog.color.set(p.fog); hillMat.color.set(p.hill); hemi.color.set(p.amb); hemi.groundColor.set(p.ground); hemi.intensity = night ? 1.55 : 1.25;
+    sunL.color.set(p.key); sunL.intensity = night ? 1.5 : 1.6; sunL.position.copy(sunDir).multiplyScalar(80); specks.material.opacity = night ? .5 : .7;
     if (opt.onTheme) opt.onTheme(night);
   }
   theme(); new MutationObserver(theme).observe(html, { attributes: true, attributeFilter: ["class"] });
@@ -86,6 +91,9 @@ export function makeWorld(canvas, opt = {}) {
     cam.from = { pos: cam.pos.clone(), look: cam.look.clone() }; cam.to = T; cam.t0 = performance.now(); cam.dur = dur * 1000; cam.done = done || null;
   }
   function place(pos, look) { cam.pos.copy(pos); cam.look.copy(look); cam.from = null; }
+  /* the way in: the camera rises out of the water to where it rests, as the curtain on the horizon opens */
+  function intro() { if (still) return; const T = { pos: cam.pos.clone(), look: cam.look.clone() }; const s0 = T.pos.clone().lerp(T.look, .3); s0.y = .9;
+    cam.pos.copy(s0); cam.look.copy(T.look).y += 2.5; camera.position.copy(s0); fly(T.pos, T.look, 3.6); }
 
   /* the picture's centre sits to the right of the card on wide screens */
   let shift = 0;
@@ -117,9 +125,9 @@ export function makeWorld(canvas, opt = {}) {
   }
   document.addEventListener("visibilitychange", () => { if (document.hidden) { cancelAnimationFrame(raf); running = false; } else if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); } });
   raf = requestAnimationFrame(frame);
-  requestAnimationFrame(() => document.body.classList.add("ready"));
+  requestAnimationFrame(() => { document.body.classList.add("ready"); horizon(); });
 
-  return { THREE, scene, camera, renderer, fly, place, label, still: () => still, onFrame: (fn) => updates.push(fn), dark: () => html.classList.contains("dark") };
+  return { THREE, scene, camera, renderer, fly, place, intro, label, still: () => still, onFrame: (fn) => updates.push(fn), dark: () => html.classList.contains("dark") };
 }
 
 /* a soft round glow, for lanterns and stones (one small canvas, shared) */
@@ -128,6 +136,21 @@ export function glow(color = 0xffcf8f, size = 2) {
   if (!glowTex) { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
     r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(.25, "rgba(255,255,255,.55)"); r.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = r; g.fillRect(0, 0, 128, 128); glowTex = new THREE.CanvasTexture(c); }
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); return s;
+}
+
+/* the curtain on the horizon (portal.css .hz): opens when the page is ready, closes before going to another page */
+function horizon() {
+  const hz = document.querySelector(".hz"); if (!hz || hz.dataset.on) return; hz.dataset.on = "1";
+  const quick = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  hz.style.animation = "none";
+  if (quick) { hz.classList.add("gone"); return; }
+  requestAnimationFrame(() => { hz.classList.add("draw"); setTimeout(() => { hz.classList.add("open"); }, 750); setTimeout(() => { hz.classList.add("gone"); }, 2100); });
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest("a[href]"); if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === "_blank" || a.hasAttribute("download")) return;
+    const u = new URL(a.href, location.href); if (u.origin !== location.origin || !/\.html$|\/$/.test(u.pathname) || (u.pathname === location.pathname && u.hash)) return;
+    e.preventDefault(); hz.classList.remove("gone", "open"); hz.classList.add("closing"); setTimeout(() => { location.href = u.href; }, 900);
+  });
+  addEventListener("pageshow", (e) => { if (e.persisted) { hz.classList.remove("closing"); hz.classList.add("open", "gone"); } });   /* back to this page from the browser's memory */
 }
 
 /* the top bar: dark mode (kept like the home page's switch) and the phone menu */

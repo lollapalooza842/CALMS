@@ -80,17 +80,23 @@ router.get("/track", wrap(async (req, res) => {
   const nope = () => res.status(404).json({ error: "We couldn't find that reference with those digits. Check both and try again." });
   if (ref.startsWith("W-")) {
     await tables();
-    const r = (await db.query("select reference, product, amount, term_months, status, mobile, created_at from web_applications where reference = $1", [ref])).rows[0];
-    if (!r || !String(r.mobile || "").endsWith(last4)) return nope();
+    await require("./website").ensure();
+    const r = (await db.query("select w.reference, w.product, w.amount, w.term_months, w.status, w.mobile, w.created_at, a.reference app_ref from web_applications w left join applications a on a.id = w.application_id where w.reference = $1", [ref])).rows[0];
+    if (!r || !String(r.mobile || "").replace(/\D/g, "").endsWith(last4)) return nope();
+    if (r.app_ref) return trackApp(r.app_ref, last4, res, nope, r.reference);   // now in CALMS: follow the application it became
+    if (r.status === "closed") return res.json({ reference: r.reference, product: r.product, amount: Number(r.amount), months: r.term_months, stage: 0, stages: STAGES, status: "rejected", since: r.created_at, note: "This online application was closed. The branch can tell you more." });
     return res.json({ reference: r.reference, product: r.product, amount: Number(r.amount), months: r.term_months, stage: 0, stages: STAGES, status: "received", since: r.created_at,
       note: "We have your application. A loan processor will call you within one working day to go over your papers." });
   }
+  return trackApp(ref, last4, res, nope);
+}));
+async function trackApp(ref, last4, res, nope, web) {
   const r = (await db.query(`select a.reference, a.status, a.status_since, a.amount, a.term_months, p.name as product, b.mobile from applications a
     join borrowers b on b.id = a.borrower_id join loan_products p on p.id = a.product_id where a.reference = $1`, [ref])).rows[0];
   if (!r || !String(r.mobile || "").replace(/\D/g, "").endsWith(last4)) return nope();
   const notes = { draft: "Your application is being prepared.", submitted: "Your papers are being checked.", review: "An underwriter is reviewing your application.", approved: "Approved. We'll show you the final numbers before you sign.",
     awaiting: "Waiting for your answer on our offer.", accepted: "Accepted. Your loan is being released.", funded: "Your loan is released. Your schedule is in My GR8.", declined: "We couldn't approve this one. The branch will explain why and what you can do.", rejected: "This application was closed. The branch can tell you more." };
-  res.json({ reference: r.reference, product: r.product, amount: Number(r.amount), months: r.term_months, stage: STAGE_OF[r.status] || 0, stages: STAGES, status: r.status, since: r.status_since, note: notes[r.status] || "" });
-}));
+  res.json({ reference: web ? web + " · " + r.reference : r.reference, product: r.product, amount: Number(r.amount), months: r.term_months, stage: STAGE_OF[r.status] || 0, stages: STAGES, status: r.status, since: r.status_since, note: notes[r.status] || "" });
+}
 
 module.exports = router;

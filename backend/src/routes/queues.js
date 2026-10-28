@@ -226,7 +226,8 @@ router.get("/rail", wrap(async (req, res) => {
   const k = railKept.get(req.user.id);
   if (k && Date.now() - k.t < 20000) return res.json(k.v);
   const [q, n] = await Promise.all([queue(req.user), oversight.notices(req.user)]);
-  const v = { queue: q.items.length, unread: n.filter((x) => x.un).length, role: req.user.role, practice: require("../lib/practice").on() };
+  const web = await require("./website").count(req.user).catch(() => 0);   // what came in from the public website (routes/website.js)
+  const v = { queue: q.items.length, unread: n.filter((x) => x.un).length, website: web, role: req.user.role, practice: require("../lib/practice").on() };
   railKept.set(req.user.id, { t: Date.now(), v }); res.json(v);
 }));
 router.forgetRail = () => railKept.clear();

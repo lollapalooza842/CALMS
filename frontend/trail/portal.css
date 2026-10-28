@@ -71,10 +71,15 @@ html.dark .sheet { box-shadow: 0 40px 90px -40px rgba(0,0,0,.8), inset 0 0 0 1px
 
 /* ---- the 3D labels (positioned by the scripts, over the picture) ---- */
 .labels { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
-.lab3 { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 8px; color: #fff; font: 500 11.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
-  text-shadow: 0 1px 10px rgba(40,15,5,.55); opacity: .5; transition: opacity .6s ease; will-change: transform; }
-.lab3 i { font-style: normal; opacity: .7; } .lab3.lit { opacity: 1; } .lab3.now { opacity: 1; } .lab3.now b { color: #ffd59a; } .lab3.hide { opacity: 0; }
-.lab3 b { font-weight: 500; }
+.lab3 { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 999px; white-space: nowrap;
+  background: rgba(36,16,8,.62); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 6px 20px -8px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.12);
+  color: rgba(255,244,230,.82); font: 500 11.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; opacity: .9; transition: opacity .6s ease, background .6s, color .6s; will-change: transform; margin-top: -8px; }
+html.dark .lab3 { background: rgba(14,18,40,.66); }
+.lab3 i { font-style: normal; opacity: .6; } .lab3 b { font-weight: 500; }
+.lab3.lit { color: #fff; opacity: 1; } .lab3.lit i { opacity: .85; }
+.lab3.now { opacity: 1; color: #2a1609; background: linear-gradient(90deg, #ffd59a, #f0a050); box-shadow: 0 8px 26px -8px rgba(240,140,60,.7); } .lab3.now i { opacity: .7; }
+html.dark .lab3.now { background: linear-gradient(90deg, #ffe2b0, #f0a050); color: #2a1609; }
+.lab3.hide { opacity: 0; }
 
 /* ---- Kuwa, bottom right ---- */
 .kw { position: fixed; z-index: 9; right: clamp(16px, 3vw, 54px); bottom: clamp(18px, 4vh, 40px); }
@@ -138,3 +143,29 @@ html.dark .due .when b { color: var(--acc); }
 .rows { list-style: none; margin: 0; padding: 0; } .rows li { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--faint); }
 .rows li b { display: block; font-weight: 500; } .rows li small { display: block; margin-top: 3px; color: var(--soft); font-size: 13.5px; line-height: 1.4; } .rows li .r { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 @media (max-width: 760px) { .code input { font-size: 32px; } .due .amt { font-size: 50px; } }
+
+/* ---- the way in and out: "the horizon" (portal3d.js). A thin line of light draws across the middle of a dark
+   screen; the screen parts along it, top up and bottom down, like a curtain on the horizon, while the camera rises
+   from the water. Leaving for another page closes it again. (The home page's ways in are smoke and ripples; this
+   one is its own.) If the script never runs, the curtain lifts by itself after a few seconds. ---- */
+.hz { position: fixed; inset: 0; z-index: 50; pointer-events: none; animation: hzFail 0s 4.5s forwards; }
+.hz i { position: absolute; left: 0; right: 0; display: block; }
+.hz-t, .hz-b { height: 50.5%; background: linear-gradient(#1b0d07, #3a1d10 92%, #6a3418); transition: transform 1.25s cubic-bezier(.76,0,.24,1); }
+.hz-t { top: 0; } .hz-b { bottom: 0; transform-origin: bottom; background: linear-gradient(#6a3418, #3a1d10 8%, #1b0d07); }
+html.dark .hz-t { background: linear-gradient(#03050d, #0e1430 92%, #2a3466); } html.dark .hz-b { background: linear-gradient(#2a3466, #0e1430 8%, #03050d); }
+.hz-l { top: 50%; height: 2px; margin-top: -1px; background: linear-gradient(90deg, transparent, #ffcf8f 22%, #fff6e8 50%, #ffcf8f 78%, transparent); box-shadow: 0 0 22px 4px rgba(255,190,110,.55);
+  transform: scaleX(0); transition: transform .75s cubic-bezier(.6,0,.2,1), opacity .9s ease .2s, height .9s ease; }
+html.dark .hz-l { background: linear-gradient(90deg, transparent, #bcd0ff 22%, #ffffff 50%, #bcd0ff 78%, transparent); box-shadow: 0 0 22px 4px rgba(170,195,255,.5); }
+.hz.draw .hz-l { transform: scaleX(1); }
+.hz.open .hz-t { transform: translateY(-101%); } .hz.open .hz-b { transform: translateY(101%); } .hz.open .hz-l { opacity: 0; }
+.hz.gone { visibility: hidden; }
+.hz.closing { visibility: visible; pointer-events: auto; } .hz.closing .hz-t, .hz.closing .hz-b { transition-duration: .85s; transform: none; } .hz.closing .hz-l { opacity: 1; transform: scaleX(1); transition: transform .5s ease .45s, opacity .2s ease .4s; }
+@keyframes hzFail { to { visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .hz { display: none; } }
+.app-card { margin-top: 26px; padding-top: 18px; border-top: 1.5px solid var(--rule); } .app-card .lbl { color: var(--soft); }
+.app-h { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 0; font: 400 26px/1.15 var(--sans); letter-spacing: -.01em; } .app-n { margin: 10px 0 0; color: var(--soft); }
+.app-card .rows { margin-top: 12px; } .app-card label.pbtn { cursor: pointer; }
+.payf { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; } .payf label { display: grid; gap: 5px; font: 500 10.5px/1 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: color-mix(in srgb, var(--bg) 70%, transparent); }
+.payf input, .payf select { height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--bg) 14%, transparent); color: var(--bg); font: 400 15px/1 var(--sans); }
+.payf select option { color: #2a1609; } .payf .err, .payf button { grid-column: 1 / -1; justify-self: start; } .due .err { color: #ffb08a; } .due .note + .note { margin-top: 6px; }
+.sample[hidden], .payf[hidden], .tag[hidden] { display: none; }

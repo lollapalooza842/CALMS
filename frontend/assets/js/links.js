@@ -22,7 +22,7 @@
     "my queue": "my-queue", "applications": "applications", "new application": "new-application", "notifications": "notifications",
     "review queue": "review-queue", "counter-offers": "counter-offers", "disbursement": "disbursement-queue", "disbursement queue": "disbursement-queue",
     "loan accounts": "loan-accounts", "payments": "post-payment", "reports": "reports", "audit log": "audit-log",
-    "users and roles": "users-roles", "administration": "users-roles", "rules": "products-rules", "system": "system", "my profile": "my-profile"
+    "users and roles": "users-roles", "administration": "users-roles", "rules": "products-rules", "system": "system", "my profile": "my-profile", "website": "website"
   };
   /* Free text (a button label, an action name, a page name) to a screen. First match wins, so the order matters. */
   var BY_WORDS = [
@@ -52,15 +52,15 @@
   /* 0. Online, the side rail holds only the drawers the signed-in person's role may open (FR-111),
      with how much is waiting in My Queue and how many notices are new. */
   var RAIL = {
-    sales_agent: ["My Queue", "Applications", "Counter-offers", "Notifications"],
-    loan_processor: ["My Queue", "Applications", "New application", "Loan accounts", "Notifications"],
+    sales_agent: ["My Queue", "Applications", "Counter-offers", "Website", "Notifications"],
+    loan_processor: ["My Queue", "Applications", "New application", "Website", "Loan accounts", "Notifications"],
     underwriter: ["My Queue", "Review queue", "Applications", "Counter-offers", "Notifications"],
     lead_underwriter: ["My Queue", "Review queue", "Applications", "Counter-offers", "Loan accounts", "Notifications"],
     disbursement_officer: ["My Queue", "Disbursement queue", "Loan accounts", "Notifications"],
-    loan_account_officer: ["My Queue", "Loan accounts", "Payments", "Notifications"],
-    operations_manager: ["My Queue", "Applications", "Review queue", "Loan accounts", "Reports", "Rules", "Notifications"],
+    loan_account_officer: ["My Queue", "Loan accounts", "Payments", "Website", "Notifications"],
+    operations_manager: ["My Queue", "Applications", "Review queue", "Loan accounts", "Website", "Reports", "Rules", "Notifications"],
     compliance_auditor: ["My Queue", "Applications", "Loan accounts", "Reports", "Audit log", "Rules", "Notifications"],
-    system_administrator: ["My Queue", "Users and roles", "Rules", "System", "Audit log", "Notifications"]
+    system_administrator: ["My Queue", "Users and roles", "Rules", "System", "Website", "Audit log", "Notifications"]
   };
   /* Screens reached from a drawer light up that drawer. */
   var PARENT = { "application-detail": "applications", documents: "applications", "encode-verify": "applications", "credit-assessment": "review-queue", decision: "review-queue",
@@ -70,7 +70,7 @@
   function railBuild(nav) { window.CALMS_RAIL_BUILD = true; try { railBuild0(nav); } finally { window.CALMS_RAIL_BUILD = false; } }   /* look.js lets only this draw the rail */
   function railBuild0(nav) { nav.textContent = ""; var here = PARENT[HERE] || HERE;
     WANT.forEach(function (label) { var li = document.createElement("li"), a = document.createElement("a"), p = document.createElement("span"); p.className = "plate"; p.appendChild(document.createTextNode(label)); a.href = "#";
-      var n = label === "My Queue" ? COUNTS.queue : label === "Notifications" ? COUNTS.unread : null; if (n) { var i = document.createElement("i"); i.textContent = String(n); p.appendChild(i); }
+      var n = label === "My Queue" ? COUNTS.queue : label === "Notifications" ? COUNTS.unread : label === "Website" ? COUNTS.website : null; if (n) { var i = document.createElement("i"); i.textContent = String(n); p.appendChild(i); }
       if (byLabel(label) === here) a.setAttribute("aria-current", "page"); a.appendChild(p); li.appendChild(a); nav.appendChild(li); }); }
   function railLoad() { if (!window.CALMS) return; CALMS.api("GET", "/api/rail").then(function (d) { WANT = RAIL[d.role] || null; COUNTS = d; var nav = document.getElementById("nav"); if (nav && WANT) { var t = document.createElement("ul"); railBuild(t); var cur = function (n) { var a = n.querySelector("[aria-current]"); return a ? a.textContent.trim() : ""; };
       if (t.textContent !== nav.textContent || cur(t) !== cur(nav)) railBuild(nav); }   /* unchanged (the rail kept from the last page): leave it be, nothing blinks */
@@ -135,7 +135,7 @@
   /* 7. On a phone the side rail becomes a tab bar at the bottom of the screen (styled in rail.css): the first four
      drawers as tabs, and "More" for the rest, My profile and Sign out. It is rebuilt whenever the rail changes. */
   var SHORT = { "My Queue": "Queue", "New application": "New", "Review queue": "Review", "Counter-offers": "Offers", "Disbursement queue": "Release",
-    "Loan accounts": "Accounts", "Notifications": "Notices", "Users and roles": "Users", "Audit log": "Audit" };
+    "Loan accounts": "Accounts", "Notifications": "Notices", "Users and roles": "Users", "Audit log": "Audit", "Website": "Web" };
   function tabbar() {
     var nav = document.getElementById("nav"), rail = document.querySelector(".rail"); if (!nav || !rail) return;
     var items = [].map.call(nav.querySelectorAll("a"), function (a) { var p = a.querySelector(".plate"), n = p && p.querySelector("i"), ic = a.querySelector(".ic");
