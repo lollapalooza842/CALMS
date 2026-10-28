@@ -54,7 +54,7 @@ function build(W) {
 
   /* the ring: one stone per item (a monthly payment, or a step of the application) */
   let stones = [];
-  const C = { gold: new THREE.Color(0xf0b45a), next: new THREE.Color(0xff9a4a), late: new THREE.Color(0xe0574a), stone: new THREE.Color(0x7a6a66), cool: new THREE.Color(0x9fb3c8),
+  const C = { gold: new THREE.Color(0xf0b45a), next: new THREE.Color(0xff9a4a), late: new THREE.Color(0xe0574a), stone: new THREE.Color(0xa58c84), cool: new THREE.Color(0x9fb3c8),
     eGold: new THREE.Color(0x8a4a10), eNext: new THREE.Color(0xc04a10), eLate: new THREE.Color(0x8a1a10), black: new THREE.Color(0) };
   const stoneGeo = new THREE.OctahedronGeometry(.62, 0);
   function ring(items) {
@@ -76,6 +76,10 @@ function build(W) {
   const small = () => innerWidth <= 760;
   const view = (k) => small() ? [V[k][0].clone().multiplyScalar(k === "door" ? 1 : 1.45), V[k][1]] : V[k];
   W.place(...view("gate"));
+  /* before signing in, plain stones already float round the island; signing in lights them up as payments */
+  const IDLE = () => Array.from({ length: 12 }, () => ({ state: "", tip: "" }));
+  function idle(delay) { ring(IDLE()); stones.forEach((st, i) => setTimeout(() => { st.want = 1; }, delay + (W.still() ? 0 : 140 * i))); }
+  idle(900);
 
   let signedIn = false, doorK = 0;
   W.onFrame((dt, t) => {
@@ -105,18 +109,18 @@ function build(W) {
   addEventListener("pointermove", (e) => { if (e.target.closest && e.target.closest(".sheet, .pn, .kw, .kc")) { if (hover >= 0) { hover = -1; mark(-1); } return; } const i = pick(e); if (i !== hover) { hover = i; if (i >= 0) setTip(i); mark(i); document.body.style.cursor = i >= 0 ? "pointer" : ""; } }, { passive: true });
   addEventListener("click", (e) => { if (e.target.closest && e.target.closest(".sheet, .pn, .kw, .kc")) return; const i = pick(e); if (i >= 0) { pinned = i; setTip(i); showRow(i); } });
 
-  function theme(night) { winM.color.set(night ? 0xffd27f : 0xffc879); winGlow.material.opacity = night ? .55 : .28; wallM.color.set(night ? 0xb3aac0 : 0xf2e2cc); grassM.color.set(night ? 0x3a4a3e : 0x75804c); treeM.color.set(night ? 0x2a3d33 : 0x3f5a3a); C.stone.set(night ? 0x5a5872 : 0x7a6a66); }
+  function theme(night) { winM.color.set(night ? 0xffd27f : 0xffc879); winGlow.material.opacity = night ? .55 : .28; wallM.color.set(night ? 0xb3aac0 : 0xf2e2cc); grassM.color.set(night ? 0x3a4a3e : 0x75804c); treeM.color.set(night ? 0x2a3d33 : 0x3f5a3a); C.stone.set(night ? 0x7c7aa0 : 0xa58c84); }
   theme(W.dark());
 
   return {
     theme,
     enter(items, quick) {
-      signedIn = true; ring(items);
-      const rise = () => stones.forEach((st, i) => setTimeout(() => { st.want = 1; }, quick || W.still() ? 0 : 110 * i));
+      signedIn = true; stones.forEach((st) => { st.want = 0; });   /* the plain stones sink, and the borrower's rise */
+      const rise = () => { ring(items); stones.forEach((st, i) => setTimeout(() => { st.want = 1; if (S && S.onRise) S.onRise(i, st.it.state); }, quick || W.still() ? 0 : 110 * i)); };
       if (quick || W.still()) { W.place(...view("home")); rise(); return; }
       W.fly(...view("door"), 1.7, () => setTimeout(() => { W.fly(...view("home"), 2.4); setTimeout(rise, 500); }, 250));
     },
-    leave() { signedIn = false; pinned = hover = -1; stones.forEach((st) => { st.want = 0; }); W.fly(...view("gate"), 2.2); },
+    leave() { signedIn = false; pinned = hover = -1; stones.forEach((st) => { st.want = 0; }); W.fly(...view("gate"), 2.2); setTimeout(() => { if (!signedIn) idle(0); }, 1400); },
     pick(i) { pinned = i; if (i >= 0) setTip(i); }
   };
 }
@@ -262,3 +266,4 @@ let wasSample = false; try { wasSample = sessionStorage.getItem("gr8-me") === "s
 if (wasSample) { mode = "sample"; paintSample(); }
 else api("GET", "/api/public/me").then((d) => { ME = d; paint(d, true); }, () => {});
 if (W) W.intro();   /* rise out of the water as the curtain opens */
+if (S && W) S.onRise = (i, state) => { if (state) W.sound.ping(i, state === "stop" ? "stop" : ""); };   /* a soft note for each payment or step that lights up */

@@ -100,6 +100,7 @@ function build(W) {
       l.globeM.color.copy(dimC).lerp(col, l.level);
       l.gl.material.color.set(l.kind === "stop" ? 0x9fb3c8 : now ? 0xffb46a : 0xffcf8f); l.gl.material.opacity = l.level * (now ? 1 : .75) * pulse; l.gl.scale.setScalar((now ? 4.4 : 3.2) * (now ? pulse : 1) * glowK);
       l.ring.material.color.set(l.kind === "stop" ? 0x9fb3c8 : 0xffcf8f); l.ring.material.opacity = now ? l.level * (.45 + .3 * Math.sin(t * 2.6)) : 0; const rs = now ? 1 + ((t * .5) % 1) * .6 : 1; l.ring.scale.setScalar(rs);
+      if (l.level > .5 && !l.rang) { l.rang = true; W.sound.ping(i, l.kind === "stop" ? "stop" : ""); } else if (l.level < .2) l.rang = false;
       l.tag.classList.toggle("lit", l.level > .5); l.tag.classList.toggle("now", now && l.level > .5); l.tag.classList.toggle("hide", focus >= 0 && Math.abs(i - focus) > 1);
     });
   });

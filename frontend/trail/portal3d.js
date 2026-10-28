@@ -4,12 +4,14 @@
    makeWorld() also runs the top bar (dark mode, menu), the camera's flights, the 3D labels, and the frame loop, which
    pauses when the tab is hidden. The Motion setting (gr8-motion) or the system's "reduce motion" keeps it still. */
 import * as THREE from "../assets/vendor/three/three.module.min.js";
+import { makeSound } from "./portalsound.js";
 
 const DUSK = { top: 0x9a6a78, mid: 0xd98f74, hor: 0xffcf9e, sun: 0xfff1d6, fog: 0xe3a888, water: 0x84575a, deep: 0x4f3341, hill: 0x6b4448, glint: 0xffe2b8, amb: 0xffd9b8, ground: 0x6a4a4c, key: 0xffe0c0 };
 const NIGHT = { top: 0x0a1030, mid: 0x1f2c5c, hor: 0x52578a, sun: 0xf2f5ff, fog: 0x2e3760, water: 0x2f3d68, deep: 0x1c2648, hill: 0x1e2442, glint: 0xe6edff, amb: 0xaebdf0, ground: 0x2a2c48, key: 0xc9d8ff };
 
 export function makeWorld(canvas, opt = {}) {
   topBar();
+  const sound = makeSound(() => document.documentElement.classList.contains("dark"));
   const html = document.documentElement;
   let still = matchMedia("(prefers-reduced-motion: reduce)").matches; try { if (localStorage.getItem("gr8-motion") === "off") still = true; } catch (e) {}
   let renderer;
@@ -127,7 +129,7 @@ export function makeWorld(canvas, opt = {}) {
   raf = requestAnimationFrame(frame);
   requestAnimationFrame(() => { document.body.classList.add("ready"); horizon(); });
 
-  return { THREE, scene, camera, renderer, fly, place, intro, label, still: () => still, onFrame: (fn) => updates.push(fn), dark: () => html.classList.contains("dark") };
+  return { THREE, scene, camera, renderer, sound, fly, place, intro, label, still: () => still, onFrame: (fn) => updates.push(fn), dark: () => html.classList.contains("dark") };
 }
 
 /* a soft round glow, for lanterns and stones (one small canvas, shared) */
@@ -155,6 +157,8 @@ function horizon() {
 
 /* the top bar: dark mode (kept like the home page's switch) and the phone menu */
 function topBar() {
+  const tools = document.querySelector(".pn .tools"), m0 = document.querySelector(".pn .mode");
+  if (tools && m0 && !tools.querySelector(".snd")) { const b = document.createElement("button"); b.type = "button"; b.className = "snd"; b.setAttribute("aria-label", "Sound"); b.setAttribute("aria-pressed", "false"); b.innerHTML = "<i></i><i></i><i></i><i></i><i></i>"; tools.insertBefore(b, m0); }
   const html = document.documentElement, mode = document.querySelector(".pn .mode"), menu = document.querySelector(".pn .menu-btn"), mob = document.querySelector(".pn .mob");
   if (mode) mode.addEventListener("click", () => { const d = !html.classList.contains("dark"); html.classList.toggle("dark", d); try { localStorage.setItem("gr8-theme", d ? "dark" : "light"); } catch (e) {} mode.setAttribute("aria-pressed", String(d)); });
   if (menu && mob) { menu.addEventListener("click", () => { const o = !mob.classList.contains("open"); mob.classList.toggle("open", o); menu.setAttribute("aria-expanded", String(o)); });

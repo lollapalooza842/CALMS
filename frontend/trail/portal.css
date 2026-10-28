@@ -169,3 +169,11 @@ html.dark .hz-l { background: linear-gradient(90deg, transparent, #bcd0ff 22%, #
 .payf input, .payf select { height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--bg) 14%, transparent); color: var(--bg); font: 400 15px/1 var(--sans); }
 .payf select option { color: #2a1609; } .payf .err, .payf button { grid-column: 1 / -1; justify-self: start; } .due .err { color: #ffb08a; } .due .note + .note { margin-top: 6px; }
 .sample[hidden], .payf[hidden], .tag[hidden] { display: none; }
+/* the sound button: five bars that sway while the lake is playing */
+.pn .snd { width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 3px; border: 0; border-radius: 50%; background: rgba(255,255,255,.14); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .3s; }
+.pn .snd:hover { background: rgba(255,255,255,.26); }
+.pn .snd i { width: 2px; height: 5px; border-radius: 2px; background: #fff; transition: height .4s; }
+.pn .snd.on i { animation: sndBar 1.6s ease-in-out infinite; } .pn .snd.on i:nth-child(2) { animation-delay: -.4s; } .pn .snd.on i:nth-child(3) { animation-delay: -.9s; } .pn .snd.on i:nth-child(4) { animation-delay: -.2s; } .pn .snd.on i:nth-child(5) { animation-delay: -1.2s; }
+.pn .snd[aria-pressed="false"] i { height: 2px; opacity: .7; }
+@keyframes sndBar { 0%, 100% { height: 4px; } 50% { height: 15px; } }
+@media (prefers-reduced-motion: reduce) { .pn .snd.on i { animation: none; height: 9px; } }
