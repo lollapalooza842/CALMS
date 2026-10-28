@@ -80,29 +80,34 @@
     var last = log[log.length - 1]; addChips(last.role === "kuwa" ? (chipsFor(last).length ? chipsFor(last) : FOLLOW) : []);
   }
 
-  /* ---- the typewriter: Kuwa's words appear as she says them. With her voice on, each word shows when the browser says
-     it is speaking it (or, for voices that don't say, at her speaking pace); with the voice off, at a quick reading pace. ---- */
+  /* ---- the typewriter: Kuwa's words appear as she says them. The whole answer is laid out at once (each word hidden),
+     so the bubble has its final size from the start and nothing re-wraps or jumps; then each word fades in. With her
+     voice on, a word shows when the browser says she is speaking it (or, for voices that don't say, at her speaking
+     pace); with the voice off, at a quick reading pace. Only a class changes per word, so it stays smooth. ---- */
   var typing = null;
   function typeOut(p, text, done) {
     finishTyping();
-    var t = { p: p, text: text, shown: 0, target: 0, mode: "timer", cps: 46, last: performance.now(), done: done }; typing = t; p.textContent = "";
+    var t = { p: p, text: text, shown: 0, target: 0, mode: "timer", cps: 60, last: performance.now(), done: done, words: [], next: 0 }; typing = t;
+    p.textContent = ""; p.classList.add("tw");
+    var re = /\S+\s*/g, m; while ((m = re.exec(text))) { var w = document.createElement("span"); w.className = "w"; w.textContent = m[0]; p.appendChild(w); t.words.push({ el: w, at: m.index }); }
+    scrollDown();
     function frame(now) {
       if (typing !== t) return;
       var dt = Math.min(.1, (now - t.last) / 1000); t.last = now;
-      if (t.mode === "timer") t.target = Math.min(text.length, t.target + dt * t.cps);
-      if (t.shown < t.target) { var before = Math.floor(t.shown); t.shown = Math.min(t.target, t.shown + dt * (t.mode === "timer" ? t.cps : 70)); var n = Math.floor(t.shown);
-        if (n !== before) { p.textContent = text.slice(0, n); if (/\s/.test(text.charAt(n - 1))) pulse = Math.max(pulse, .6); scrollDown(); } }
-      if (t.shown >= text.length) { finishTyping(); return; }
+      if (t.mode === "timer" || t.mode === "end") t.target = Math.min(text.length, t.target + dt * (t.mode === "end" ? 90 : t.cps));
+      t.shown = t.target;
+      while (t.next < t.words.length && t.words[t.next].at <= t.shown) { t.words[t.next].el.classList.add("on"); t.next++; pulse = Math.max(pulse, .6); }
+      if (t.next >= t.words.length) { setTimeout(function () { if (typing === t) finishTyping(); }, 260); return; }   /* let the last word finish fading in */
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame); return t;
   }
-  function finishTyping() { var t = typing; if (!t) return; typing = null; t.p.textContent = t.text; scrollDown(); if (t.done) t.done(); }
+  function finishTyping() { var t = typing; if (!t) return; typing = null; t.words.forEach(function (w) { w.el.classList.add("on"); }); if (t.done) t.done(); }
   function wordEnd(text, i) { var m = /\s/.exec(text.slice(i)); return m ? i + m.index : text.length; }
   /* Kuwa says something: a bubble that types itself out with her voice, then its chips */
   function kuwaSay(text, after, opts) {
     var b = bubble({ role: "kuwa", text: "" }, true), t = typeOut($("p", b), text, after);
-    if (voiceOn && TTS && !(opts && opts.quiet)) { t.mode = "wait"; speak(text, t); } else { t.cps = 46; setState("idle"); }
+    if (voiceOn && TTS && !(opts && opts.quiet)) { t.mode = "wait"; speak(text, t); } else { t.cps = 60; setState("idle"); }
     return b;
   }
 
@@ -247,13 +252,13 @@
     u.onstart = function () { if (utter !== u) return; started = true; setState("talking"); setTimeout(function () { if (!heard) toTimer(14.5); }, 900); };   /* no word timings from this voice: type at her speaking pace */
     u.onboundary = function (e) { if (utter !== u) return; pulse = 1; if (e.name && e.name !== "word") return; heard = true;
       if (t && typing === t) { t.mode = "speech"; t.target = Math.max(t.target, Math.min(text.length, e.charLength ? e.charIndex + e.charLength : wordEnd(text, e.charIndex))); } };
-    u.onend = u.onerror = function () { if (utter !== u) return; if (t && typing === t) { t.mode = "end"; t.target = text.length; } setState("idle"); };
+    u.onend = u.onerror = function () { if (utter !== u) return; if (t && typing === t) { t.mode = "end"; } setState("idle"); };
     TTS.cancel(); setState("talking"); clearInterval(keepAlive);
     setTimeout(function () { TTS.speak(u); if (TTS.paused) TTS.resume(); }, 80);       /* Chrome drops a speak() right after cancel() */
     keepAlive = setInterval(function () { if (!TTS.speaking) { clearInterval(keepAlive); return; } TTS.pause(); TTS.resume(); }, 9000);
     setTimeout(function () { if (!started && utter === u) { toTimer(30); setTimeout(function () { if (state === "talking" && !TTS.speaking) setState("idle"); }, Math.min(6000, text.length * 40)); } }, 1500);   /* the voice never started */
   }
-  function hush() { utter = null; if (TTS) TTS.cancel(); if (typing && typing.mode !== "timer") { typing.mode = "timer"; typing.cps = 46; typing.target = Math.max(typing.target, typing.shown); } if (state === "talking") setState("idle"); }
+  function hush() { utter = null; if (TTS) TTS.cancel(); if (typing && typing.mode !== "timer") { typing.mode = "timer"; typing.cps = 60; typing.target = Math.max(typing.target, typing.shown); } if (state === "talking") setState("idle"); }
 
   /* ---- listening: the browser's speech recognition (Chrome, Edge, Safari) ---- */
   var rec = null;
@@ -271,7 +276,7 @@
 
   /* ---- the orb: a glassy orange sphere with warm light swirling inside, a soft aura, and a bright rim. Faceless. ---- */
   var cx = canvas.getContext("2d"), raf = 0, energy = .2, spin = 0, dark = false;
-  function size() { var d = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * d; canvas.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0); }
+  function size() { var d = Math.min(devicePixelRatio || 1, 1);   /* the orb is soft and blurred: full resolution only costs frames */ canvas.width = innerWidth * d; canvas.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0); }
   function blob(x, y, r, amp, t, k, col, blur) {
     cx.save(); cx.filter = "blur(" + blur + "px)"; cx.beginPath();
     for (var i = 0; i <= 72; i++) { var a = i / 72 * Math.PI * 2, w = 1 + amp * (Math.sin(a * 3 + t * 1.3 + k) * .5 + Math.sin(a * 5 - t * 1.7 + k * 2) * .3 + Math.sin(a * 2 + t * .7) * .2), px = x + Math.cos(a) * r * w, py = y + Math.sin(a) * r * w; if (i) cx.lineTo(px, py); else cx.moveTo(px, py); }

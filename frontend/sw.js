@@ -9,7 +9,7 @@
    - On install, every screen and its files are fetched once (the list comes from the server, /sw-files.json), so a
      screen opens offline even if it was never visited on this computer.
    Change VERSION to throw away every old copy. */
-var VERSION = "calms-shell-v38";
+var VERSION = "calms-shell-v39";
 var SHELL = ["index.html", "assets/css/fonts.css", "assets/css/theme-ui.css", "assets/css/index.css", "assets/css/entrance.css", "assets/css/classic-fonts.css", "assets/css/classic.css", "assets/css/icons.css",
   "assets/js/entrance.js", "assets/js/api.js", "assets/js/offline.js", "assets/js/app.js", "assets/js/index.js", "assets/js/links.js", "assets/fonts/badhorse.otf", "assets/img/logo-large.webp", "assets/img/kuwa.png", "assets/img/app/icon-192.png"];
 

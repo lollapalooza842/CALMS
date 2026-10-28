@@ -39,6 +39,8 @@ html.dark .kc-b p { font-weight: 500; }
 html:not(.dark) .kc-b.k p { box-shadow: 0 1px 2px rgba(40,20,10,.03); }
 .kc-b.u { align-self: flex-end; } .kc-b.u p { background: linear-gradient(90deg, var(--kc-a), var(--kc-a2)); color: #fff; font-weight: 500; border-radius: clamp(10px, .7vw, 14px); }
 .kc-b.dots p { color: var(--kc-soft); }
+.kc-b p.tw .w { opacity: 0; filter: blur(3px); transition: opacity .32s ease-out, filter .32s ease-out; }   /* the typewriter: each word fades in, in place */
+.kc-b p.tw .w.on { opacity: 1; filter: none; }
 .kc-b.dots p::after { content: "..."; display: inline-block; width: 1.1em; text-align: left; animation: kcDots 1.2s steps(4) infinite; clip-path: inset(0 100% 0 0); }
 @keyframes kcDots { to { clip-path: inset(0 -10% 0 0); } }
 .kc-who { margin: 0 0 6px 4px; color: var(--kc-soft); font: 400 clamp(12px, .7vw, 14px)/1 var(--kc-sans); letter-spacing: -.005em; }
@@ -110,7 +112,7 @@ html.dark .kc-ring { background: radial-gradient(circle at 50% 40%, #262321, #19
   .kc-agent { left: 50%; top: 24%; width: min(66vw, 36vh); } .kc-orb { transform-origin: 50% 25%; }
   .kc-ring { inset: 6%; } .kc-face { gap: 6px; } .kc-av { width: 64px; font-size: 24px; } .kc-an { font-size: 17px; } .kc-as { font-size: 12.5px; }
 }
-@media (prefers-reduced-motion: reduce) { .kc-b.new, .kc-sys.new, .kc-chips, .kc-start, .kc-in::before, .kc-ring::before, .kc-av { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .kc-b p.tw .w { transition: none; filter: none; } .kc-b.new, .kc-sys.new, .kc-chips, .kc-start, .kc-in::before, .kc-ring::before, .kc-av { animation: none !important; } }
 
 /* ---- the orb (every page): just an orb, glowing, a slow swirl of light inside ---- */
 .orbx { position: relative; } .pill .orb.orbx { overflow: visible; background: none; }
