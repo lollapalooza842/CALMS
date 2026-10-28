@@ -211,3 +211,17 @@
   var TITLE = ["Work it out", "Work it out", "Work it out", "Start here", "Get your papers ready", "Can I carry it?", "Track an application", "See your schedule", "Paying", "Get your papers ready", "Get your papers ready", "Get your papers ready", "See the fee", "Pay early, see the saving", "If you're late", "Your data"];
   window.GR8_TOOLS = { render: function (i, box) { box.innerHTML = ""; var t = document.createElement("div"); t.className = "tl"; box.appendChild(t); (TOOL[i] || startTool)(t); return TITLE[i] || "Try it"; }, installment: installment, peso: peso, byKind: byKind };
 })();
+
+/* Home page, "I'm looking for a loan": the "Borrow up to" pills show each loan's live maximum once the products load
+   (the amounts written in index.html are the same figures, shown until then). Here, not in index.html, because the
+   site's security policy blocks scripts written inside a page. */
+(function () {
+  var pills = document.getElementById("tkBorrowPills");
+  if (!pills || !window.GR8_DATA_READY) return;
+  window.GR8_DATA_READY.then(function (d) {
+    var prods = (d && d.products) || []; if (!prods.length) return;
+    var fmt = function (n) { return "\u20b1" + Number(n).toLocaleString("en-PH"); };
+    pills.textContent = "";
+    prods.forEach(function (p) { var s = document.createElement("span"); s.className = "tk-borrow-pill"; s.textContent = p.name + " " + fmt(p.max); pills.appendChild(s); });
+  });
+})();

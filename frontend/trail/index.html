@@ -269,20 +269,6 @@
 <script src="gate.js"></script>
 <script src="stage.js"></script>
 <script src="tools.js"></script>
-<script>
-(function() {
-  var pills = document.getElementById('tkBorrowPills');
-  if (!pills || !window.GR8_DATA_READY) return;
-  window.GR8_DATA_READY.then(function(d) {
-    var prods = (d && d.products) || [];
-    if (!prods.length) return;
-    var fmt = function(n) { return '₱' + Number(n).toLocaleString('en-PH'); };
-    pills.innerHTML = prods.map(function(p) {
-      return '<span class="tk-borrow-pill">' + p.name + ' ' + fmt(p.max) + '</span>';
-    }).join('');
-  });
-})();
-</script>
 <script src="apply.js"></script>
 <script type="module" src="scene.js"></script>
 <script src="memory.js" defer></script>

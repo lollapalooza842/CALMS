@@ -1,5 +1,7 @@
 // Kuwa, the talking guide on the public site (no sign-in).
-//   POST /api/public/kuwa   { messages: [{ role: "user"|"kuwa", text }] }  ->  { reply, go: [...], source }
+//   POST /api/public/kuwa   { messages: [{ role: "user"|"kuwa", text }] }  ->  { reply, go: [...], human, source }
+// human: true when the question needs a real person (their own application or account, a complaint, a payment problem,
+// anything Kuwa can't answer from the facts, or the visitor asks for a person). The page then offers a live agent (routes/live.js).
 // Kuwa answers questions about GR8 Lending's loans from what CALMS itself holds (the products and their rates, read live),
 // through an AI service chosen by what is in the server's .env:
 //   GEMINI_API_KEY     Google Gemini (has a free tier)      KUWA_MODEL to change the model (default gemini-flash-latest)
@@ -47,6 +49,7 @@ const SYSTEM = (products) => `You are Kuwa, the friendly owl guide of GR8 Lendin
 - Only talk about GR8 Lending, its loans, applying, paying, and using this website. For anything else, say kindly that you only know about GR8 loans.
 - Use ONLY the facts below. Never invent rates, fees, promos, phone numbers or addresses. If you do not know, say the branch can help.
 - Never promise approval or an amount; an underwriter decides. Never ask for or repeat ID numbers, passwords, codes or account numbers. You cannot look up anyone's application: send them to the Track page or My GR8.
+- Answer simple, general questions yourself. When the question needs a real person, say in one short sentence that someone from the GR8 team can help and end with the tag [[human]]. A person is needed for: anything about the visitor's own application, loan, balance, payment or documents; complaints, disputes or problems; restructuring, extensions or special requests; anything you cannot answer from the facts below; or when the visitor asks for a person, agent, staff or human. Never use [[human]] for questions the facts already answer.
 - When a page would help, end your reply with one or two tags from this list, exactly as written: [[go:apply]] [[go:loans]] [[go:calc]] [[go:track]] [[go:signin]] [[go:downloads]] [[go:faq]]
 
 FACTS
@@ -60,6 +63,7 @@ Branch: Malolos, Monday to Saturday, 8:00 to 5:00. Privacy: only staff working o
 
 // ---- when there is no AI key: the common questions, by keyword ----
 const CANNED = [
+  [/\b(agent|human|person|tao|representative|someone|complain|reklamo|problem|dispute|refund|my (loan|account|balance|payment|application))\b/i, "Someone from the GR8 team can help you with that. [[human]]"],
   [/paper|requirement|document|kailangan|need to apply/i, "Every loan needs a government ID and the signed consent form. A salary loan also asks for pay stubs and a certificate of employment, and an SME loan asks for your business registration and permit. [[go:loans]]"],
   [/how much|magkano|compute|monthly|calculat|interest|rate/i, "Rates start at 1.5% a month for SME loans, 1.6% for salary loans and 1.8% for personal loans. Slide the amount on the calculator and you'll see the monthly payment, the fee and the total. [[go:calc]]"],
   [/track|status|where is my|nasaan/i, "Type your reference number and the mobile number you applied with on the Track page, and I'll show you the step your loan is at. [[go:track]]"],
@@ -77,7 +81,7 @@ async function askGemini(sys, msgs) {
   const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY }, signal: AbortSignal.timeout(20000),
     body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: msgs.map((m) => ({ role: m.role === "kuwa" ? "model" : "user", parts: [{ text: m.text }] })),
-      generationConfig: { maxOutputTokens: 400, temperature: .6 } }),
+      generationConfig: { maxOutputTokens: 1200, temperature: .6 } }),
   });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error((d.error && d.error.message) || "Gemini " + r.status);
@@ -96,9 +100,10 @@ async function askClaude(sys, msgs) {
 
 const GO = ["apply", "loans", "calc", "track", "signin", "downloads", "faq"];
 function shape(text, source) {
-  const go = []; text = String(text || "").replace(/\[\[go:(\w+)\]\]/g, (_, k) => { if (GO.includes(k) && !go.includes(k)) go.push(k); return ""; })
+  const go = []; let human = false;
+  text = String(text || "").replace(/\[\[human\]\]/gi, () => { human = true; return ""; }).replace(/\[\[go:(\w+)\]\]/g, (_, k) => { if (GO.includes(k) && !go.includes(k)) go.push(k); return ""; })
     .replace(/[*_#`]/g, "").replace(/\s+/g, " ").trim();
-  return { reply: text || "Sorry, partner, I lost my words for a second. Could you ask that again?", go: go.slice(0, 2), source };
+  return { reply: text || "Sorry, partner, I lost my words for a second. Could you ask that again?", go: go.slice(0, 2), human, source };
 }
 
 router.get("/", (req, res) => res.json({ ai: process.env.GEMINI_API_KEY ? "gemini" : process.env.ANTHROPIC_API_KEY ? "claude" : "builtin" }));

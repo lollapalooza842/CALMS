@@ -48,10 +48,11 @@ app.get("/api/health", async (req, res) => {
 });
 // Any change (a POST, PUT, PATCH or DELETE) clears what the server keeps for a few seconds to answer page loads fast:
 // the signed-in users (lib/auth.js) and the side rail's counts (routes/queues.js).
-app.use("/api", (req, res, next) => { if (req.method !== "GET" && req.path !== "/public/visit") res.on("finish", () => { auth.forgetUser(); require("./routes/queues").forgetRail(); }); next(); });
+app.use("/api", (req, res, next) => { if (req.method !== "GET" && req.path !== "/public/visit" && !req.path.startsWith("/public/live") && req.path !== "/public/kuwa") res.on("finish", () => { auth.forgetUser(); require("./routes/queues").forgetRail(); }); next(); });
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/public/kuwa", require("./routes/kuwa"));   // Kuwa, the guide on the public site: no sign-in, rate-limited
 app.use("/api/public/talk", require("./routes/talk"));   // "Let's talk" on the public site: no sign-in, rate-limited
+app.use("/api/public/live", require("./routes/live").pub);   // live chat with GR8 staff when Kuwa can't help: no sign-in, the visitor holds a token
 app.use("/api/public/visit", require("./routes/visits").pub);   // counts visits to the public site (no names, no addresses)
 app.use("/api/public", require("./routes/publicApply"));   // online applications and tracking: no sign-in, rate-limited
 // Everything below needs a signed-in user (checked once per request).
@@ -75,6 +76,7 @@ app.use("/api/applications", require("./routes/applications"));
 app.use("/api/me", require("./routes/me"));
 app.use("/api/search", require("./routes/search"));
 app.use("/api/visits", require("./routes/visits").staff);   // the website visitor counts, for managers
+app.use("/api/live", require("./routes/live").staff);   // staff answer the website's live chats (pages/live-chat.html)
 app.use("/api", require("./routes/admin"));
 app.use("/api", require("./routes/oversight"));
 app.use("/api", require("./routes/queues"));
