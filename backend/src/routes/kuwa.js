@@ -4,7 +4,7 @@
 // anything Kuwa can't answer from the facts, or the visitor asks for a person). The page then offers a live agent (routes/live.js).
 // Kuwa answers questions about GR8 Lending's loans from what CALMS itself holds (the products and their rates, read live),
 // through an AI service chosen by what is in the server's .env:
-//   GEMINI_API_KEY     Google Gemini (has a free tier)      KUWA_MODEL to put a model first (default gemini-2.5-flash-lite, then 2.5-flash)
+//   GEMINI_API_KEY     Google Gemini (has a free tier)      KUWA_MODEL to put a model first (default gemini-3.5-flash-lite, then 3.8-flash)
 //   ANTHROPIC_API_KEY  Anthropic Claude                      KUWA_MODEL to change the model (default claude-haiku-4-5)
 // With neither, Kuwa still answers the common questions from a small built-in list, so the site never shows him broken.
 // Kuwa never sees or asks for anyone's personal details, cannot look up an application, and never promises approval.
@@ -78,7 +78,7 @@ function canned(q) { for (const [re, a] of CANNED) if (re.test(q)) return a; ret
 // ---- the AI services ----
 // Gemini: a light, fast model first; when Google says it is busy (or it takes too long), the next one is tried.
 // KUWA_MODEL in .env puts a model of your choice first.
-const GEMINI_MODELS = () => [...new Set([process.env.KUWA_MODEL, "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-flash-latest"].filter(Boolean))];
+const GEMINI_MODELS = () => [...new Set([process.env.KUWA_MODEL, "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-flash-latest"].filter(Boolean))];
 async function askGeminiModel(model, sys, msgs) {
   const generationConfig = { maxOutputTokens: 1200, temperature: .6 };
   if (/2\.5/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 };   /* short answers: no thinking time, so replies come fast */
