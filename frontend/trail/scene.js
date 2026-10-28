@@ -381,8 +381,8 @@ async function main() {
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = velo.read.texture; advectM.uniforms.tx.value = velo.tx; advectM.uniforms.dt.value = dt; advectM.uniforms.dissipation.value = .35; pass(advectM, velo.write); velo.swap();
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = dye.read.texture; advectM.uniforms.dissipation.value = 1.1; pass(advectM, dye.write); dye.swap();
   }
-  const outMat = mat({ tScene: U(rtScene.texture), tDye: U(null), dtx: U(dye.tx), time: U(0), on: U(canFloat ? 1 : 0), milk: U(new THREE.Color(1, .96, .9)), deep: U(new THREE.Color(.55, .32, .2)), beat: U(0), alarm: U(0), wipe: U(0), rip: U(99), ripC: U(new THREE.Vector2(.5, .5)), asp: U(1), bh: U(0) },
-    `uniform sampler2D tScene, tDye; uniform vec2 dtx, ripC; uniform float time, on; uniform vec3 milk, deep; uniform float beat, alarm, wipe, rip, asp, bh; varying vec2 vUv;
+  const outMat = mat({ tScene: U(rtScene.texture), tDye: U(null), dtx: U(dye.tx), time: U(0), on: U(canFloat ? 1 : 0), milk: U(new THREE.Color(1, .96, .9)), deep: U(new THREE.Color(.55, .32, .2)), beat: U(0), alarm: U(0), wipe: U(0), flash: U(0), rip: U(99), ripC: U(new THREE.Vector2(.5, .5)), asp: U(1), bh: U(0) },
+    `uniform sampler2D tScene, tDye; uniform vec2 dtx, ripC; uniform float time, on; uniform vec3 milk, deep; uniform float beat, alarm, wipe, flash, rip, asp, bh; varying vec2 vUv;
      float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233)))*43758.5453); }
      float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
      float fb(vec2 p){ float v = 0.0, a = .5; for (int i = 0; i < 5; i++){ v += a*vn(p); p = p*2.02 + 3.1; a *= .5; } return v; }
@@ -427,6 +427,8 @@ async function main() {
          float rad = length((vUv - .5)*vec2(1.6, 1.0));
          float cover = smoothstep(e - .16, e + .16, wipe*1.45 - .25 + rad*.35*(1.0 - wipe));
          vec3 smoke = mix(vec3(1.0, .965, .925), vec3(.93, .8, .7), fb(w*2.0 + time*.1)); c = mix(c, smoke, cover); }
+       /* the bead journey's way into About: the light inside the 8 fills the screen, brightest at the centre */
+       if (flash > .001) { float r = length((vUv - .5)*vec2(asp, 1.0)); c = mix(c, vec3(1.0, .93, .82), clamp(flash*1.35 - r*.5*(1.0 - flash), 0.0, 1.0)); }
        gl_FragColor = vec4(c, 1.0);\n#include <colorspace_fragment>\n
      }`);
 
@@ -468,8 +470,29 @@ async function main() {
     if (inRoom && camera.view && camera.view.enabled) camera.clearViewOffset();
     dispatchEvent(new CustomEvent("gr8:place", { detail: inRoom || (talkOn ? "talk" : "home") }));
   }
-  function goPlace(name) { name = name || null; if (name === inRoom && !wipeDir) return; nextRoom = name; if (wipeDir <= 0) wipeDir = 1; }
-  addEventListener("gr8:room", (e) => goPlace(e.detail && e.detail.room));
+  function goPlace(name, via) { name = name || null; if (name === inRoom && !wipeDir && !flashDir) return; nextRoom = name;
+    if (via === "beads") { flashDir = 1; return; }   /* the scroll journey: through the 8's light instead of the smoke */
+    if (wipeDir <= 0) wipeDir = 1; }
+  addEventListener("gr8:room", (e) => goPlace(e.detail && e.detail.room, e.detail && e.detail.via));
+  /* ---- the scroll journey on the home page (homescroll.js sends gr8:hs, 0 to 1): five views round the 8, then into it ---- */
+  let hsT = 0, hs = 0, flash = 0, flashDir = 0;
+  addEventListener("gr8:hs", (e) => { hsT = Math.max(0, Math.min(1, +e.detail || 0)); });
+  const sc = small ? 1.3 : 1, EY = small ? 8.6 : 7.4;
+  const HS_POS = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 4.2, small ? 30 : 24),          /* 1  the lake, the 8 over the water (where the page opens) */
+    new THREE.Vector3(14 * sc, 5.5, 14 * sc),             /* 2  round to the right: the 8 side-on, the rocks behind */
+    new THREE.Vector3(-10 * sc, 2.4, 9 * sc),             /* 3  low on the left, looking up through the beads at the sky */
+    new THREE.Vector3(3 * sc, 21, 11 * sc),               /* 4  high above: the 8 and its reflection, the lake round it */
+    new THREE.Vector3(0, EY, 9.5 * sc),                   /* 5  face to face, the beads filling the view */
+    new THREE.Vector3(0, EY, 1.2)                         /*    and into the light at its heart */
+  ], false, "centripetal", .5);
+  const HS_LOOK = [new THREE.Vector3(0, small ? 7.5 : 6.4, 0), new THREE.Vector3(-1, EY, 0), new THREE.Vector3(1.5, EY + 2.5, 0), new THREE.Vector3(0, EY - 1, -1), new THREE.Vector3(0, EY, 0), new THREE.Vector3(0, EY, -6)];
+  const hsPos = new THREE.Vector3(), hsLook = new THREE.Vector3();
+  function hsPose(t) {   /* t 0..1 -> camera position and target; 0..0.8 are the five views (0.2 apart), 0.8..1 the way in */
+    HS_POS.getPoint(t, hsPos);   /* six points evenly along the curve: the five views at 0, .2, .4, .6, .8, and the heart at 1 */
+    const seg = Math.min(4, Math.floor(t / .2)), k = Math.min(1, (t - seg * .2) / .2), e = k * k * (3 - 2 * k);
+    hsLook.lerpVectors(HS_LOOK[seg], HS_LOOK[seg + 1], e);
+  }
   addEventListener("gr8:aboutscroll", (e) => rooms.setScroll(e.detail || 0));
   addEventListener("gr8:loansfilter", (e) => rooms.filter(e.detail || "All"));
   addEventListener("gr8:cardgo", (e) => rooms.focus(e.detail | 0));
@@ -499,8 +522,8 @@ async function main() {
   }
   const clock = new THREE.Clock(); let time = 0;
   function frame() {
-    const dt = Math.min(clock.getDelta(), .05);
-    if (paused && !wipeDir && inRoom === "about") { requestAnimationFrame(frame); return; }
+    const rdt = Math.min(clock.getDelta(), .12), dt = Math.min(rdt, .05);   /* rdt: real time, for the timed transitions on a slow phone */
+    if (paused && !wipeDir && !flashDir && inRoom === "about") { requestAnimationFrame(frame); return; }
     if (!still) time += dt;
     const flowAwake = performance.now() - stirAt < 7000;   /* the milk settles in a few seconds; after that the fluid sleeps */
     /* day and night, eased */
@@ -516,10 +539,12 @@ async function main() {
     emx += ((mx - .5) - emx) * .05; emy += ((my - .5) - emy) * .05;
     talkT += (talkOn ? 1 : -1) * dt / 2.6; talkT = Math.min(1, Math.max(0, talkT));
     const te = talkT < .5 ? 4 * talkT * talkT * talkT : 1 - Math.pow(-2 * talkT + 2, 3) / 2, home = 1 - te, lift = Math.sin(te * Math.PI) * 6;
-    camera.position.set((camBase.x + emx * 4) * home + (TALK.pos.x + emx * 2) * te, (camBase.y + emy * 1.6 - lastPulse * .06) * home + (TALK.pos.y + emy * .8 + Math.sin(hop * Math.PI) * 5) * te + lift, (camBase.z - lastPulse * .32) * home + TALK.pos.z * te);
+    hs += (hsT - hs) * Math.min(1, dt * (still ? 30 : 2.6)); if (Math.abs(hsT - hs) < 1e-4) hs = hsT;   /* the camera follows the scroll with a soft lag */
+    hsPose(hs); const lean = 1 - Math.min(1, hs * 1.4) * .7;   /* the cursor's lean fades as we travel */
+    camera.position.set((hsPos.x + emx * 4 * lean) * home + (TALK.pos.x + emx * 2) * te, (hsPos.y + emy * 1.6 * lean - lastPulse * .06) * home + (TALK.pos.y + emy * .8 + Math.sin(hop * Math.PI) * 5) * te + lift, (hsPos.z - lastPulse * .32) * home + TALK.pos.z * te);
     homeLive = talkT < 1; eight.visible = homeLive; boatGroup.visible = homeLive;
     const shore = !inRoom && (talkOn || talkT > 0); grove.visible = office.visible = shore;   /* the far shore is only drawn when we go there */
-    tmpLook.copy(look).lerp(TALK.look, te); camera.lookAt(tmpLook);   /* the heartbeat nudges the camera in; "Let's talk" flies it to the far shore */
+    tmpLook.copy(hsLook).lerp(TALK.look, te); camera.lookAt(tmpLook);   /* the heartbeat nudges the camera in; "Let's talk" flies it to the far shore */
     const offW = innerWidth > 900 && !inRoom ? innerWidth * .25 * te : 0; if (offW > .5) camera.setViewOffset(innerWidth, innerHeight, offW, 0, innerWidth, innerHeight); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
     if (inRoom) { homeLive = false; eight.visible = false; rooms.update(dt, time, emx, emy); }
     /* the transition: push the camera forward into the smoke as it rolls in; at full cover, swap places; then let it thin */
@@ -531,6 +556,10 @@ async function main() {
       else if (wipeDir < 0 && wipe <= 0) { wipeDir = 0; camera.fov = baseFov; camera.updateProjectionMatrix(); }
     }
     outMat.uniforms.wipe.value = wipe;
+    if (flashDir) { flash = Math.min(1, Math.max(0, flash + flashDir * rdt / (flashDir > 0 ? .5 : 1.2)));
+      if (flashDir > 0 && flash >= 1) { applyPlace(); flashDir = -1; if (!inRoom) { hs = .9; hsT = .8; } else { hs = hsT = .8; } }   /* back from About: we come out of the light in front of the 8 */
+      else if (flashDir < 0 && flash <= 0) flashDir = 0; }
+    outMat.uniforms.flash.value = Math.max(flash, inRoom ? 0 : Math.min(1, Math.max(0, (hs - .86) / .14)) * .92);
     { const k = 1 - Math.exp(-dt * 1.5); TALK.pos.lerp(SPOTS[spot].pos, k); TALK.look.lerp(SPOTS[spot].look, k); hop *= Math.exp(-dt * 1.2); }
     if (shore) for (let i = 0; i < PN; i++) { const q = PP[i]; dummy.position.set(q.x + Math.sin(time * q.sp + q.ph) * .6, q.y + Math.sin(time * .7 + q.ph) * .35, q.z); dummy.rotation.set(Math.sin(time * .4 + q.ph) * .8, time * q.sp + q.ph, Math.cos(time * .3 + q.ph) * .5); dummy.scale.setScalar(1); dummy.updateMatrix(); papers.setMatrixAt(i, dummy.matrix); }
     papers.instanceMatrix.needsUpdate = true; lampLight.intensity = 13 + Math.sin(time * 3.1) * .4;

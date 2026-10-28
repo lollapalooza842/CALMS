@@ -11,7 +11,7 @@ const NIGHT = { top: 0x0a1030, mid: 0x1f2c5c, hor: 0x52578a, sun: 0xf2f5ff, fog:
 
 export function makeWorld(canvas, opt = {}) {
   topBar();
-  const sound = makeSound(() => document.documentElement.classList.contains("dark"));
+  const sound = makeSound();
   const html = document.documentElement;
   let still = matchMedia("(prefers-reduced-motion: reduce)").matches; try { if (localStorage.getItem("gr8-motion") === "off") still = true; } catch (e) {}
   let renderer;

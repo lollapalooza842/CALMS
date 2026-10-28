@@ -15,14 +15,17 @@
 
   /* ================= the soundtrack ================= */
   var music = null, AC = null;
-  function ctx() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume(); return AC; }
+  /* phones: "playback" asks the browser for bigger audio buffers (no crackle when the page is busy), the reverbs are
+     shorter and the pads use one oscillator a note instead of two, so the sound never stutters the picture */
+  var PHONE = matchMedia("(pointer: coarse)").matches || innerWidth < 760, IRK = PHONE ? .35 : 1;
+  function ctx() { if (!AC) { var K = window.AudioContext || window.webkitAudioContext; try { AC = new K({ latencyHint: "playback" }); } catch (e) { AC = new K(); } } if (AC.state === "suspended") AC.resume(); return AC; }
   function Music() {
     var A = ctx();
     var master = A.createGain(); master.gain.value = 0;
     var comp = A.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.knee.value = 12;
     master.connect(comp); comp.connect(A.destination);
     /* a long, soft room */
-    var rev = A.createConvolver(), len = A.sampleRate * 5, ir = A.createBuffer(2, len, A.sampleRate);
+    var rev = A.createConvolver(), len = Math.round(A.sampleRate * 5 * IRK), ir = A.createBuffer(2, len, A.sampleRate);
     for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
     rev.buffer = ir; var wet = A.createGain(); wet.gain.value = .55; rev.connect(wet); wet.connect(master);
     var dry = A.createGain(); dry.gain.value = .85; dry.connect(master);
@@ -38,9 +41,9 @@
     var BAR = 8, ci = 0, nextBar = 0, nextBell = 0, timer = 0, on = false;
     function pad(notes, t) {
       notes.forEach(function (m, k) {
-        [-6, 6].forEach(function (det) {
+        (PHONE ? [0] : [-6, 6]).forEach(function (det) {
           var o = A.createOscillator(), g = A.createGain(); o.type = k < 2 ? "triangle" : "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det + (Math.random() * 4 - 2);
-          var peak = (k < 2 ? .05 : .018);
+          var peak = (k < 2 ? .05 : .018) * (PHONE ? 1.5 : 1);   /* one oscillator instead of two on phones: a little louder each */
           g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 3); g.gain.setValueAtTime(peak, t + BAR - 1); g.gain.linearRampToValueAtTime(0, t + BAR + 3);
           o.connect(g); g.connect(lp); o.start(t); o.stop(t + BAR + 3.2);
         });
@@ -76,7 +79,7 @@
     var A = ctx(), master = A.createGain(); master.gain.value = 0;
     var comp = A.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; master.connect(comp); comp.connect(A.destination);
     var nz = A.createBuffer(1, A.sampleRate, A.sampleRate), nd = nz.getChannelData(0); for (var i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
-    var rev = A.createConvolver(), rl = A.sampleRate * 2, ir = A.createBuffer(2, rl, A.sampleRate); for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var k = 0; k < rl; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / rl, 3); }
+    var rev = A.createConvolver(), rl = Math.round(A.sampleRate * 2 * IRK), ir = A.createBuffer(2, rl, A.sampleRate); for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var k = 0; k < rl; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / rl, 3); }
     rev.buffer = ir; var wet = A.createGain(); wet.gain.value = .25; rev.connect(wet); wet.connect(master);
     var dl = A.createDelay(1), fb = A.createGain(), dwet = A.createGain(); dl.delayTime.value = 60 / 116 * .75; fb.gain.value = .32; dwet.gain.value = .35; dl.connect(fb); fb.connect(dl); dl.connect(dwet); dwet.connect(master);
     var mtof = function (m) { return 440 * Math.pow(2, (m - 69) / 12); }, BEAT = 60 / 116, S16 = BEAT / 4;
@@ -116,7 +119,7 @@
     var comp = A.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
     /* tape wow: everything passes through a short delay whose length drifts slowly, bending the pitch a hair */
     var wd = A.createDelay(.1); wd.delayTime.value = .014; master.connect(wd); wd.connect(lp); lp.connect(comp); comp.connect(A.destination);
-    var rev = A.createConvolver(), rl = A.sampleRate * 3.5, ir = A.createBuffer(2, rl, A.sampleRate); for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var k = 0; k < rl; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / rl, 2.8); }
+    var rev = A.createConvolver(), rl = Math.round(A.sampleRate * 3.5 * IRK), ir = A.createBuffer(2, rl, A.sampleRate); for (var c = 0; c < 2; c++) { var d = ir.getChannelData(c); for (var k = 0; k < rl; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / rl, 2.8); }
     rev.buffer = ir; var wet = A.createGain(); wet.gain.value = .5; rev.connect(wet); wet.connect(master);
     var dl = A.createDelay(2), fb = A.createGain(); dl.delayTime.value = .7; fb.gain.value = .35; dl.connect(fb); fb.connect(dl); dl.connect(rev); dl.connect(master);
     var wow = A.createOscillator(), wowG = A.createGain(); wow.frequency.value = .5; wowG.gain.value = .0018; wow.connect(wowG); wowG.connect(wd.delayTime); wow.start();
@@ -586,7 +589,7 @@
   /* ================= the rooms: Loans and About (rooms.js draws them; scene.js carries us there in smoke) ================= */
   var room = null, loUI = $("#loansUI"), abUI = $("#aboutUI");
   loUI.inert = true; abUI.inert = true;
-  function setRoom(name) {
+  function setRoom(name, via) {   /* via "beads": the scroll journey's way in, through the 8's light (homescroll.js) */
     name = name || null; if (!entered || name === room) return;
     if (talkOpen) setTalk(false, true);
     room = name; page = name || "home";
@@ -595,9 +598,10 @@
     if (swish && name) swish.g.gain.setTargetAtTime(0, ctx().currentTime, .05);
     var o = document.getElementById("orb"); if (o) o.classList.remove("beat"); body.classList.remove("beat");
     var want = name ? "#" + name : ""; if (location.hash !== want) history.pushState(null, "", want || location.pathname + location.search);
-    window.dispatchEvent(new CustomEvent("gr8:room", { detail: { room: name } }));
-    navRipple(); ripple();
+    window.dispatchEvent(new CustomEvent("gr8:room", { detail: { room: name, via: via } }));
+    if (via !== "beads") { navRipple(); ripple(); }
   }
+  window.GR8_GO = setRoom;
   /* the smoke has covered the screen and the place has changed: show that place's writing */
   addEventListener("gr8:place", function (e) {
     var at = e.detail; root.classList.toggle("at-loans", at === "loans"); root.classList.toggle("at-about", at === "about");
