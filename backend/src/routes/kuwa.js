@@ -4,7 +4,7 @@
 // anything Kuwa can't answer from the facts, or the visitor asks for a person). The page then offers a live agent (routes/live.js).
 // Kuwa answers questions about GR8 Lending's loans from what CALMS itself holds (the products and their rates, read live),
 // through an AI service chosen by what is in the server's .env:
-//   GEMINI_API_KEY     Google Gemini (has a free tier)      KUWA_MODEL to change the model (default gemini-flash-latest)
+//   GEMINI_API_KEY     Google Gemini (has a free tier)      KUWA_MODEL to put a model first (default gemini-2.5-flash-lite, then 2.5-flash)
 //   ANTHROPIC_API_KEY  Anthropic Claude                      KUWA_MODEL to change the model (default claude-haiku-4-5)
 // With neither, Kuwa still answers the common questions from a small built-in list, so the site never shows him broken.
 // Kuwa never sees or asks for anyone's personal details, cannot look up an application, and never promises approval.
@@ -76,16 +76,31 @@ const CANNED = [
 function canned(q) { for (const [re, a] of CANNED) if (re.test(q)) return a; return "Howdy! I can tell you about our loans, the papers you need, what a loan costs, or how to apply and pay. What would you like to know? [[go:loans]]"; }
 
 // ---- the AI services ----
-async function askGemini(sys, msgs) {
-  const model = process.env.KUWA_MODEL || "gemini-flash-latest";
+// Gemini: a light, fast model first; when Google says it is busy (or it takes too long), the next one is tried.
+// KUWA_MODEL in .env puts a model of your choice first.
+const GEMINI_MODELS = () => [...new Set([process.env.KUWA_MODEL, "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-flash-latest"].filter(Boolean))];
+async function askGeminiModel(model, sys, msgs) {
+  const generationConfig = { maxOutputTokens: 1200, temperature: .6 };
+  if (/2\.5/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 };   /* short answers: no thinking time, so replies come fast */
   const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-    method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY }, signal: AbortSignal.timeout(20000),
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: msgs.map((m) => ({ role: m.role === "kuwa" ? "model" : "user", parts: [{ text: m.text }] })),
-      generationConfig: { maxOutputTokens: 1200, temperature: .6 } }),
+    method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY }, signal: AbortSignal.timeout(12000),
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: msgs.map((m) => ({ role: m.role === "kuwa" ? "model" : "user", parts: [{ text: m.text }] })), generationConfig }),
   });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error((d.error && d.error.message) || "Gemini " + r.status);
-  return ((d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || []).map((p) => p.text || "").join("").trim();
+  if (!r.ok) { const e = new Error((d.error && d.error.message) || "Gemini " + r.status); e.status = r.status; throw e; }
+  const text = ((d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || []).map((p) => p.text || "").join("").trim();
+  if (!text) throw new Error("Gemini gave an empty answer");
+  return text;
+}
+async function askGemini(sys, msgs) {
+  let last; const t0 = Date.now();
+  for (const model of GEMINI_MODELS()) {
+    if (Date.now() - t0 > 18000) break;   /* the visitor has waited long enough: answer from the built-in list */
+    try { return await askGeminiModel(model, sys, msgs); }
+    catch (e) { last = e; console.error(`Kuwa (${model}):`, e.message);
+      if (e.status && ![404, 429, 500, 503].includes(e.status)) throw e; }   /* a wrong key won't work on any model: stop */
+  }
+  throw last;
 }
 async function askClaude(sys, msgs) {
   const model = process.env.KUWA_MODEL || "claude-haiku-4-5";
