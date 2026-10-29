@@ -557,9 +557,8 @@ html.ab-mem .snav { background: linear-gradient(180deg, rgba(18,11,8,.96) 0, rgb
 .hs-hint span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; } .hs-hint i { width: 1px; height: 34px; background: linear-gradient(rgba(255,255,255,0), #fff); animation: hsDrip 2.2s ease-in-out infinite; transform-origin: top; }
 @keyframes hsDrip { 0% { transform: scaleY(0); opacity: 1; } 60% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
 .ready .hs-hint { opacity: .85; transition-delay: 3.5s; } html:not([data-hs="0"]) .hs-hint, html.room-on .hs-hint, html.talk-open .hs-hint { opacity: 0 !important; transition-delay: 0s; }
-.hs-dots { position: fixed; z-index: 6; right: clamp(16px, 2.2vw, 34px); top: 50%; transform: translateY(-50%); display: grid; gap: 10px; opacity: 0; transition: opacity .6s; pointer-events: none; }
-.hs-dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.4); transition: background .4s, transform .4s; } .hs-dots i.on { background: #fff; transform: scale(1.5); }
-.ready .hs-dots { opacity: 1; } html.room-on .hs-dots, html.talk-open .hs-dots, html[data-hs="-1"] .hs-dots { opacity: 0; }
+
+
 @media (prefers-reduced-motion: reduce) { .hs-h .l > span, .hs-st { transition: none !important; } .hs-hint i { animation: none; } }
 
 /* ---- phones: built for the phone, not shrunk. A bar at the bottom within reach of the thumb (the menu, the name,
@@ -598,6 +597,6 @@ html.ab-mem .snav { background: linear-gradient(180deg, rgba(18,11,8,.96) 0, rgb
   /* the words and the journey sit above the bar */
   .scopy { bottom: calc(100px + env(safe-area-inset-bottom)); }
   .hs-k { font-size: 12.5px; margin-bottom: 2.4vh; } .hs-h { font-size: clamp(44px, 12.6vw, 64px); }
-  .hs-hint { display: none; } .hs-dots { right: 10px; gap: 8px; }
+  .hs-hint { display: none; } 
   .stage-page .draft { top: 12px; bottom: auto; }
 }
