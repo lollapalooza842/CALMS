@@ -7,3 +7,6 @@ calms.env
 dist/
 *.zip
 calms-upload/
+*.keystore
+android/tools/*.jar
+android/app/build/

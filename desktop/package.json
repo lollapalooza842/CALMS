@@ -1,7 +1,7 @@
 {
   "name": "calms-desktop",
   "productName": "CALMS",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "CALMS as a desktop app: the same screens in their own window, with the back end running inside.",
   "author": "CPE-3C Group 2-3, Bulacan State University",
@@ -52,7 +52,7 @@
       "uninstallerSidebar": "build/uninstallerSidebar.bmp",
       "installerHeader": "build/installerHeader.bmp",
       "include": "build/installer.nsh",
-      "artifactName": "CALMS Setup ${version}.${ext}"
+      "artifactName": "CALMS-Setup.${ext}"
     },
     "mac": {
       "icon": "build/icon.png",
