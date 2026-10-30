@@ -22,6 +22,7 @@
     clearTimeout(listT);
     api("").then(function (d) {
       me = d.me; chats = d.chats || []; drawList();
+      var want = +((/[?&]chat=(\d+)/.exec(location.search) || [])[1] || 0); if (want && cur == null && chats.some(function (c) { return c.id === want; })) { history.replaceState(null, "", location.pathname); openChat(want); }   /* from an alert card */
       var waiting = chats.filter(function (c) { return c.status === "waiting"; }).length;
       document.title = (waiting ? "(" + waiting + ") " : "") + baseTitle;
       listT = setTimeout(loadList, 3000);

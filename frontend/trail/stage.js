@@ -378,11 +378,12 @@
   function sw(id, on, fn) { var b = $(id); b.setAttribute("aria-checked", String(on)); b.addEventListener("click", function () { var v = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", String(v)); fn(v); pick(v); }); }
   /* a whole settings row is clickable, not just its switch (so its label really is something you can press) */
   Array.prototype.forEach.call(document.querySelectorAll(".card div.set-row"), function (r) { r.addEventListener("click", function (e) { if (e.target.closest(".sw")) return; var b = r.querySelector(".sw"); if (b) b.click(); }); });
-  /* Quality: High, Balanced or Low, for slower computers (scene.js listens for gr8:quality) */
-  var QS = ["high", "balanced", "low"], QN = { high: "High", balanced: "Balanced", low: "Low" }, qBtn = $("#qBtn"), q = "high";
-  try { q = localStorage.getItem("gr8-quality") || "high"; } catch (e) {} if (QS.indexOf(q) < 0) q = "high";
-  $(".v", qBtn).textContent = QN[q];
-  qBtn.addEventListener("click", function () { q = QS[(QS.indexOf(q) + 1) % 3]; $(".v", qBtn).textContent = QN[q]; try { localStorage.setItem("gr8-quality", q); } catch (e) {} window.dispatchEvent(new CustomEvent("gr8:quality", { detail: q })); pick(q !== "low"); });
+  /* Graphics: Low (the default, light on phones and batteries), Balanced or High, chosen here only (scene.js, portal3d.js
+     listen for gr8:quality; the number of beads and leaves follows on the next visit). Kept per computer as gr8-gfx. */
+  var QS = ["low", "balanced", "high"], QN = { high: "High", balanced: "Balanced", low: "Low" }, qBtn = $("#qBtn"), q = "low";
+  try { q = localStorage.getItem("gr8-gfx") || "low"; } catch (e) {} if (QS.indexOf(q) < 0) q = "low";
+  $(".v", qBtn).textContent = QN[q]; document.documentElement.classList.toggle("gfx-low", q === "low");
+  qBtn.addEventListener("click", function () { q = QS[(QS.indexOf(q) + 1) % 3]; $(".v", qBtn).textContent = QN[q]; document.documentElement.classList.toggle("gfx-low", q === "low"); try { localStorage.setItem("gr8-gfx", q); } catch (e) {} window.dispatchEvent(new CustomEvent("gr8:quality", { detail: q })); pick(q !== "low"); });
   var tips = true; try { tips = localStorage.getItem("gr8-tips") !== "off"; } catch (e) {}
   sw("#darkSw", root.classList.contains("dark"), function (v) { root.classList.toggle("dark", v); try { localStorage.setItem("gr8-theme", v ? "dark" : "light"); } catch (e) {} });
   sw("#tipSw", tips, function (v) { tips = v; try { localStorage.setItem("gr8-tips", v ? "on" : "off"); } catch (e) {} if (!v) say.classList.add("hide"); });

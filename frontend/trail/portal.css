@@ -11,7 +11,7 @@
   margin: 0; height: 100vh; height: 100svh; overflow: hidden; background: #e9b48c; color: var(--ink); font: 400 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
 html.dark .portal { --bg: #1b110c; --card: rgba(27,17,12,.88); --ink: #f3e3cc; --soft: rgba(243,227,204,.62); --faint: rgba(243,227,204,.14); --rule: rgba(243,227,204,.7); --acc: #f0a050; --acc2: #f3cf7a; --ok: #7cc79a; --cool: #9fb3c8; background: #120d0b; }
 .portal *, .portal *::before, .portal *::after { box-sizing: border-box; }
-#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#gl { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; display: block; }   /* the large viewport: the address bar slides over it instead of squashing it */
 .nogl-bg { position: fixed; inset: 0; display: none; background: radial-gradient(60% 50% at 70% 40%, #ffe3bd, transparent 70%), linear-gradient(#e7a77c, #f2c79b 55%, #9a6f68 56%, #6e4a4c); }
 html.dark .nogl-bg { background: radial-gradient(40% 40% at 70% 30%, #3a2a30, transparent 70%), linear-gradient(#0b0d18, #2a1c24 55%, #0c0c14 56%); }
 .nogl #gl { display: none; } .nogl .nogl-bg { display: block; }
@@ -171,9 +171,17 @@ html.dark .hz-l { background: linear-gradient(90deg, transparent, #bcd0ff 22%, #
 .sample[hidden], .payf[hidden], .tag[hidden] { display: none; }
 /* the sound button: five bars that sway while the lake is playing */
 .pn .snd { width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 3px; border: 0; border-radius: 50%; background: rgba(255,255,255,.14); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .3s; }
+.pn .gfx { display: inline-grid; justify-items: center; align-content: center; gap: 1px; height: 42px; min-width: 52px; padding: 0 10px; border: 0; border-radius: 21px; background: rgba(255,255,255,.14); color: #fff; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font: 600 12.5px/1 system-ui, sans-serif; }
+.pn .gfx small { font: 500 9px/1 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; opacity: .75; } .pn .gfx:hover { background: rgba(255,255,255,.26); }
 .pn .snd:hover { background: rgba(255,255,255,.26); }
 .pn .snd i { width: 2px; height: 5px; border-radius: 2px; background: #fff; transition: height .4s; }
 .pn .snd.on i { animation: sndBar 1.6s ease-in-out infinite; } .pn .snd.on i:nth-child(2) { animation-delay: -.4s; } .pn .snd.on i:nth-child(3) { animation-delay: -.9s; } .pn .snd.on i:nth-child(4) { animation-delay: -.2s; } .pn .snd.on i:nth-child(5) { animation-delay: -1.2s; }
 .pn .snd[aria-pressed="false"] i { height: 2px; opacity: .7; }
 @keyframes sndBar { 0%, 100% { height: 4px; } 50% { height: 15px; } }
 @media (prefers-reduced-motion: reduce) { .pn .snd.on i { animation: none; height: 9px; } }
+
+/* Low graphics (portal3d.js sets html.gfx-low): no frosted glass over the moving picture, solid tints instead */
+html.gfx-low *, html.gfx-low *::before, html.gfx-low *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.gfx-low .pn .snd, html.gfx-low .pn .gfx, html.gfx-low .pn .mode { background-color: rgba(40,22,14,.45); }
+a, button, [role="button"], input, label { touch-action: manipulation; }
+@media (max-width: 700px) { .pn .tools { gap: 8px; } .pn .gfx { min-width: 44px; height: 40px; padding: 0 9px; } .pn .gfx small { display: none; } .pn .snd { width: 40px; height: 40px; } }

@@ -1,0 +1,18 @@
+/* Live-chat alert cards (assets/js/chat-alert.js), the same on every staff page, western or classic */
+.ca-stack { position: fixed; z-index: 2147483000; right: 18px; bottom: 18px; display: grid; gap: 10px; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+.ca-card { pointer-events: auto; display: grid; grid-template-columns: 40px 1fr; gap: 4px 12px; padding: 14px 14px 10px; border-radius: 16px; background: #2a1810; color: #fbeee0;
+  box-shadow: 0 18px 44px rgba(20,8,2,.35), 0 0 0 1px rgba(255,220,180,.12) inset; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  opacity: 0; transform: translateY(14px) scale(.98); transition: opacity .28s ease, transform .34s cubic-bezier(.2,.8,.2,1); }
+.ca-card.in { opacity: 1; transform: none; } .ca-card.out { opacity: 0; transform: translateX(30px); }
+.ca-av { grid-row: span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #e8892a, #c0562f); color: #fff; font: 700 17px/1 system-ui, sans-serif; font-style: normal; position: relative; }
+.ca-av::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid #e8892a; animation: caRing 1.8s ease-out infinite; }
+@keyframes caRing { from { opacity: .9; transform: scale(.9); } to { opacity: 0; transform: scale(1.35); } }
+.ca-tx b { display: block; font-weight: 650; } .ca-tx span { display: block; color: #d9bfa9; font-size: 13px; }
+.ca-acts { grid-column: 2; display: flex; gap: 8px; margin-top: 6px; }
+.ca-go, .ca-x { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 16px; border-radius: 999px; border: 0; font: 600 14px/1 system-ui, sans-serif; cursor: pointer; text-decoration: none; }
+.ca-go { background: #e8892a; color: #fff; } .ca-go:hover { background: #f29a3d; } .ca-x { background: rgba(255,255,255,.1); color: #fbeee0; } .ca-x:hover { background: rgba(255,255,255,.18); }
+.ca-foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
+.ca-link { padding: 0; border: 0; background: none; color: #d9bfa9; font: 12.5px/1.4 system-ui, sans-serif; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.ca-go:focus-visible, .ca-x:focus-visible, .ca-link:focus-visible { outline: 2px solid #f3cf7a; outline-offset: 2px; }
+@media (max-width: 760px) { .ca-stack { right: 12px; left: 12px; width: auto; bottom: calc(84px + env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) { .ca-card { transition: none; } .ca-av::after { animation: none; } }

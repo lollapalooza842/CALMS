@@ -43,6 +43,9 @@ async function count(user) {
   return (s.includes("apps") ? r.apps : 0) + (s.includes("calls") ? r.calls : 0) + r.reqs + (s.includes("chats") ? r.chats : 0);
 }
 
+// the online applications nobody has encoded or closed yet (for the loan processor's My Queue, routes/queues.js)
+async function waiting() { await ensure(); return (await db.query("select reference, product, amount, term_months, full_name, status, staff_note, created_at from web_applications where status in ('received', 'called') order by created_at")).rows; }
+
 const router = express.Router();
 router.use(allow(...STAFF));
 router.use(wrap(async (req, res, next) => { await ensure(); next(); }));
@@ -50,7 +53,7 @@ router.use(wrap(async (req, res, next) => { await ensure(); next(); }));
 router.get("/", wrap(async (req, res) => {
   const s = SEES[req.user.role], kinds = ["offer", "paper", "payment"].filter((k) => s.includes(k));
   const [apps, calls, reqs, chats] = await Promise.all([
-    s.includes("apps") ? db.query(`select w.reference, w.product, w.amount, w.term_months, w.full_name, w.mobile, w.status, w.created_at, w.handled_at, w.staff_note, u.short_name handled_by, a.reference app_ref,
+    s.includes("apps") ? db.query(`select w.reference, w.product, w.amount, w.term_months, w.full_name, w.mobile, w.status, w.created_at, w.handled_at, w.staff_note, u.short_name handled_by, a.reference app_ref, a.status app_status, a.check_state app_check, (select l.number from loan_accounts l where l.application_id = a.id limit 1) account,
         (select count(*)::int from web_application_files f where f.web_application_id = w.id) papers
       from web_applications w left join users u on u.id = w.handled_by left join applications a on a.id = w.application_id
       where w.status in ('received', 'called') or w.created_at > now() - interval '30 days' order by (w.status = 'received') desc, w.created_at desc limit 100`) : { rows: [] },
@@ -63,11 +66,35 @@ router.get("/", wrap(async (req, res) => {
   ]);
   const mobile = (m) => { const d = String(m || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? "0" + d.slice(0, 3) + " " + d.slice(3, 6) + " " + d.slice(6) : m; };
   res.json({ role: req.user.role, sees: s, canEncode: ["loan_processor"].includes(req.user.role), canFile: ["loan_processor", "operations_manager", "system_administrator"].includes(req.user.role),
-    applications: apps.rows.map((w) => ({ reference: w.reference, product: w.product, amount: Number(w.amount), months: w.term_months, name: w.full_name, mobile: mobile(w.mobile), status: w.status, at: w.created_at, handledBy: w.handled_by, handledAt: w.handled_at, note: w.staff_note, appRef: w.app_ref, papers: w.papers })),
+    applications: apps.rows.map((w) => ({ reference: w.reference, product: w.product, amount: Number(w.amount), months: w.term_months, name: w.full_name, mobile: mobile(w.mobile), status: w.status, at: w.created_at, handledBy: w.handled_by, handledAt: w.handled_at, note: w.staff_note, appRef: w.app_ref, papers: w.papers, stage: stageOf(w), next: nextOf(w, req.user.role) })),
     callbacks: calls.rows.map((t) => ({ id: t.id, need: t.need, amount: t.amount, months: t.months, name: t.name, mobile: t.mobile ? mobile(t.mobile) : "", email: t.email, reach: t.reach, message: t.message, status: t.status, at: t.created_at, handledBy: t.handled_by, handledAt: t.handled_at, note: t.staff_note })),
     requests: reqs.rows.map((r) => ({ id: r.id, kind: r.kind, name: r.borrower_name, mobile: mobile(r.mobile), details: r.details, status: r.status, at: r.created_at, handledBy: r.handled_by, handledAt: r.handled_at, note: r.staff_note, appRef: r.app_ref, account: r.account })),
     chats: chats.rows[0] });
 }));
+
+// Where an online application is now, on the way from the website to a released loan: 0 received, 1 called, 2 in CALMS
+// (encoded), 3 verified (with the underwriters), 4 decided, 5 agreement signed, 6 released. -1 closed or turned down.
+function stageOf(w) {
+  if (w.status === "closed") return -1; if (!w.app_ref) return w.status === "called" ? 1 : 0;
+  return { draft: 2, submitted: 2, review: 3, approved: 4, awaiting: 4, declined: -1, rejected: -1, accepted: 5, funded: 6 }[w.app_status] ?? 2;
+}
+// What happens next, the screen it happens on, and whether this person can do it (the same roles the screens allow).
+function nextOf(w, role) {
+  const P = (does, page, who, can) => ({ does, page: page + (page.includes("?") ? "" : "?ref=" + w.app_ref), who, can: can.includes(role) });
+  if (w.status === "closed") return null;
+  if (!w.app_ref) return { does: w.status === "called" ? "Encode it in CALMS" : "Call the borrower, check the papers, then encode it", page: "", who: "A loan processor", can: role === "loan_processor" };
+  switch (w.app_status) {
+    case "draft": return P("Finish the papers and submit it", "documents", "The loan processor who encoded it", ["loan_processor"]);
+    case "submitted": return w.app_check === "returned" ? P("Fix the entries the verifier returned", "encode-verify", "The loan processor who encoded it", ["loan_processor"])
+      : P("Check the papers, then verify the entries (maker-checker)", "documents", "A different loan processor", ["loan_processor"]);
+    case "review": return P("Run the credit assessment and decide", "credit-assessment", "An underwriter", ["underwriter", "lead_underwriter", "operations_manager"]);
+    case "approved": return P("Draw up the agreement and get it signed", "loan-agreement", "A loan processor", ["loan_processor"]);
+    case "awaiting": return P("Tell the borrower the counter-offer and record the answer", "record-answer", "The sales agent or a loan processor", ["sales_agent", "loan_processor"]);
+    case "accepted": return P("Lock the signed agreement, then release the money", "loan-agreement", "A loan processor, then the disbursement officer", ["loan_processor"]);
+    case "funded": return w.account ? { does: "Released. Follow the payments on the loan account", page: "loan-account.html?no=" + w.account, who: "The loan account officer", can: ["loan_account_officer", "operations_manager"].includes(role) } : null;
+    default: return null;
+  }
+}
 
 // ---- online applications ----
 async function webApp(ref) { return (await db.query("select * from web_applications where reference = $1", [String(ref || "").toUpperCase()])).rows[0]; }
@@ -182,3 +209,4 @@ for (const [verb, status] of [["done", "done"], ["dismiss", "dismissed"]]) route
 module.exports = router;
 module.exports.ensure = ensure;
 module.exports.count = count;
+module.exports.waiting = waiting;

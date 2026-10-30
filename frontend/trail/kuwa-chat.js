@@ -24,6 +24,8 @@
   function keep() { try { sessionStorage.setItem("kuwa-log", JSON.stringify(log.slice(-20))); sessionStorage.setItem("kuwa-live", JSON.stringify(live)); } catch (e) {} }
   var I = {
     voice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="w1" d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path class="w2" d="M18 7a7 7 0 0 1 0 10"/><path class="x" d="M16 10l4 4M20 10l-4 4"/></svg>',
+    small: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v6h6M10 20v-6H4M14 10l6-6M10 14l-6 6"/></svg>',
+    big: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h5v5M9 20H4v-5M20 4l-6 6M4 20l6-6"/></svg>',
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>',
     send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
@@ -34,7 +36,8 @@
   var box = document.createElement("div"); box.className = "kc"; box.hidden = true; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true"); box.setAttribute("aria-label", "Talk to Kuwa");
   box.innerHTML = '<canvas class="kc-orb" aria-hidden="true"></canvas>' +
     '<div class="kc-agent" aria-live="polite"><div class="kc-ring"></div><div class="kc-face"><div class="kc-av">' + I.person + '</div><div class="kc-an">GR8 Lending</div><div class="kc-as">Finding someone for you</div></div></div>' +
-    '<div class="kc-top"><button type="button" class="kc-end">End chat</button><button type="button" class="kc-ic kc-voice" aria-pressed="true" aria-label="Kuwa\'s voice">' + I.voice + '</button><button type="button" class="kc-ic kc-x" aria-label="Close">' + I.close + "</button></div>" +
+    '<button type="button" class="kc-title" aria-label="Make the chat big again"><i class="kc-dot" aria-hidden="true"></i><b>Kuwa</b><span>GR8\'s guide</span></button>' +
+    '<div class="kc-top"><button type="button" class="kc-end">End chat</button><button type="button" class="kc-ic kc-min" aria-label="Make the chat small" title="Keep chatting in a small window">' + I.small + '</button><button type="button" class="kc-ic kc-voice" aria-pressed="true" aria-label="Kuwa\'s voice">' + I.voice + '</button><button type="button" class="kc-ic kc-x" aria-label="Close">' + I.close + "</button></div>" +
     '<div class="kc-left"><div class="kc-log" aria-live="polite"></div><div class="kc-start" hidden></div>' +
     '<form class="kc-in" autocomplete="off"><button type="button" class="kc-mic" aria-label="Speak to Kuwa">' + I.mic + '</button><input type="text" maxlength="400" placeholder="Ask me anything..." aria-label="Ask Kuwa">' +
     '<button type="submit" class="kc-send idle" aria-label="Send">' + I.send + "</button></form></div>";
@@ -47,8 +50,25 @@
   setVoice(voiceOn);
   vBtn.addEventListener("click", function () { setVoice(!voiceOn); });
   $(".kc-x", box).addEventListener("click", close);
+  /* small: the chat keeps going in a window in the corner (a sheet at the bottom on a phone), so the page stays in view
+     and can be scrolled and used; it stays small from page to page during the visit, until made big or closed */
+  var mini = false, minBtn = $(".kc-min", box), titleEl = $(".kc-title", box);
+  try { mini = sessionStorage.getItem("kuwa-win") === "mini"; } catch (e) {}
+  function setMini(v) {
+    mini = !!v; box.classList.toggle("mini", mini); box.setAttribute("aria-modal", String(!mini));
+    minBtn.innerHTML = mini ? I.big : I.small; minBtn.setAttribute("aria-label", mini ? "Make the chat big again" : "Make the chat small"); minBtn.title = mini ? "Full screen" : "Keep chatting in a small window";
+    if (box.classList.contains("on")) document.documentElement.classList.toggle("kc-open", !mini);
+    document.documentElement.classList.toggle("kc-mini", mini && !box.hidden);
+    cancelAnimationFrame(raf); if (!mini && !box.hidden) raf = requestAnimationFrame(draw);   /* the big orb only draws when it shows */
+    try { if (mini) sessionStorage.setItem("kuwa-win", "mini"); else sessionStorage.removeItem("kuwa-win"); } catch (e) {}
+    scrollDown();
+  }
+  minBtn.addEventListener("click", function () { setMini(!mini); if (!mini) input.focus({ preventScroll: true }); });
+  titleEl.addEventListener("click", function () { if (mini) { setMini(false); input.focus({ preventScroll: true }); } });
+  new MutationObserver(function () { $("b", titleEl).textContent = mode === "live" ? agentName.textContent : "Kuwa"; $("span", titleEl).textContent = mode === "live" ? agentStatus.textContent : "GR8's guide"; })
+    .observe(agentEl, { childList: true, subtree: true, characterData: true });
   $(".kc-end", box).addEventListener("click", endLive);
-  box.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+  box.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (mini) close(); else setMini(true); } });   /* Esc: big to small, small to closed */
   input.addEventListener("input", function () { if (state === "idle") send.classList.toggle("idle", !input.value.trim()); });
 
   /* ---- the words: Kuwa's on the left, yours on the right ---- */
@@ -326,13 +346,14 @@
     else if (!greeted && !log.length) { greeted = true; render(); var p = $(".kc-b.k p", logEl); p.textContent = ""; startEl.hidden = true;
       setTimeout(function () { var t = typeOut(p, HELLO, function () { startChips(true); }); if (voiceOn && TTS) { t.mode = "wait"; speak(HELLO, t); } }, 450); }
     else render();
-    requestAnimationFrame(function () { box.classList.add("on"); document.documentElement.classList.add("kc-open"); input.focus({ preventScroll: true }); });
-    cancelAnimationFrame(raf); raf = requestAnimationFrame(draw);
+    var stay = arguments[0] === "mini";   /* reopening the small window on the next page */
+    requestAnimationFrame(function () { box.classList.add("on"); setMini(stay); if (!stay) input.focus({ preventScroll: true }); });
   }
-  function close() { hush(); finishTyping(); if (rec) rec.abort(); box.classList.remove("on"); document.documentElement.classList.remove("kc-open"); setTimeout(function () { box.hidden = true; cancelAnimationFrame(raf); }, 400); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function close() { hush(); finishTyping(); if (rec) rec.abort(); box.classList.remove("on"); document.documentElement.classList.remove("kc-open", "kc-mini"); try { sessionStorage.removeItem("kuwa-win"); } catch (e) {} setTimeout(function () { box.hidden = true; cancelAnimationFrame(raf); }, 400); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
   addEventListener("resize", function () { if (!box.hidden) size(); });
   document.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("[data-kuwa-chat]"); if (t) { e.preventDefault(); e.stopImmediatePropagation(); open(); } }, true);
   if (mode === "live") poll();   /* a live chat carries on from page to page during the visit */
+  if (mini) { var reopen = function () { open("mini"); }; if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", reopen); else setTimeout(reopen, 0); }   /* and so does the small window */
   window.KUWA_CHAT = { open: open, close: close, ask: function (q) { open(); if (mode === "kuwa") ask(q); } };
 })();
 

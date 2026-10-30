@@ -112,6 +112,30 @@ html.dark .kc-ring { background: radial-gradient(circle at 50% 40%, #262321, #19
   .kc-agent { left: 50%; top: 24%; width: min(66vw, 36vh); } .kc-orb { transform-origin: 50% 25%; }
   .kc-ring { inset: 6%; } .kc-face { gap: 6px; } .kc-av { width: 64px; font-size: 24px; } .kc-an { font-size: 17px; } .kc-as { font-size: 12.5px; }
 }
+/* ---- small: the chat in a window in the corner (a sheet at the bottom on a phone); the page behind stays usable ---- */
+.kc-title { display: none; }
+.kc.mini { inset: auto 20px 20px auto; width: min(400px, calc(100vw - 32px)); height: min(560px, calc(100vh - 120px)); border-radius: 24px; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(40,16,4,.28), 0 0 0 1px rgba(30,23,20,.08); transition: opacity .3s ease; animation: kcMini .42s cubic-bezier(.2,.8,.2,1) both;
+  background: radial-gradient(240px 200px at 0% 0%, rgba(255,255,255,.95), transparent 70%), var(--kc-bg); }
+html.dark .kc.mini { box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); background: var(--kc-bg); }
+@keyframes kcMini { from { opacity: 0; transform: translateY(24px) scale(.96); } }
+.kc.mini .kc-orb, .kc.mini .kc-agent { display: none; }
+.kc.mini .kc-title { display: flex; align-items: center; gap: 10px; position: absolute; z-index: 3; top: 0; left: 0; right: 120px; height: 64px; padding: 0 0 0 18px; border: 0; background: none; color: inherit; cursor: pointer; text-align: left; font: inherit; }
+.kc.mini .kc-title b { font: 600 16px/1.1 var(--kc-sans); letter-spacing: -.01em; white-space: nowrap; } .kc.mini .kc-title span { font: 400 12.5px/1.1 var(--kc-sans); color: var(--kc-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kc-dot { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffeede, #ffc495 35%, #f58f52 70%, #cf5d30); box-shadow: 0 0 14px rgba(var(--kc-a-rgb), .55); animation: kcBreath 3.2s ease-in-out infinite; }
+@keyframes kcBreath { 50% { transform: scale(.9); box-shadow: 0 0 6px rgba(var(--kc-a-rgb), .35); } }
+.kc.mini .kc-top { top: 10px; right: 10px; gap: 6px; } .kc.mini .kc-ic, .kc.mini .kc-end { width: 44px; height: 44px; } .kc.mini .kc-end { width: auto; padding: 0 14px; font-size: 13.5px; }
+.kc.mini .kc-ic svg { width: 19px; height: 19px; } .kc.mini .kc-voice { display: none; }
+.kc.mini .kc-left { left: 12px; right: 12px; top: 64px; bottom: 12px; width: auto; transform: none; display: flex; flex-direction: column; justify-content: flex-end; border-top: 1px solid var(--kc-line); padding-top: 4px; }
+.kc.mini .kc-log { flex: 1 1 auto; max-height: none; min-height: 0; padding-bottom: 18px; }
+.kc.mini .kc-b p { font-size: 15px; } .kc.mini .kc-in { height: 54px; } .kc.mini .kc-start { margin-left: 0; margin-bottom: 10px; gap: 6px; } .kc.mini .kc-start .kc-chip, .kc.mini .kc-chip { height: 36px; font-size: 13.5px; }
+@media (max-width: 760px) {
+  .kc.mini { inset: auto 0 0 0; width: auto; height: min(58vh, 520px); height: min(58dvh, 520px); border-radius: 22px 22px 0 0; padding-bottom: env(safe-area-inset-bottom); animation-name: kcSheet; }
+  .stage-page .kc.mini { inset: auto 8px 92px 8px; border-radius: 22px; height: min(52vh, 480px); height: min(52dvh, 480px); }   /* the home page keeps its bottom bar in view */
+  .kc.mini .kc-left { bottom: calc(10px + env(safe-area-inset-bottom)); }
+  @keyframes kcSheet { from { transform: translateY(100%); } }
+}
+@media (prefers-reduced-motion: reduce) { .kc.mini, .kc-dot { animation: none !important; } }
 @media (prefers-reduced-motion: reduce) { .kc-b p.tw .w { transition: none; filter: none; } .kc-b.new, .kc-sys.new, .kc-chips, .kc-start, .kc-in::before, .kc-ring::before, .kc-av { animation: none !important; } }
 
 /* ---- the orb (every page): just an orb, glowing, a slow swirl of light inside ---- */

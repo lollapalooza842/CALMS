@@ -42,9 +42,21 @@
   .ws-detail div small { display: block; font: 400 12px/1.2 var(--figure); color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; } .ws-detail div b { font-weight: 400; overflow-wrap: anywhere; }
   .ws-detail .wide { grid-column: 1 / -1; } .ws-detail img.sig { max-width: 260px; background: #fff; border: 1px solid var(--ink-soft); }
   .ws-files a { display: inline-block; margin: 2px 10px 2px 0; color: var(--blue); }
+  .ws-steps { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; padding: 0; list-style: none; counter-reset: st; }
+  .ws-steps li { position: relative; padding: 4px 10px 3px 26px; border: 1px solid rgba(36,19,10,.25); background: rgba(36,19,10,.04); color: var(--ink-soft); font: 400 13px/1.2 var(--figure); counter-increment: st; }
+  .ws-steps li::before { content: counter(st); position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; border-radius: 50%; background: rgba(36,19,10,.18); color: #fff; font: 700 10px/15px var(--figure); text-align: center; }
+  .ws-steps li.done { color: var(--ink); background: rgba(46,110,60,.10); border-color: rgba(46,110,60,.45); } .ws-steps li.done::before { content: "✓"; background: var(--green); }
+  .ws-steps li.now { color: #fff; background: var(--wood-dark); border-color: var(--wood-dark); } .ws-steps li.now::before { background: var(--brass, #c8902a); }
+  .ws-steps.off li.now { background: var(--ink-soft); border-color: var(--ink-soft); } .ws-steps.off li::before { content: "×"; }
+  .ws-next { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 10px 12px; border: 2px dashed rgba(36,19,10,.35); }
+  .ws-next.mine { border-style: solid; border-color: var(--wood-dark); background: rgba(200,144,42,.12); }
+  .ws-next small { display: block; font: 400 12px/1.2 var(--figure); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); } .ws-next b { display: block; font-weight: 700; } .ws-next span { font-size: 14px; color: var(--ink-soft); }
+  .ws-card.flash { animation: wsFlash 2.4s ease 1; } @keyframes wsFlash { 0%, 40% { box-shadow: 0 0 0 4px var(--brass, #c8902a); } 100% { box-shadow: 4px 4px 0 var(--shade); } }
+  @media (max-width: 700px) { .ws-card { grid-template-columns: 1fr; } .ws-stamp { justify-self: start; } .ws-steps li { padding-right: 7px; font-size: 12px; } .ws-acts .ws-btn, .ws-next .ws-btn { flex: 1 1 auto; justify-content: center; } }
   .ws-foot { color: var(--text-soft); font-size: 14px; }
 </style>
 <script src="../assets/js/look.js"></script>
+<link rel="stylesheet" href="../assets/css/chat-alert.css">
 </head>
 <body>
 <div class="app">
@@ -71,5 +83,6 @@
 <script src="../assets/js/website.js"></script>
 <script src="../assets/js/entrance.js"></script>
 <script src="../assets/js/links.js"></script>
+<script src="../assets/js/chat-alert.js"></script>
 </body>
 </html>

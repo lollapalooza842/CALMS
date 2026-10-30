@@ -46,7 +46,7 @@ async function escalate() {
 const ROLE_KEY = { loan_processor: "processor", underwriter: "underwriter", lead_underwriter: "underwriter", disbursement_officer: "disbursement",
   loan_account_officer: "account", sales_agent: "agent", compliance_auditor: "auditor", system_administrator: "admin", operations_manager: "manager" };
 const KINDS = {
-  processor: { back: "Returned to you", docs: "Documents outstanding", draft: "Drafts to finish", verify: "Yours to verify", offer: "Walk-in counter-offers", agree: "Agreements to finish" },
+  processor: { web: "From the website", back: "Returned to you", docs: "Documents outstanding", draft: "Drafts to finish", verify: "Yours to verify", offer: "Walk-in counter-offers", agree: "Agreements to finish" },
   underwriter: { above: "Escalated to you", review: "Manual review", counter: "Counter-offer declined" },
   disbursement: { release: "Ready to release", wait: "Not ready yet" },
   account: { late: "Past due", due: "Due this week", paid: "Fully paid" },
@@ -118,6 +118,11 @@ async function queue(u) {
           { amt: Number(a.approved_amount || a.amount), term: (a.approved_term || a.term_months) + " months" }));
       }
     }
+    // online applications from the website (routes/website.js): the loan processor calls the borrower, then encodes it
+    const W = await require("./website").waiting().catch(() => []);
+    for (const w of W) items.push({ ref: w.reference, who: w.full_name, prod: w.product, amt: Number(w.amount), term: w.term_months + " months", kind: "web", hours: hoursSince(w.created_at),
+      stamp: w.status === "called" ? "Called" : "New online", tone: w.status === "called" ? "blue" : "red", act: w.status === "called" ? "Encode in CALMS" : "Call, then encode",
+      why: (w.status === "called" ? "Called" + (w.staff_note ? ": " + clip(w.staff_note, 120) : ". ") + " " : "Applied on the website. ") + "Check the papers and encode it; it then follows the usual steps.", page: "website.html?w=" + w.reference, escalated: false });
     extra = ["Submitted today", Number((await db.query("select count(*) n from applications where encoded_by = $1 and created_at > (now() at time zone 'Asia/Manila')::date at time zone 'Asia/Manila'", [u.id])).rows[0].n)];
   } else if (role === "underwriter") {
     const A = await apps(), lead = u.role === "lead_underwriter", lim = Number(u.approval_limit || 0);
@@ -227,7 +232,9 @@ router.get("/rail", wrap(async (req, res) => {
   if (k && Date.now() - k.t < 20000) return res.json(k.v);
   const [q, n] = await Promise.all([queue(req.user), oversight.notices(req.user)]);
   const web = await require("./website").count(req.user).catch(() => 0);   // what came in from the public website (routes/website.js)
-  const v = { queue: q.items.length, unread: n.filter((x) => x.un).length, website: web, role: req.user.role, practice: require("../lib/practice").on() };
+  const chats = ["sales_agent", "loan_processor", "loan_account_officer", "operations_manager", "system_administrator"].includes(req.user.role)
+    ? await db.query("select count(*)::int n from live_chats where status = 'waiting'").then((r) => r.rows[0].n, () => 0) : 0;   // Live chat (routes/live.js)
+  const v = { chats, queue: q.items.length, unread: n.filter((x) => x.un).length, website: web, role: req.user.role, practice: require("../lib/practice").on() };
   railKept.set(req.user.id, { t: Date.now(), v }); res.json(v);
 }));
 router.forgetRail = () => railKept.clear();

@@ -8,7 +8,7 @@
 @font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url(../assets/fonts/instrument-sans-latin-400-normal.woff2) format("woff2"); }
 .stage-page { --serif: "Instrument Serif", "Times New Roman", serif; --pmono: "IBM Plex Mono", "Courier New", monospace;
   height: 100vh; height: 100svh; overflow: hidden; background: #e9b48c; color: #fff; }
-#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#gl { position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100lvh; display: block; }   /* the large viewport: the address bar slides over it instead of squashing it */
 .nogl-bg { position: fixed; inset: 0; display: none; background: radial-gradient(60% 50% at 50% 40%, #ffe3bd, transparent 70%), linear-gradient(#e7a77c, #f2c79b 55%, #9a6f68 56%, #6e4a4c); }
 .nogl #gl { display: none; } .nogl .nogl-bg { display: block; }
 .stage-page .mono { font-family: var(--pmono); font-weight: 500; }
@@ -600,3 +600,13 @@ html.ab-mem .snav { background: linear-gradient(180deg, rgba(18,11,8,.96) 0, rgb
   .hs-hint { display: none; } 
   .stage-page .draft { top: 12px; bottom: auto; }
 }
+
+/* ---- phones and Low graphics (stage.js sets html.gfx-low) ----
+   A frosted-glass blur over a moving 3D picture has to be redrawn every frame, which is the heaviest thing a phone does
+   here; with Low graphics the glass becomes a solid tint instead. Pull-to-refresh is turned off on the home page, so a
+   swipe down to go back a view never reloads the page. Taps answer at once (no double-tap zoom wait). */
+html.gfx-low *, html.gfx-low *::before, html.gfx-low *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.gfx-low .snav .pill, html.gfx-low .snav .pop, html.gfx-low .card { background-color: rgba(58,30,18,.9); }
+html:has(body.stage-page), body.stage-page { overscroll-behavior: none; }
+a, button, [role="button"], input, label { touch-action: manipulation; }
+@media (max-width: 700px) { html.gfx-low .snav { background: linear-gradient(135deg, #8a4a2c, #5a2d1a) !important; } }

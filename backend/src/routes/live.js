@@ -102,6 +102,16 @@ staff.get("/", wrap(async (req, res) => {
     from live_chats c where c.status <> 'closed' or c.closed_at > now() - interval '12 hours' order by (c.status = 'closed'), c.created_at desc limit 60`);
   res.json({ me: req.user.id, chats: rows.map((c) => Object.assign(shapeChat(c), { last: c.last_text, unanswered: c.unanswered })) });
 }));
+// the alert every staff page asks for every few seconds (assets/js/chat-alert.js): who is waiting, and new messages in my chats
+staff.get("/pulse", wrap(async (req, res) => {
+  await table();
+  const { rows } = await db.query(`select c.id, c.name, c.status, c.created_at,
+      (select count(*)::int from live_messages m where m.chat_id = c.id and m.sender = 'visitor' and m.id > coalesce((select max(id) from live_messages a where a.chat_id = c.id and a.sender = 'agent'), 0)) unanswered,
+      (select max(id) from live_messages m where m.chat_id = c.id and m.sender = 'visitor') last_visitor
+    from live_chats c where (c.status = 'waiting' and c.visitor_seen_at > now() - interval '10 minutes') or (c.status = 'open' and c.agent_id = $1) order by c.created_at limit 20`, [req.user.id]);
+  const waiting = rows.filter((c) => c.status === "waiting"), mine = rows.filter((c) => c.status === "open" && c.unanswered);
+  res.set("Cache-Control", "no-store").json({ waiting: waiting.map((c) => ({ id: c.id, name: c.name, at: c.created_at })), mine: mine.map((c) => ({ id: c.id, name: c.name, unanswered: c.unanswered, last: c.last_visitor })) });
+}));
 staff.get("/:id", wrap(async (req, res) => {
   await table(); const c = await chat(req.params.id); if (!c) return res.status(404).json({ error: "No such chat." });
   if (c.agent_id === req.user.id && c.status === "open") await db.query("update live_chats set agent_seen_at = now() where id = $1", [c.id]);

@@ -36,10 +36,21 @@
     var live = a.status === "received" || a.status === "called";
     return '<li class="ws-card' + (live ? "" : " old") + '" data-ref="' + esc(a.reference) + '"><div><h3>' + esc(a.name) + "<small>" + esc(a.reference) + "</small></h3><p>" + esc(a.product) + " · " + peso(a.amount) + " · " + a.months + " months · " + a.papers + " paper" + (a.papers === 1 ? "" : "s") + " attached</p></div>" + stamp(a.status) +
       '<div class="ws-meta">Applied ' + when(a.at) + " · " + esc(a.mobile) + (a.handledBy ? " · " + (a.status === "encoded" ? "encoded" : a.status) + " by " + esc(a.handledBy) + " " + when(a.handledAt) : "") + (a.appRef ? ' · now <a href="application-detail.html?ref=' + esc(a.appRef) + '">' + esc(a.appRef) + "</a>" : "") + "</div>" +
-      (a.note ? '<div class="ws-msg">' + esc(a.note) + "</div>" : "") + '<div class="ws-detail-slot" style="grid-column:1/-1"></div>' +
+      (a.note ? '<div class="ws-msg">' + esc(a.note) + "</div>" : "") + steps(a.stage) + nextBox(a) + '<div class="ws-detail-slot" style="grid-column:1/-1"></div>' +
       '<div class="ws-acts"><button class="ws-btn light" type="button" data-do="view">' + (open[a.reference] ? "Hide details" : "Open the application") + "</button>" +
       (live ? (a.status === "received" ? '<button class="ws-btn light" type="button" data-do="called">I called them</button>' : "") + (data.canEncode ? '<button class="ws-btn" type="button" data-do="encode">Encode in CALMS</button>' : "") +
         '<input class="ws-note" placeholder="A note (needed to close it)" aria-label="Note"><button class="ws-btn light" type="button" data-do="close">Not going ahead</button>' : "") + '</div><p class="ws-err"></p></li>';
+  }
+  /* where it is on the way from the website to a released loan, and what happens next (routes/website.js stageOf, nextOf) */
+  var STEPS = ["Received", "Called", "In CALMS", "Verified", "Decided", "Signed", "Released"];
+  function steps(n) {
+    if (n == null) return ""; if (n < 0) return '<ol class="ws-steps off" aria-label="Progress"><li class="now">Closed</li></ol>';
+    return '<ol class="ws-steps" aria-label="Progress">' + STEPS.map(function (t, i) { return '<li class="' + (i < n ? "done" : i === n ? "now" : "") + '"' + (i === n ? ' aria-current="step"' : "") + ">" + t + "</li>"; }).join("") + "</ol>";
+  }
+  function nextBox(a) {
+    var x = a.next; if (!x) return "";
+    var go = x.page ? (x.can ? '<a class="ws-btn" href="' + esc(x.page) + '">' + (a.appRef ? "Continue on " + esc(a.appRef) : "Open") + " →</a>" : '<a class="ws-btn light" href="' + esc(x.page) + '">See it in CALMS</a>') : "";
+    return '<div class="ws-next' + (x.can ? " mine" : "") + '"><div><small>Next</small><b>' + esc(x.does) + "</b><span>" + (x.can ? "You can do this." : esc(x.who) + " does this" + (a.appRef ? "." : ". It is waiting in their My Queue.")) + "</span></div>" + go + "</div>";
   }
   function callCard(c) {
     return '<li class="ws-card' + (c.status === "done" ? " old" : "") + '" data-call="' + c.id + '"><div><h3>' + esc(c.name) + "<small>T-" + String(c.id).padStart(5, "0") + "</small></h3><p>" + esc(c.need) + (c.amount ? " · about " + esc(c.amount) : "") + (c.months ? " · " + esc(c.months) : "") + "</p></div>" + stamp(c.status === "new" ? "new" : c.status === "called" ? "called" : "done") +
@@ -94,5 +105,8 @@
     }, function (x) { busy = false; b.disabled = false; err.textContent = x.message; });
   });
 
+  /* from My Queue: website.html?w=W-… opens that application, on its tab, with its details showing */
+  var W = (/[?&]w=(W-\d{4}-\d{4,})/.exec(location.search) || [])[1];
+  if (W) { tab = "apps"; open[W] = '<div class="ws-detail"><div><small>Loading</small><b>…</b></div></div>'; details(W).then(function (h) { open[W] = h; draw(); var c = list.querySelector('[data-ref="' + W + '"]'); if (c) { c.scrollIntoView({ block: "center" }); c.classList.add("flash"); } }, function () { delete open[W]; draw(); }); }
   load(); setInterval(function () { if (!document.hidden && !busy && !document.activeElement.classList.contains("ws-note")) load(); }, 20000);
 })();

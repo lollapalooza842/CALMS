@@ -18,8 +18,12 @@ if (renderer) main();
 
 async function main() {
   prog(.1);
-  const QK = { high: 1, balanced: .75, low: .55 }; let quality = "high"; try { quality = localStorage.getItem("gr8-quality") || "high"; } catch (e) {} if (!QK[quality]) quality = "high";
-  let DPR = Math.min(devicePixelRatio || 1, 1.75) * QK[quality];
+  /* graphics: Low by default (settings, stage.js: gr8-gfx). Low draws fewer pixels, beads and leaves, a smaller fluid and no
+     multisampling; it is what a phone gets unless the visitor asks for more. */
+  const QK = { high: 1, balanced: .85, low: .72 }, QCAP = { high: 1.75, balanced: 1.5, low: 1.25 };
+  let quality = "low"; try { quality = localStorage.getItem("gr8-gfx") || "low"; } catch (e) {} if (!QK[quality]) quality = "low";
+  const LOW = quality === "low", HIGH = quality === "high";
+  let DPR = Math.min(devicePixelRatio || 1, QCAP[quality]) * QK[quality];
   renderer.setPixelRatio(DPR); renderer.setSize(innerWidth, innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const small = innerWidth < 700;
@@ -93,13 +97,13 @@ async function main() {
 \n#include <colorspace_fragment>\n
       }`
   };
-  const water = new Reflector(new THREE.PlaneGeometry(900, 900), { textureWidth: innerWidth * DPR * .5, textureHeight: innerHeight * DPR * .5, color: 0xb48a86, shader: waterShader, clipBias: .003 });
+  const water = new Reflector(new THREE.PlaneGeometry(900, 900), { textureWidth: innerWidth * DPR * (LOW ? .3 : .5), textureHeight: innerHeight * DPR * (LOW ? .3 : .5), color: 0xb48a86, shader: waterShader, clipBias: .003 });
   water.rotation.x = -Math.PI / 2; scene.add(water);
   prog(.5);
 
   /* ---- the "8", in beads ---- */
   try { await document.fonts.load('400 300px "Instrument Serif"'); } catch (e) {}
-  const N = small ? 4200 : 7200, H8 = small ? 9 : 8.6;
+  const N = LOW ? (small ? 2400 : 4400) : HIGH ? (small ? 4200 : 7200) : (small ? 3200 : 5600), H8 = small ? 9 : 8.6;
   /* two shapes the beads flow between, like emotion's heart and logo: GR8's "8" and the peso sign */
   function shape(draw) {
     const S = 360, cv = document.createElement("canvas"); cv.width = S; cv.height = S; const g = cv.getContext("2d");
@@ -195,7 +199,7 @@ async function main() {
   { const top = limb(new THREE.Vector3(0, 0, 0), new THREE.Vector3(.3, 5.2, 0), .75, .5);
     [[-3.6, 8.4, .6], [3.8, 8.8, -.4], [.4, 9.6, -1.2], [-1.6, 7.2, 2], [2.4, 7, 2.2]].forEach(([x, y, z]) => { const end = limb(top, new THREE.Vector3(x, y, z), .45, .16); tips.push(end);
       tips.push(limb(end, new THREE.Vector3(x * 1.45, y + rnd(.6, 1.6), z + rnd(-1, 1)), .16, .06)); }); }
-  const crownN = small ? 2600 : 5200, crown = new THREE.InstancedMesh(leafletGeo, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, emissive: 0x6a2a0c, emissiveIntensity: .55 }), crownN);
+  const crownN = LOW ? (small ? 1100 : 2400) : (small ? 2600 : 5200), crown = new THREE.InstancedMesh(leafletGeo, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, emissive: 0x6a2a0c, emissiveIntensity: .55 }), crownN);
   { const d = new THREE.Object3D(), CC = [0xff9a3c, 0xe8892a, 0xf3b25a, 0xd05a3a, 0xffc878, 0xb8402a, 0xffe0a0];
     for (let i = 0; i < crownN; i++) { const t = tips[i % tips.length], u = new THREE.Vector3().randomDirection().multiplyScalar(Math.cbrt(Math.random()) * rnd(1.8, 3)); u.y *= .62;
       d.position.copy(t).add(u); d.rotation.set(rnd(0, 6.3), rnd(0, 6.3), rnd(0, 6.3)); const sc = rnd(.42, .72); d.scale.set(sc, sc, sc); d.updateMatrix(); crown.setMatrixAt(i, d.matrix);
@@ -319,9 +323,9 @@ async function main() {
      over the picture like cream poured into coffee: it never bends the picture, it only clouds it, softly lit. */
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2)), postScene = new THREE.Scene(), postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1); postScene.add(quad);
   const canFloat = renderer.capabilities.isWebGL2;
-  const rtScene = new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: canFloat ? THREE.HalfFloatType : THREE.UnsignedByteType, samples: canFloat ? 4 : 0 });
+  const rtScene = new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: canFloat ? THREE.HalfFloatType : THREE.UnsignedByteType, samples: canFloat && !LOW ? 4 : 0 });
   const V = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
-  const SIM = small ? 96 : 128, DYE = small ? 384 : 640;
+  const SIM = LOW ? (small ? 64 : 96) : small ? 96 : 128, DYE = LOW ? (small ? 256 : 384) : small ? 384 : 640, JACOBI = LOW ? 6 : 12;
   const gridOf = (r) => { const a = innerWidth / innerHeight; return a >= 1 ? [Math.round(r * a), r] : [r, Math.round(r / a)]; };
   const fOpt = { type: THREE.HalfFloatType, format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false, wrapS: THREE.ClampToEdgeWrapping, wrapT: THREE.ClampToEdgeWrapping };
   function pair(r) { const [w, h] = gridOf(r); let a = new THREE.WebGLRenderTarget(w, h, fOpt), b = new THREE.WebGLRenderTarget(w, h, fOpt);
@@ -376,7 +380,7 @@ async function main() {
     divM.uniforms.uVelocity.value = velo.read.texture; divM.uniforms.tx.value = velo.tx; pass(divM, one.write); one.swap();
     fadeM.uniforms.uTexture.value = pres.read.texture; pass(fadeM, pres.write); pres.swap();
     presM.uniforms.uDivergence.value = one.read.texture; presM.uniforms.tx.value = velo.tx;
-    for (let i = 0; i < 12; i++) { presM.uniforms.uPressure.value = pres.read.texture; pass(presM, pres.write); pres.swap(); }
+    for (let i = 0; i < JACOBI; i++) { presM.uniforms.uPressure.value = pres.read.texture; pass(presM, pres.write); pres.swap(); }
     gradM.uniforms.uPressure.value = pres.read.texture; gradM.uniforms.uVelocity.value = velo.read.texture; gradM.uniforms.tx.value = velo.tx; pass(gradM, velo.write); velo.swap();
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = velo.read.texture; advectM.uniforms.tx.value = velo.tx; advectM.uniforms.dt.value = dt; advectM.uniforms.dissipation.value = .35; pass(advectM, velo.write); velo.swap();
     advectM.uniforms.uVelocity.value = velo.read.texture; advectM.uniforms.uSource.value = dye.read.texture; advectM.uniforms.dissipation.value = 1.1; pass(advectM, dye.write); dye.swap();
@@ -453,12 +457,22 @@ async function main() {
   addEventListener("gr8:still", (e) => { still = e.detail.on; });
 
   /* ================= resize ================= */
-  function resize() {
-    const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    rtScene.setSize(w * DPR, h * DPR); rtWin.setSize(w * DPR * .5, h * DPR * .5); water.getRenderTarget().setSize(w * DPR * .5, h * DPR * .5); beadU.scale.value = h * DPR * .5; velo.size(); dye.size(); pres.size(); one.size();
+  /* a phone's address bar showing or hiding changes the height a little while scrolling: that is not a real resize, and
+     rebuilding every picture for it is what makes a phone stutter, so it is ignored (the canvas is sized by CSS) */
+  let lastW = innerWidth, lastH = innerHeight; const TOUCH = matchMedia("(pointer: coarse)").matches;
+  function resize(force) {
+    const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;   /* the canvas is the large viewport (stage.css) */
+    if (force !== true && TOUCH && w === lastW && Math.abs(h - lastH) < 180) return; lastW = w; lastH = h;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    rtScene.setSize(w * DPR, h * DPR); rtWin.setSize(w * DPR * .5, h * DPR * .5); water.getRenderTarget().setSize(w * DPR * (LOW ? .3 : .5), h * DPR * (LOW ? .3 : .5)); beadU.scale.value = h * DPR * .5; velo.size(); dye.size(); pres.size(); one.size();
   }
   addEventListener("resize", resize);
-  addEventListener("gr8:quality", (e) => { const q = e.detail; if (!QK[q]) return; DPR = Math.min(devicePixelRatio || 1, 1.75) * QK[q]; renderer.setPixelRatio(DPR); resize(); });
+  addEventListener("gr8:quality", (e) => { const q = e.detail; if (!QK[q]) return; DPR = dprBase = Math.min(devicePixelRatio || 1, QCAP[q]) * QK[q]; renderer.setPixelRatio(DPR); resize(true); });
+  /* keeping it smooth: if frames take too long (a busy or older phone), draw fewer pixels; give them back when it is easy */
+  let dprBase = DPR, perfN = 0, perfT = 0, easy = 0;
+  function pace(rdt) { if (document.hidden) return; perfN++; perfT += rdt; if (perfT < 2) return; const ms = perfT / perfN * 1000; perfN = 0; perfT = 0;
+    if (ms > 23 && DPR > dprBase * .6 + .01) { DPR = Math.max(dprBase * .6, DPR * .85); easy = 0; renderer.setPixelRatio(DPR); resize(true); }
+    else if (ms < 14 && DPR < dprBase - .01) { if (++easy >= 3) { easy = 0; DPR = Math.min(dprBase, DPR * 1.1); renderer.setPixelRatio(DPR); resize(true); } } else easy = 0; }
 
   /* ================= every frame ================= */
   /* ---- the rooms (rooms.js) and moving between places ---- */
@@ -520,10 +534,11 @@ async function main() {
     worldList.forEach((o) => { o.visible = false; }); rooms.about.visible = true; scene.fog = fog; eight.visible = false;
     rooms.win.uniforms.res.value.set(rtScene.width, rtScene.height); rooms.win.uniforms.on.value = 1;
   }
-  const clock = new THREE.Clock(); let time = 0;
+  const clock = new THREE.Clock(), docEl = document.documentElement; let time = 0;
   function frame() {
     const rdt = Math.min(clock.getDelta(), .12), dt = Math.min(rdt, .05);   /* rdt: real time, for the timed transitions on a slow phone */
     if (paused && !wipeDir && !flashDir && inRoom === "about") { requestAnimationFrame(frame); return; }
+    if (docEl.classList.contains("kc-open")) { requestAnimationFrame(frame); return; }   /* Kuwa's full screen covers it: draw nothing (it is the phone's battery) */
     if (!still) time += dt;
     const flowAwake = performance.now() - stirAt < 7000;   /* the milk settles in a few seconds; after that the fluid sleeps */
     /* day and night, eased */
@@ -679,12 +694,13 @@ async function main() {
     renderer.setRenderTarget(rtScene); renderer.render(scene, camera);
     outMat.uniforms.tDye.value = dye.read.texture; outMat.uniforms.dtx.value = dye.tx; outMat.uniforms.time.value = time; quad.material = outMat;
     renderer.setRenderTarget(null); renderer.render(postScene, postCam);
-    requestAnimationFrame(frame);
+    pace(rdt); requestAnimationFrame(frame);
   }
   /* first leaves placed, then go */
   for (let i = 0; i < LN; i++) { const l = L[i]; dummy.position.set(l.x, l.y, l.z); dummy.rotation.set(l.r, l.r, 0); dummy.updateMatrix(); leaves.setMatrixAt(i, dummy.matrix); }
   if (still) { gather = .999; gathering = true; }
   prog(.95); renderer.compile(scene, camera); grove.visible = office.visible = false; renderer.compile(scene, camera);   /* both light setups, so going to the far shore never stalls */
+  if (canvas.clientHeight && Math.abs(canvas.clientHeight - innerHeight) > 2) resize(true);   /* the canvas is the large viewport on a phone */
   requestAnimationFrame(frame);
   setTimeout(() => { prog(1); dispatchEvent(new Event("gr8:ready")); }, 200);
 }

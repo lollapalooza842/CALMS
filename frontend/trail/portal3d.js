@@ -15,10 +15,12 @@ export function makeWorld(canvas, opt = {}) {
   const html = document.documentElement;
   let still = matchMedia("(prefers-reduced-motion: reduce)").matches; try { if (localStorage.getItem("gr8-motion") === "off") still = true; } catch (e) {}
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" }); }
+  let q = "low"; try { q = localStorage.getItem("gr8-gfx") || "low"; } catch (e) {}   /* graphics: Low unless chosen in the settings */
+  document.documentElement.classList.toggle("gfx-low", q !== "balanced" && q !== "high");
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: q !== "low", powerPreference: q === "high" ? "high-performance" : "default" }); }
   catch (e) { document.body.classList.add("nogl"); requestAnimationFrame(() => { document.body.classList.add("ready"); horizon(); }); return null; }
-  const QK = { high: 1, balanced: .8, low: .6 }; let q = "high"; try { q = localStorage.getItem("gr8-quality") || "high"; } catch (e) {}
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5) * (QK[q] || 1));
+  const QK = { high: 1, balanced: .85, low: .75 }, QCAP = { high: 1.75, balanced: 1.5, low: 1.25 }; if (!QK[q]) q = "low";
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, QCAP[q]) * QK[q]);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, 1, .1, 900);
@@ -99,7 +101,8 @@ export function makeWorld(canvas, opt = {}) {
 
   /* the picture's centre sits to the right of the card on wide screens */
   let shift = 0;
-  function size() { const W = innerWidth, H = innerHeight; renderer.setSize(W, H, false); camera.aspect = W / H;
+  let lw = 0, lh = 0; const touch = matchMedia("(pointer: coarse)").matches;   /* the phone's address bar sliding in and out is not a resize */
+  function size() { const W = canvas.clientWidth || innerWidth, H = canvas.clientHeight || innerHeight; if (touch && lw === W && Math.abs(H - lh) < 180) return; lw = W; lh = H; renderer.setSize(W, H, false); camera.aspect = W / H;
     shift = W > 760 ? (opt.shift == null ? .2 : opt.shift) : 0;
     if (shift) camera.setViewOffset(W, H, -W * shift, 0, W, H); else camera.setViewOffset(W, H, 0, H * .3, W, H);   /* on a phone the card covers the bottom: the picture's centre moves up */
     camera.fov = W > 760 ? 42 : 52; camera.updateProjectionMatrix(); if (opt.onSize) opt.onSize(W, H); }
@@ -108,13 +111,14 @@ export function makeWorld(canvas, opt = {}) {
   /* labels: HTML over the picture, placed at points in the world each frame */
   const labels = [], v = new THREE.Vector3();
   function label(el, at) { labels.push({ el, at }); return el; }
-  function placeLabels() { const W = innerWidth, H = innerHeight;
+  function placeLabels() { const W = canvas.clientWidth || innerWidth, H = canvas.clientHeight || innerHeight;
     labels.forEach((l) => { v.copy(l.at).project(camera); const behind = v.z > 1; l.el.style.transform = `translate(${((v.x + 1) / 2 * W).toFixed(1)}px, ${((1 - v.y) / 2 * H).toFixed(1)}px) translate(-50%, -100%)`; l.el.style.visibility = behind ? "hidden" : ""; }); }
 
   /* the frame loop */
   const updates = []; let last = performance.now(), time = 0, raf = 0, running = true;
   function frame(now) {
     raf = requestAnimationFrame(frame);
+    if (document.documentElement.classList.contains("kc-open")) { last = now; return; }   /* Kuwa's full screen covers it */
     const dt = Math.min(.05, (now - last) / 1000); last = now; if (!still) time += dt; U.time.value = time;
     if (cam.from) { const k = Math.min(1, (now - cam.t0) / cam.dur), e = ease(k); camera.position.lerpVectors(cam.from.pos, cam.to.pos, e); curLook.lerpVectors(cam.from.look, cam.to.look, e);
       if (k >= 1) { cam.pos.copy(cam.to.pos); cam.look.copy(cam.to.look); cam.from = null; const d = cam.done; cam.done = null; if (d) d(); } }
@@ -159,6 +163,11 @@ function horizon() {
 function topBar() {
   const tools = document.querySelector(".pn .tools"), m0 = document.querySelector(".pn .mode");
   if (tools && m0 && !tools.querySelector(".snd")) { const b = document.createElement("button"); b.type = "button"; b.className = "snd"; b.setAttribute("aria-label", "Sound"); b.setAttribute("aria-pressed", "false"); b.innerHTML = "<i></i><i></i><i></i><i></i><i></i>"; tools.insertBefore(b, m0); }
+  /* graphics: Low unless the visitor picks more (the same setting as the home page's, gr8-gfx); a change redraws the page */
+  if (tools && m0 && !tools.querySelector(".gfx")) { const G = ["low", "balanced", "high"], GN = { low: "Low", balanced: "Mid", high: "High" }; let g = "low"; try { g = localStorage.getItem("gr8-gfx") || "low"; } catch (e) {} if (!GN[g]) g = "low";
+    const b = document.createElement("button"); b.type = "button"; b.className = "gfx"; b.title = "Graphics: Low is lightest (best on phones). High looks sharpest."; b.setAttribute("aria-label", "Graphics: " + GN[g]); b.innerHTML = "<small>Graphics</small><b>" + GN[g] + "</b>";
+    b.addEventListener("click", () => { g = G[(G.indexOf(g) + 1) % 3]; try { localStorage.setItem("gr8-gfx", g); } catch (e) {} b.querySelector("b").textContent = GN[g]; b.setAttribute("aria-label", "Graphics: " + GN[g]); setTimeout(() => location.reload(), 250); });
+    tools.insertBefore(b, m0); }
   const html = document.documentElement, mode = document.querySelector(".pn .mode"), menu = document.querySelector(".pn .menu-btn"), mob = document.querySelector(".pn .mob");
   if (mode) mode.addEventListener("click", () => { const d = !html.classList.contains("dark"); html.classList.toggle("dark", d); try { localStorage.setItem("gr8-theme", d ? "dark" : "light"); } catch (e) {} mode.setAttribute("aria-pressed", String(d)); });
   if (menu && mob) { menu.addEventListener("click", () => { const o = !mob.classList.contains("open"); mob.classList.toggle("open", o); menu.setAttribute("aria-expanded", String(o)); });
